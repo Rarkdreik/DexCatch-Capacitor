@@ -1,0 +1,8 @@
+{
+  "name": "PokDex",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "b8b5f764"
+}
