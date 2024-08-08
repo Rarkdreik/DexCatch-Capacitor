@@ -1,0 +1,43 @@
+// ######  Personaje Imagen  ##########################
+#wrapper {
+    position: fixed;
+}
+
+.imgAvatar {
+    height: 40vh;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.imgMapa {
+    height: 150px;
+    width: 270px;
+}
+
+// ######  Bloque derecho  ##########################
+// ###################  Region  #####################
+.letraregion {
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+// ###################  Generar QR   #####################
+
+// ######  Estructura con lineas  ##########################
+
+.bordeabajo {
+    border-bottom: solid 1px white;
+}
+
+.bordederecha {
+    border-right: solid 1px white;
+}
+
+// ######  Botones  ##########################
+
+.marginTopButton {
+    margin-top: 10px !important;
+}
+
+.btn {
+    width: 100%;
+}

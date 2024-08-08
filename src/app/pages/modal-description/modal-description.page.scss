@@ -1,0 +1,102 @@
+* {
+    color: white;
+}
+
+ion-card {
+    height: 50%;
+    border: 1px solid gold;
+    padding: 5px !important;
+    margin-bottom: 15px !important;
+}
+
+ion-fab {
+    position: absolute !important;
+    bottom: 2% !important;
+}
+
+.titulo {
+    font-size: 15px !important;
+    font-weight: bold;
+}
+
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
+}
+
+// .tarjeta {
+//     margin: 2%;
+//     padding: 5%;
+// }
+
+.tipoVACIO {
+    display: none;
+}
+
+.width-100 {
+    width: 100% !important;
+}
+
+.padding-10 {
+    padding: 10px !important;
+}
+
+// * {
+//     color: white;
+// }
+
+.margin-auto {
+    margin: auto !important;
+}
+
+.margin-bottom-5 {
+    margin-bottom: 5px !important;
+}
+
+.margin-bottom-15 {
+    margin-bottom: 15% !important;
+}
+
+// .icon {
+//     width: 50px;
+//     position: relative;
+//     bottom: 2px;
+// }
+
+.no-evolucion {
+    width: 70%;
+    margin: auto;
+    display: block;
+}
+
+.font-size-10 {
+    font-size: 10px !important;
+}
+
+.en-linea {
+    display: inline-flex !important;
+    justify-content: space-between !important;
+}
+
+.bordeabajo {
+    border-bottom: solid 1px #ffffff;
+}
+
+.bordearriba {
+    border-top: solid 1px #ffffff;
+}
+
+.bordederecha {
+    border-right: solid 1px #ffffff;
+}
+
+.borde {
+    border: solid 1px #ffffff;
+}
+
+.letraregion {
+    text-transform: uppercase;
+}

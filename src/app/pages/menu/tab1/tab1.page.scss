@@ -1,0 +1,98 @@
+* {
+    font-family: Verdana;
+    font-weight: bold;
+    color: white;
+}
+
+#header {
+    margin: auto !important;
+    width: inherit;
+    height: 100vw;
+}
+
+ion-content {
+    background-color: #1b1f22 !important;
+}
+
+#virtualScroll {
+    margin: auto !important;
+    // height: 100% !important;
+    width: 100% !important;
+}
+
+.cardPokemon {
+    width: 100%;
+    margin: 0px !important;
+    padding: 0px !important;
+    display: grid !important;
+    margin-bottom: 10px !important;
+    border: 1px solid gold;
+}
+
+.pokeimagen {
+    width: 110px !important;
+    margin-bottom: 5px !important;
+}
+
+.pokenombre > * {
+    font-size: 18px;
+    font-family: Verdana !important;
+    margin-bottom: 5px !important;
+}
+
+.pokeiconos,
+.pokeiconos>* {
+    width: 20px !important;
+    margin-bottom: 5px !important;
+}
+
+.centrar {
+    margin: auto !important;
+    text-align: center;
+}
+
+.dblock {
+    display: block;
+}
+
+.elementos {
+    margin-top: 5px !important;
+    margin-bottom: 10px !important;
+}
+
+.elementos > * {
+    font-size: 11px;
+}
+
+.iconos {
+    margin-top: 10px !important;
+    margin-bottom: 5px !important;
+}
+
+.pokeball {
+    background-image: url('../../../../assets/images/item_pokemon/pokeball.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px 100px;
+}
+
+.superball {
+    background-image: url('../../../../assets/images/item_pokemon/superball.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px 100px;
+}
+
+.ultraball {
+    background-image: url('../../../../assets/images/item_pokemon/ultraball.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px 100px;
+}
+
+.masterball {
+    background-image: url('../../../../assets/images/item_pokemon/masterball.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px 100px;
+}

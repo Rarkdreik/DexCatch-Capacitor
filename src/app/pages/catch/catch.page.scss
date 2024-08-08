@@ -1,0 +1,646 @@
+// #################################################
+// ######## BLOQUE CAMPO BATALLA ###################
+// #################################################
+.fondoStatsBatalla {
+  padding: 5px;
+  border-radius: 10px !important;
+  border: 1px solid gold;
+}
+
+.fondo-batalla {
+  background-image: url(../../../assets/images/test.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 10px;
+}
+
+// #################################################
+// ######## SECCION UNO POKEMON RIVAL ##############
+// #################################################
+// Vida Salvaje
+.barraVida {
+  height: 17px;
+  display: flex;
+  width: 100%;
+  border: 1px solid black;
+}
+
+.imgSobreImg {
+  left: 0px;
+  position: absolute;
+  top: 4%;
+}
+
+.textoImgCentrado1 {
+  position: absolute;
+  top: 24%;
+  left: 50%;
+  margin-left: -20px;
+  color: black
+}
+
+// Imagen Batalla
+.pokesalvaje {
+  height: 140px;
+}
+
+.pokemonbatalla {
+  transform: rotateY(180deg);
+  height: 150px;
+}
+
+// #################################################
+// ######## SECCION DOS POKEMON ALIADO #############
+// #################################################
+// Texto barra de vida
+.textoImgCentrado2 {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  margin-left: -20px;
+  color: black
+}
+
+// Texto barra de exp
+.textoImgCentrado3 {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  margin-left: -20px;
+  color: black;
+}
+
+// #################################################
+// ######## FIN BLOQUE CAMPO BATALLA ###############
+// #################################################
+
+// #################################################
+// ######## BLOQUE EQUIPO POKEMON ##################
+// #################################################
+.equipo-batalla {
+  padding-top: 10px;
+}
+
+.cardPokemon {
+  width: 30%;
+  height: 150px;
+  margin: 5px;
+}
+
+.equipo-poke {
+  display: flex;
+}
+
+.equipopoke {
+  border-radius: 15px;
+  justify-content: center;
+  align-content: center;
+  padding: 11px;
+  line-height: 1.8;
+  background-color: #1b1f22 !important;
+  border-radius: 10px !important;
+  border: 1px solid gold;
+}
+
+.equipopoke * {
+  font-size: 9px;
+  padding: unset;
+  margin: unset;
+}
+
+.scene {
+  width: 100%;
+  height: 150px;
+}
+
+.tarjeta {
+  height: 100%;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+
+.tarjeta2 {
+  height: 100%;
+}
+
+.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.tarjeta__face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.tarjeta__face--back {
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
+
+.pokemon2 {
+  height: 90px !important;
+}
+
+// #################################################
+// ######## FIN BLOQUE EQUIPO POKEMON ##############
+// #################################################
+
+// #################################################
+// ######## BLOQUE ICONOS BATALLA ##################
+// #################################################
+.icon {
+  padding: 5px !important;
+  border-radius: 10px !important;
+  margin: 5px !important;
+}
+
+.iconos {
+  height: 100px;
+}
+
+.iconless, .iconless > *, .iconless > * > *, .iconless > * > * > *, .iconless > * > * > * > * {
+  height: 100%;
+}
+
+// #################################################
+// ######## ESTILOS GENERALES ######################
+// #################################################
+* {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.absoluto {
+  position: absolute;
+  background-color: #1b1f22;
+}
+
+.centrar {
+  justify-content: center;
+  display: flex;
+}
+
+.width-100 {
+  width: 100% !important;
+}
+
+.row {
+  margin-right: unset !important;
+  margin-left: unset !important;
+}
+
+.col,
+.col-1,
+.col-2,
+.col-3,
+.col-4,
+.col-5,
+.col-6,
+.col-7,
+.col-8,
+.col-9,
+.col-10,
+.col-11,
+.col-12 {
+  padding-right: unset;
+  padding-left: unset;
+}
+
+.modal {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1000000;
+}
+
+// Margin y Padding
+.margin-top-5 {
+  margin-top: 5px !important;
+}
+
+.margin-bottom-5 {
+  margin-bottom: 5px;
+}
+
+.padding-bottom-5 {
+  padding-bottom: 5px;
+}
+
+// Mochila
+.cardBall {
+  width: 45%;
+  display: flex;
+  justify-content: center;
+  margin: 5px;
+  border-radius: 10px;
+  border: 1px solid gold;
+  background-color: #1b1f22 !important;
+  height: 150px;
+}
+
+.cardBall > *, .cardBall > * > *, .cardBall > * > * > * {
+  height: 100%;
+}
+
+.ball {
+  height: 90%;
+}
+
+.badge_ball {
+  width: 100%;
+  display: grid;
+  padding: 0 5% 5% 5%;
+  justify-content: center;
+  justify-items: center;
+  align-content: center;
+  align-items: center;
+}
+
+.medalla {
+  // background: none;
+  background-color: #313131;
+  border-radius: 20px;
+  display: grid;
+  width: 100%;
+}
+
+.cls-1 {
+  fill: #e8e73c;
+}
+
+// #################################################
+// ######### HIDDEN STYLES #########################
+// #################################################
+
+.hide {
+  visibility: hidden;
+}
+
+.show {
+  visibility: show;
+}
+
+.block {
+  display: block;
+}
+
+.none {
+  display: none;
+}
+
+// #################################################
+// ######## POKEBALL ANIMATION #####################
+// #################################################
+
+a {
+  margin: 4px;
+  height: min-content;
+  box-shadow: none;
+}
+
+.catch {
+  background: #ff041d00;
+  border-radius: 50%;
+  position: absolute;
+  height: 25px !important;
+  width: 26px !important;
+  margin: 91px 0px 0px 63px !important;
+  z-index: 3;
+}
+
+.star {
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+}
+
+.star1, .star2, .star3 {
+  opacity: 0;
+}
+
+.star1 {
+  left: 0;
+}
+
+.star2 {
+  left: 33%;
+}
+
+.star3 {
+  left: 70%;
+}
+
+.pokeball {
+  position: absolute;
+  width: 150px;
+  border-radius: 50%;
+  transition: all 0.25s ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+.pokeball:target {
+  // animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
+  animation: throw-ball 2s 1, fall 8s 2, wiggle 1.3s 3 3s;
+  animation-fill-mode: forwards;
+}
+
+.pokeball:target #catch1 {
+  animation: catch 0.2s 1 steps(1, start);
+  animation-delay: 7.2s;
+}
+
+.pokeball:target #star1 {
+  animation: star1 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.pokeball:target #star2 {
+  animation: star2 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.pokeball:target #star3 {
+  animation: star3 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.superball {
+  position: absolute;
+  width: 150px;
+  border-radius: 50%;
+  transition: all 0.25s ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+.superball:target {
+  animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
+  animation-fill-mode: forwards;
+}
+
+.superball:target #catch2 {
+  animation: catch 0.2s 1 steps(1, start);
+  animation-delay: 7.2s;
+}
+
+.superball:target #star4 {
+  animation: star1 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.superball:target #star5 {
+  animation: star2 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.superball:target #star6 {
+  animation: star3 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.ultraball {
+  position: absolute;
+  width: 150px;
+  border-radius: 50%;
+  transition: all 0.25s ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+.ultraball:target {
+  animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
+  animation-fill-mode: forwards;
+}
+
+.ultraball:target #catch3 {
+  animation: catch 0.2s 1 steps(1, start);
+  animation-delay: 7.2s;
+}
+
+.ultraball:target #star7 {
+  animation: star1 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.ultraball:target #star8 {
+  animation: star2 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.ultraball:target #star9 {
+  animation: star3 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.masterball {
+  position: absolute;
+  width: 150px;
+  border-radius: 50%;
+  transition: all 0.25s ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+.masterball:target {
+  animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
+  animation-fill-mode: forwards;
+}
+
+.masterball:target #catch4 {
+  animation: catch 0.2s 1 steps(1, start);
+  animation-delay: 7.2s;
+}
+
+.masterball:target #star10 {
+  animation: star1 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.masterball:target #star11 {
+  animation: star2 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+.masterball:target #star12 {
+  animation: star3 0.45s linear 1;
+  animation-delay: 7.2s;
+}
+
+@keyframes throw-ball {
+  0% {
+    position: relative;
+    top: 25vh;
+    left: -50vw;
+    transform: scale(0.3);
+  }
+
+  100% {
+    top: 10%;
+    left: 0vw;
+    transform: scale(0.8);
+    position: absolute;
+  }
+}
+
+@keyframes wiggles {
+  0% {
+    transform: scale(0.8) rotateZ(0deg);
+  }
+
+  20% {
+    transform: scale(0.8) rotateZ(15deg);
+  }
+
+  40% {
+    transform: scale(0.8) rotateZ(0deg);
+  }
+
+  60% {
+    transform: scale(0.8) rotateZ(-15deg);
+  }
+
+  80% {
+    transform: scale(0.8) rotateZ(15deg);
+  }
+
+  100% {
+    transform: scale(0.8) rotateZ(0deg);
+  }
+}
+
+@keyframes catch {
+  0% {
+    background: rgba(255, 0, 0, 0.2);
+  }
+
+  100% {
+    background: rgba(255, 0, 0, 0.7);
+  }
+}
+
+@keyframes star1 {
+  0% {
+    top: 0;
+    left: 0;
+    opacity: 1;
+    transform: rotate(0);
+  }
+
+  40% {
+    top: -70px;
+    left: -30px;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  80% {
+    top: -50px;
+    left: -50px;
+    opacity: 1;
+    transform: rotate(-45deg)scale(1.2);
+  }
+
+  100% {
+    top: -50px;
+    left: -50px;
+    opacity: 0;
+    transform: rotate(-60deg) scale(1);
+  }
+}
+
+@keyframes star2 {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+
+  40% {
+    top: -90px;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  80% {
+    top: -70px;
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  100% {
+    top: -70px;
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes star3 {
+  0% {
+    top: 0;
+    opacity: 1;
+    transform: rotate(0);
+  }
+
+  40% {
+    top: -70px;
+    left: calc(70% + 30px);
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  80% {
+    top: -50px;
+    left: calc(70% + 50px);
+    opacity: 1;
+    transform: rotate(45deg) scale(1.2);
+  }
+
+  100% {
+    top: -50px;
+    left: calc(70% + 50px);
+    opacity: 0;
+    transform: rotate(60deg) scale(1);
+  }
+}
+
+// #################################################
+// ######## FIN POKEBALL ANIMATION #################
+// #################################################
+
+@keyframes wiggle {
+  0% {
+    transform: translateX(0) rotate(0);
+  }
+  20% {
+    transform: translateX(-10px) rotate(-20deg);
+  }
+  30% {
+    transform: translateX(10px) rotate(20deg);
+  }
+  50% {
+    transform: translateX(-10px) rotate(-10deg);
+  }
+  60% {
+    transform: translateX(10px) rotate(10deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-200%);
+  }
+  60% {
+    transform: translateY(0);
+  }
+  80% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

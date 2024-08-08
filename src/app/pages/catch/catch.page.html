@@ -1,0 +1,340 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Catch Them</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button routerLink="/main/avatar"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- <ion-content class="contenedor"> -->
+  <!-- <div id="wrapper" class="wrapper"> -->
+  
+  <div class="contenedor">
+    <div class="modal" *ngIf="modal"></div>
+    <ion-row class="row absoluto width-100">
+      <ion-col class="col-12">
+        <!-- Fondo Batalla -->
+        <ion-row class="row fondo-batalla width-100">
+          <ion-col class="col-12">
+            <!-- Seccion Uno -->
+            <ion-row class="row">
+              <ion-col class="col-6">
+                <ion-row class="row color1 fondoStatsBatalla margin-bottom-5">
+                  <div class="flex">{{pokeSalvaje.nombre}}
+                    <div class="text-left" *ngIf="pokeSalvaje.genero === 'hembra'">
+                      <ion-icon name="female" style="font-size: 15px; color: hotpink"></ion-icon>
+                    </div>
+                    <div class="text-left" *ngIf="pokeSalvaje.genero === 'macho'">
+                      <ion-icon name="male" style="font-size: 15px; color: dodgerblue"></ion-icon>
+                    </div>
+                    <div class="text-right">Nv. {{ pokeSalvaje.nivel }}</div>
+                  </div>
+                  <ion-row class="row">
+                    <div class="color1 barraVida">
+                      <img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP">
+                    </div>
+                    <div class="textoImgCentrado1">{{pokeSalvaje.hp}} / {{pokeSalvaje.hp_max}}</div>
+                  </ion-row>
+                </ion-row>
+              </ion-col>
+              <ion-col class="col-6 centrar">
+                <div style="height: 150px;"></div>
+                <img src="../../../assets/images/pokemons/{{pokeSalvaje.numero_nacional}}.png" [ngClass]="pokeOculto" class="pokesalvaje absoluto50">
+                <!-- Animaciones de pokeball -->
+                <div class="animaciones absoluto50">
+                  <!-- Animacion Pokeball -->
+                  <div>
+                    <div id="pokeball" [ngClass]="ocultar1" class="pokeball">
+                      <img id="pokeballe" class="pokeballe" alt="pokeball" src="../../../assets/images/item_pokemon/pokeball.png">
+                      <div id="catch1" class="catch"></div>
+                      <div class="star star1" id="star1">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star1</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star2" id="star2">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star2</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star3" id="star3">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star3</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Animacion SuperBall -->
+                  <div>
+                    <div id="superball" [ngClass]="ocultar2" class="superball">
+                      <img id="superballe" class="superballe" alt="superball" src="../../../assets/images/item_pokemon/superball.png">
+                      <div id="catch2" class="catch"></div>
+                      <div class="star star1" id="star4">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star1</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star2" id="star5">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star2</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star3" id="star6">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star3</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Animacion UltraBall -->
+                  <div>
+                    <div id="ultraball" [ngClass]="ocultar3" class="ultraball">
+                      <img id="ultraballe" class="ultraballe" alt="ultraball" src="../../../assets/images/item_pokemon/ultraball.png">
+                      <div id="catch3" class="catch"></div>
+                      <div class="star star1" id="star7">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star1</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star2" id="star8">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star2</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star3" id="star9">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star3</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Animacion MasterBall -->
+                  <div>
+                    <div id="masterball" [ngClass]="ocultar4" class="masterball">
+                      <img id="masterballe" class="masterballe" alt="masterball" src="../../../assets/images/item_pokemon/masterball.png">
+                      <div id="catch4" class="catch"></div>
+                      <div class="star star1" id="star10">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star1</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star2" id="star11">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star2</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                      <div class="star star3" id="star12">
+                        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.95 50.35">
+                          <title>star3</title>
+                          <polygon class="cls-1" points="26.47 0 32.72 19.23 52.95 19.23 36.58 31.12 42.83 50.35 26.47 38.47 10.11 50.35 16.36 31.12 0 19.23 20.22 19.23 26.47 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Fin animaciones -->
+              </ion-col>
+            </ion-row>
+            <!-- Seccion Fin Uno -->
+
+            <!-- Seccion Dos -->
+            <ion-row class="row">
+              <ion-col class="col-6 centrar">
+                <img src="../../../assets/images/pokemons/{{pokemonBatalla.numero_nacional}}.png" class="pokemonbatalla">
+              </ion-col>
+              <!-- Bloque Stats Batalla -->
+              <ion-col class="col-6">
+                <ion-row class="row color1 fondoStatsBatalla">
+                  <ion-col class="col-12">
+                    <!-- Bloque Nombre genero nivel -->
+                    <ion-row class="row">
+                      <!-- Nombre -->
+                      <ion-col class="col-6"> {{pokemonBatalla.nombre}} </ion-col>
+                      <!-- Fin Nombre -->
+                      <!-- Genero -->
+                      <ion-col class="col-2 text-center">
+                        <div class="text-left" *ngIf="pokemonBatalla.genero === 'hembra'">
+                          <ion-icon name="female" style="font-size: 15px; color: hotpink"></ion-icon>
+                        </div>
+                        <div class="text-left" *ngIf="pokemonBatalla.genero === 'macho'">
+                          <ion-icon name="male" style="font-size: 15px; color: dodgerblue"></ion-icon>
+                        </div>
+                      </ion-col>
+                      <!-- Fin Genero -->
+                      <!-- Nivel -->
+                      <ion-col class="col-4 text-right">
+                        Nv. {{ pokemonBatalla.nivel }}
+                      </ion-col>
+                      <!-- Fin Nivel -->
+                    </ion-row>
+                    <!-- Fin Bloque Nombre genero nivel -->
+                    <!-- Bloque Barras -->
+                    <ion-row class="row">
+                      <ion-col class="col-12">
+                        <!-- Barar de Vida -->
+                        <ion-row class="row">
+                          <div class="color1 barraVida">
+                            <img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP2">
+                          </div>
+                          <div class="textoImgCentrado2">{{pokemonBatalla.hp}} / {{pokemonBatalla.hp_max}}</div>
+                        </ion-row>
+                        <!-- Fin Barar de Vida -->
+                        <!-- Barar de Exp -->
+                        <ion-row class="row margin-top-5">
+                          <div class="color1 barraVida">
+                            <img src="../../../assets/images/item_pokemon/barra_exp.png" alt="hp" [ngStyle]="barraExp">
+                            <div class="textoImgCentrado3">{{pokemonBatalla.exp}} / {{(pokemonBatalla.nivel! + 1) * (pokemonBatalla.nivel! + 1) * (pokemonBatalla.nivel! + 1)}}
+                            </div>
+                          </div>
+                        </ion-row>
+                        <!-- Fin Barar de Exp -->
+                      </ion-col>
+                    </ion-row>
+                    <!-- Fin Bloque Barras -->
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+              <!-- Fin Bloque Stats Batalla -->
+            </ion-row>
+            <!-- Seccion Fin Dos -->
+
+          </ion-col>
+        </ion-row>
+        <!-- Fin Fondo Batalla -->
+
+
+        <!-- Bloque Iconos -->
+        <ion-row class="row iconos">
+          <ion-col class="col-12 iconless centrar">
+            <ion-row class="row" style="display: inline-flex;">
+              <ion-col class="col-4" (click)="atacar()">
+                <div class="icon color1">
+                  <img src="../../../assets/images/iconos/espadasFreepik.png">
+                </div>
+              </ion-col>
+              <ion-col class="col-4" (click)="mostrarPokeballs()">
+                <div class="icon color1">
+                  <img src="../../../assets/images/iconos/mochila.png">
+                </div>
+              </ion-col>
+              <ion-col class="col-4" (click)="huir()">
+                <div class="icon color1">
+                  <img src="../../../assets/images/iconos/huir.png">
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+        <!-- Fin Bloque Iconos -->
+
+        <!-- Equipo -->
+        <ion-row class="row equipo-batalla centrar" [ngStyle]='ocultarEquipo'>
+          <div *ngFor='let pokemon of repo.getEquipoPokemon()' class='cardPokemon' (click)="voltear()">
+            <div class="scene scene--tarjeta">
+              <div class="tarjeta" [ngClass]="flip">
+                <ion-row class="row color2 tarjeta__face tarjeta__face--front equipopoke"
+                  (click)="cambiar_pokemon(pokemon)">
+                  <img alt="{{ pokemon.numero_nacional }}"
+                    src="../../../assets/images/pokemons/{{ pokemon.numero_nacional }}.png" class="center pokemon2">
+                  <ion-row class="row width-100">
+                    <ion-col class="col">Hp</ion-col>
+                    <ion-col class="col-8 text-center">{{pokemon.hp}}/{{pokemon.hp_max}}</ion-col>
+                  </ion-row>
+                </ion-row>
+                <div class=" color2 tarjeta__face tarjeta__face--back  equipopoke">
+                  <ion-row class="row" style="visibility: hidden">ESTADÍSTICAS</ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Ataque:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.ataque }}</ion-col>
+                  </ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Defensa:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.defensa }}</ion-col>
+                  </ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Atq esp:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.ataque_especial }}</ion-col>
+                  </ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Def esp:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.defensa_especial }}</ion-col>
+                  </ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Velocidad:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.velocidad }}</ion-col>
+                  </ion-row>
+                  <ion-row class="row">
+                    <ion-col class="col text-left">Estado:</ion-col>
+                    <ion-col class="text-right">{{ pokemon.estado }}</ion-col>
+                  </ion-row>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-row>
+        <!-- Fin Equipo -->
+
+        <!-- Mochila -->
+        <ion-row class="row mochila" style="display: flex; margin-top: 10px; justify-content: center;" [ngStyle]='ocultarBalls'>
+          <div class='cardBall'>
+            <div class="tarjeta2">
+              <ion-row class="row">
+                <a class="badge_ball" href="/captura/{{pokeSalvaje.numero_nacional}}#pokeball">
+                  <img alt="pokeball" src="../../../assets/images/item_pokemon/pokeball.png" class="ball center" (click)="capturarPokeBall()">
+                  <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().pokeBalls }}</ion-badge>
+                </a>
+              </ion-row>
+            </div>
+          </div>
+          <div class='cardBall'>
+            <div class="tarjeta2">
+              <ion-row class="row">
+                <a class="badge_ball" href="/captura/{{pokeSalvaje.numero_nacional}}#superball">
+                  <img alt="superball" src="../../../assets/images/item_pokemon/superball.png" class="ball center" (click)="capturarSuperBall()">
+                  <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().superBalls }}</ion-badge>
+                </a>
+              </ion-row>
+            </div>
+          </div>
+          <div class='cardBall'>
+            <div class="tarjeta2">
+              <ion-row class="row">
+                <a class="badge_ball" href="/captura/{{pokeSalvaje.numero_nacional}}#ultraball">
+                  <img alt="ultraball" src="../../../assets/images/item_pokemon/ultraball.png" class="ball center" (click)="capturarUltraBall()">
+                  <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().ultraBalls }}</ion-badge>
+                </a>
+              </ion-row>
+            </div>
+          </div>
+          <div class='cardBall'>
+            <div class="tarjeta2">
+              <ion-row class="row">
+                <a class="badge_ball" href="/captura/{{pokeSalvaje.numero_nacional}}#masterball">
+                  <img alt="masterball" src="../../../assets/images/item_pokemon/masterball.png" class="ball center" (click)="capturarMasterBall()">
+                  <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().masterBalls }}</ion-badge>
+                </a>
+              </ion-row>
+            </div>
+          </div>
+        </ion-row>
+        <!-- Fin Mochila -->
+
+      </ion-col>
+    </ion-row>
+  </div>
+<!-- </ion-content> -->

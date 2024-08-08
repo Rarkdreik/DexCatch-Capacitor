@@ -1,0 +1,222 @@
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.machine-container {
+    width: 90%;
+    height: 90%;
+    max-width: 400px;
+    max-height: 700px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    // BACKGROUND
+    background-image: url('../../../../assets/images/item_pokemon/heal2.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.machine-header {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pokeball-slot1, .pokeball-slot2 {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.pokeball {
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    border-radius: 50%;
+    border: 2px solid black;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: rotate(180deg);
+}
+
+.pokeball::before,
+.pokeball::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+    border-radius: 50px 50px 0px 0px;
+}
+
+.pokeball::before {
+    width: 100%;
+    height: 50%;
+    top: 0;
+    border-bottom: 2px solid black;
+}
+
+.pokeball::after {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    top: calc(50% - 7.5px);
+    left: calc(50% - 7.5px);
+    border: 2px solid black;
+    background-color: white;
+}
+
+.machine-footer {
+    font-size: 18px;
+    text-align: center;
+}
+
+
+.cardalgo {
+    position: relative;
+    bottom: -40px;
+}
+
+.cardPokemon {
+    background-color: #2f2f2f;
+}
+
+.pokeball-slot1 {
+    position: relative;
+    bottom: -5%;
+}
+
+.pokeball-slot2 {
+    bottom: 1%;
+    position: relative;
+}
+
+// #poke1 {
+//     position: relative;
+//     left: -27px;
+// }
+
+// #poke3 {
+//     position: relative;
+//     right: -27px;
+// }
+
+// #poke4 {
+//     position: relative;
+//     left: -16px;
+// }
+
+// #poke6 {
+//     position: relative;
+//     right: -16px;
+// }
+
+
+.none {
+    display: none;
+}
+
+.padding0 {
+    padding: 0;
+}
+
+.colorBlack {
+    background-color: rgba(0, 0, 0, 0.69);
+}
+
+.barraVida {
+    height: 5px;
+    margin-bottom: 5px;
+}
+
+.barraVida > img {
+    height: 5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.imgball {
+    z-index: 1;
+    height: 135%;
+    object-fit: cover;
+    object-position: center;
+    left: -15%;
+    top: -15%;
+    max-width: unset;
+    position: absolute;
+    rotate: 180deg;
+}
+
+
+ul {
+position: relative;
+margin: 0;
+padding: 0;
+display: flex;
+}
+
+ul li {
+position: relative;
+list-style: none;
+width: 60px;
+height: 60px;
+margin: 0 30px;
+transform: rotate(-30deg) skew(25deg);
+}
+
+ul li span {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+// background: teal;
+transition: 0.5s;
+display: flex !important;
+justify-content: center;
+align-items: center;
+color: #fff;
+font-size: 30px !important;
+border-radius: 100%;
+background: unset;
+}
+
+ul li:hover span:nth-child(5) {
+transform: translate(40px, -40px);
+opacity: 1;
+}
+
+ul li:hover span:nth-child(4) {
+transform: translate(30px, -30px);
+opacity: 0.8;
+}
+
+ul li:hover span:nth-child(3) {
+transform: translate(20px, -20px);
+opacity: 0.6;
+}
+
+ul li:hover span:nth-child(2) {
+transform: translate(10px, -10px);
+opacity: 0.4;
+}
+
+ul li:hover span:nth-child(1) {
+transform: translate(0, 0);
+opacity: 0.2;
+}

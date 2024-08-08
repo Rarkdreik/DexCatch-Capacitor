@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Master</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button routerLink="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div id="wrapper" class="wrapper">
+    <header id="header">
+      <div> </div>
+      <div class="content">
+        <div class="inner">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-12">
+                  <form role="form" [formGroup]="loginForm" >
+                    <div class="form-group">
+                      <label for="nick">Nombre</label>
+                      <input formControlName="nick" type="text" class="form-control btn-outline-secondary" required>
+                    </div>
+                    <div class="form-group">
+                      <label>Region Inicial</label>
+                      <ion-select formControlName="region" value="" placeholder="Elige una region" okText="Aceptar" cancelText="Cancelar" class="borderStyle1" required>
+                        <ion-select-option value="kanto">KANTO</ion-select-option>
+                        <ion-select-option value="johto">JOHTO</ion-select-option>
+                        <ion-select-option value="hoenn">HOENN</ion-select-option>
+                        <ion-select-option value="sinnoh">SINNOH</ion-select-option>
+                        <ion-select-option value="teselia">TESELIA</ion-select-option>
+                        <ion-select-option value="kalos">KALOS</ion-select-option>
+                        <ion-select-option value="alola">ALOLA</ion-select-option>
+                      </ion-select>
+                    </div>
+                    <div class="form-group">
+                      <label>Pókemon Inicial</label>
+                      <ion-select formControlName="pokemon" value="" placeholder="Elige un pókemon" okText="Aceptar" cancelText="Cancelar" class="borderStyle1" required>
+                        <ion-select-option value="001">BULBASAUR</ion-select-option>
+                        <ion-select-option value="004">CHARMANDER</ion-select-option>
+                        <ion-select-option value="007">SQUIRTLE</ion-select-option>
+
+                        <ion-select-option value="152">CHIKORITA</ion-select-option>
+                        <ion-select-option value="155">CYNDAQUIL</ion-select-option>
+                        <ion-select-option value="158">TOTODILE</ion-select-option>
+
+                        <ion-select-option value="252">TREECKO</ion-select-option>
+                        <ion-select-option value="255">TORCHIC</ion-select-option>
+                        <ion-select-option value="258">MUDKIP</ion-select-option>
+
+                        <ion-select-option value="387">TURWIG</ion-select-option>
+                        <ion-select-option value="390">CHIMCHAR</ion-select-option>
+                        <ion-select-option value="393">PIPLUP</ion-select-option>
+
+                        <ion-select-option value="495">SNIVY</ion-select-option>
+                        <ion-select-option value="498">TEPIG</ion-select-option>
+                        <ion-select-option value="501">OSHAWOTT</ion-select-option>
+
+                        <ion-select-option value="650">CHESPIN</ion-select-option>
+                        <ion-select-option value="653">FENNEKIN</ion-select-option>
+                        <ion-select-option value="656">FROAKIE</ion-select-option>
+
+                        <ion-select-option value="722">ROWLET</ion-select-option>
+                        <ion-select-option value="725">LITTEN</ion-select-option>
+                        <ion-select-option value="728">POPLIO</ion-select-option>
+
+                        <ion-select-option value="025">PIKACHU</ion-select-option>
+                        <ion-select-option value="133">EEVEE</ion-select-option>
+                      </ion-select>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-secondary" [disabled]="!this.loginForm.valid" (click)="onSubmit()">Registrar Entrenador</button>
+                    <div class="form-group"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div> </div>
+    </header>
+  </div>
+</ion-content>

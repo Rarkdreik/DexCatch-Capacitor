@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Region {{repo.getRegion()}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button routerLink="/main/avatar"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- <div class="contenedor"> -->
+  <div id='wrapper' class='wrapper'>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div id="virtualScroll" class="vertical">
+      <ion-card class="row" *ngFor="let pokemon of pokemons;" class='cardPokemon'>
+        <div class="col-12">
+          <!-- Nombre -->
+          <div class="row">
+            <div class="col-4 pokenombre centrar dblock">
+              <p>{{ pokemon.numero_nacional }}</p>
+            </div>
+            <div class="col-8 pokenombre centrar dblock">
+              <p>{{ pokemon.nombre }}</p>
+            </div>
+          </div>
+          <!-- Fin Nombre -->
+          <div class="row">
+            <div class="col-12">
+              <div class="row">
+                <div class="col-8">
+                  <!-- Imagen Pokemon -->
+                  <div class="row" (click)='irDescripcion(pokemon.numero_nacional)'>
+                    <div class="col-12 {{pokemon.ball}}">
+                      <img src='../../../../assets/images/pokemons/{{pokemon.numero_nacional}}.png'
+                        class="pokeimagen centrar dblock" [alt]="pokemon.numero_nacional" />
+                    </div>
+                  </div>
+                  <!-- Fin Imagen Pokemon -->
+                </div>
+                <div class="col-4">
+                  <!-- Barras del elemento -->
+                  <div class="row elementos">
+                    <div class="col-12">
+                      <!-- Tipo Uno -->
+                      <div class="row">
+                        <div class="col-12">
+                          <p class='tipo tipo{{pokemon.tipo_uno | uppercase}}'>{{pokemon.tipo_uno | uppercase}}</p>
+                        </div>
+                      </div>
+                      <!-- Fin Tipo Uno -->
+                      <!-- Tipo Dos -->
+                      <div class="row">
+                        <div class="col-12">
+                          <p class='tipo tipo{{pokemon.tipo_dos | uppercase}}'>{{pokemon.tipo_dos | uppercase}}</p>
+                        </div>
+                      </div>
+                      <!-- Fin Tipo Dos -->
+                    </div>
+                  </div>
+                  <!-- Fin Barras del elemento -->
+                  <div class="row">
+                    <div class="col-12">
+                      <!-- Zona Iconos -->
+                      <div class="row iconos">
+                        <!-- Icono Pokeball -->
+                        <div class="col-6 pokeiconos centrar"
+                          (click)='capturar(pokemon.numero_nacional, pokemon.numero_evolucion)'>
+                          <img alt='ball' src='../../../../assets/images/iconos/iconBallBlanco.png'>
+                        </div>
+                        <!-- Icono Pokeball -->
+                        <!-- Icono Favorito -->
+                        <div class="col-6 pokeiconos centrar" >
+                          <img alt='fav' src='../../../../assets/images/iconos/iconStarAzul.png' *ngIf='pokemon.favorito'>
+                          <img alt='fav' src='../../../../assets/images/iconos/iconStarBlanco.png' *ngIf='!pokemon.favorito'>
+                        </div>
+                        <!-- Icono Favorito -->
+                      </div>
+                      <!-- Fin Zona Iconos -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card>
+
+      <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+  </div>
+
+</ion-content>
