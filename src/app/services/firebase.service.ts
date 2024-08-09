@@ -302,10 +302,30 @@ export class FirebaseService {
         this.toast.presentarToast('No existen pokemon atrapados.', 'danger', 3000);
       }
 
-      console.log('FIN - firebase.service - getPokemonAtrapado');
       return aux;
     });
 
+    console.log('FIN - firebase.service - getPokemonAtrapado');
+    return pokes;
+  }
+
+  public async getTeamPokemon(): Promise<PokemonInterface[]> {
+    console.log('INI - firebase.service - getTeamPokemon');
+    let pokes: PokemonInterface[] = [];
+
+    pokes = await this.masterCollection.doc<Master>('ash').ref.get().then((resultado) => {
+      let aux: PokemonInterface[] = [];
+
+      if (resultado.exists) {
+        aux = resultado.data()!.team;
+      } else {
+        this.toast.presentarToast('No existen pokemon atrapados.', 'danger', 3000);
+      }
+
+      return aux;
+    });
+
+    console.log('FIN - firebase.service - getTeamPokemon');
     return pokes;
   }
 

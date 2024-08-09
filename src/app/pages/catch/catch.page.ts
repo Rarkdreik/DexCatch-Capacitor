@@ -133,7 +133,7 @@ export class CatchPage implements OnInit {
       this.audio.play('audioAtrapando');
       this.pokeOculto = 'hide'; this.ocultar1 = 'show'; this.ocultar2 = 'hide'; this.ocultar3 = 'hide'; this.ocultar4 = 'hide';
 
-      if (this.captura(this.pokeSalvaje.nombre, 'poke')) {
+      if (this.captura(this.pokeSalvaje.numero_nacional, 'poke')) {
         this.pokeSalvaje.ball = 'pokeball';
 
         setTimeout(() => {
@@ -174,7 +174,7 @@ export class CatchPage implements OnInit {
       this.audio.play('audioAtrapando');
       this.pokeOculto = 'hide'; this.ocultar1 = 'hide'; this.ocultar2 = 'show'; this.ocultar3 = 'hide'; this.ocultar4 = 'hide';
 
-      if (this.captura(this.pokeSalvaje.nombre, 'super')) {
+      if (this.captura(this.pokeSalvaje.numero_nacional, 'super')) {
         this.pokeSalvaje.ball = 'superball';
 
         setTimeout(() => {
@@ -215,7 +215,7 @@ export class CatchPage implements OnInit {
       this.audio.play('audioAtrapando');
       this.pokeOculto = 'hide'; this.ocultar1 = 'hide'; this.ocultar2 = 'hide'; this.ocultar3 = 'show'; this.ocultar4 = 'hide';
 
-      if (this.captura(this.pokeSalvaje.nombre, 'ultra')) {
+      if (this.captura(this.pokeSalvaje.numero_nacional, 'ultra')) {
         this.pokeSalvaje.ball = 'ultraball';
 
         setTimeout(() => {
@@ -256,7 +256,7 @@ export class CatchPage implements OnInit {
       this.audio.play('audioAtrapando');
       this.pokeOculto = 'hide'; this.ocultar1 = 'hide'; this.ocultar2 = 'hide'; this.ocultar3 = 'hide'; this.ocultar4 = 'show';
 
-      if (this.captura(this.pokeSalvaje.nombre, 'master')) {
+      if (this.captura(this.pokeSalvaje.numero_nacional, 'master')) {
         this.pokeSalvaje.ball = 'masterball';
 
         setTimeout(() => {
@@ -308,23 +308,25 @@ export class CatchPage implements OnInit {
     this.pokeSalvaje.ball = 'nada'; let numEstado = 0;
 
     if (this.pokeSalvaje.estado === '') { this.pokeSalvaje.estado = 'nada'; }
+    console.log(poke);
     ratioCaptura = this.RatioCaptura.getRatioCaptura(poke);
+    console.log(ratioCaptura);
 
     switch (ball.toLowerCase().substring(0, 4)) {
       case 'poke':
-        ratioPoke = 255;
+        ratioPoke = 200;
         rand = (Math.random() * (0 - ratioPoke + 1) + ratioPoke);
         ratioBall = 1.5;
         numEstado = this.getNumEstado(this.pokeSalvaje.estado);
         break;
       case 'supe':
-        ratioPoke = 200;
+        ratioPoke = 150;
         rand = (Math.random() * (0 - ratioPoke + 1) + ratioPoke);
         ratioBall = 2.0;
         numEstado = this.getNumEstado(this.pokeSalvaje.estado);
         break;
       case 'ultr':
-        ratioPoke = 150;
+        ratioPoke = 100;
         rand = (Math.random() * (0 - ratioPoke + 1) + ratioPoke);
         ratioBall = 2.5;
         numEstado = this.getNumEstado(this.pokeSalvaje.estado);
@@ -337,13 +339,14 @@ export class CatchPage implements OnInit {
         break;
     }
 
-    a = (((3 * this.pokeSalvaje.hp_max - 1 * this.pokeSalvaje.hp) * ratioCaptura * ratioBall) / (1 * this.pokeSalvaje.hp_max))
-      + numEstado + bonus;
+    a = (((3 * this.pokeSalvaje.hp_max - 1 * this.pokeSalvaje.hp) * ratioCaptura * ratioBall) / (1 * this.pokeSalvaje.hp_max)) + numEstado + bonus;
+    console.log(`(((3 * ${this.pokeSalvaje.hp_max} - 1 * ${this.pokeSalvaje.hp}) * ${ratioCaptura} * ${ratioBall}) / (1 * ${this.pokeSalvaje.hp_max})) + ${numEstado} + ${bonus};`);
+    console.log(a);
 
-    if (a < 1) { a = 1.0; } else if (a > 255) { a = 255.0; }
+    if (a < 1) { a = 1; } else if (a > 255) { a = 255; }
 
+    // a = this.convertirEntero(a);
     if (rand <= a) { capturados = true; }
-    a = this.convertirEntero(a);
 
     return capturados;
   }

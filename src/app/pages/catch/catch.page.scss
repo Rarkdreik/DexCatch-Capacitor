@@ -248,7 +248,7 @@
 }
 
 .ball {
-  height: 90%;
+  height: 100px;
 }
 
 .badge_ball {
@@ -346,7 +346,7 @@ a {
 
 .pokeball:target {
   // animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
-  animation: throw-ball 2s 1, fall 8s 2, wiggle 1.3s 3 3s;
+  animation: throw-ball 2s 1, wiggle 1.3s 3 3s;
   animation-fill-mode: forwards;
 }
 
