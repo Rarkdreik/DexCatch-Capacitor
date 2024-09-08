@@ -74,6 +74,45 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  /** CUSTOM **/
+  --display-modal: none;
+  --border-color:#a9ffff;
+  // --background-one:#519bb4;
+  // --background-two:#30607d;
+  // --background-thr:#20405e;
+  // --background-fou:#002038;
+  --background-cer:#466e7a;
+  --background-one:#345361;
+  --background-two:#233947;
+  --background-thr:#111f2e;
+  --background-fou:#000514;
+  --background-white: #fffffd;
+  --background-blue: #7dabdc;
+  --pokeball-red: #fd5365;
+  --pokeball-grey: #f0f0f0;
+  --pokeball-black: #615e69;
+  
+  // --background-bug: #98C458;
+  /** TIPOS POKEMON **/
+  --background-bug: #a8d7a0;          /* Verde menta pastel */
+  --background-dark: #a0a0a0;        /* Gris oscuro pastel */
+  --background-dragon: #b4a0d0;       /* Morado pastel */
+  --background-electric: #f0e57a;     /* Amarillo pastel */
+  --background-fairy: #f6c6e6;        /* Rosa pastel */
+  --background-fighting: #d5a7a1;     /* Marrón claro pastel */
+  --background-fire: #f7b3a2;         /* Rojo coral pastel */
+  --background-flying: #b3cde0;       /* Azul claro pastel */
+  --background-ghost: #d0a1c2;        /* Lila suave pastel */
+  --background-grass: #b3dcb7;        /* Verde pasto pastel */
+  --background-ground: #d4b99b;       /* Marrón claro pastel */
+  --background-ice: #a4d8f1;          /* Azul hielo pastel */
+  --background-normal: #e0e0e0;       /* Gris claro pastel */
+  --background-poison: #c6a3b8;       /* Púrpura pastel */
+  --background-psychic: #e3b0c7;      /* Rosa claro pastel */
+  --background-rock: #c2b49e;         /* Gris piedra pastel */
+  --background-steel: #c2d0d5;        /* Azul acero pastel */
+  --background-water: #a2d5f2;        /* Azul agua pastel */
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,25 +1,21 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Master</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button routerLink="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div id="wrapper" class="wrapper">
-    <header id="header">
+    <header id="header" class="centrar">
       <div> </div>
       <div class="content">
         <div class="inner">
           <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
               <div class="row">
-                <div class="col-md-12">
+                <div class="col-12">
                   <form role="form" [formGroup]="loginForm" >
                     <div class="form-group">
                       <label for="nick">Nombre</label>
@@ -32,7 +28,7 @@
                         <ion-select-option value="johto">JOHTO</ion-select-option>
                         <ion-select-option value="hoenn">HOENN</ion-select-option>
                         <ion-select-option value="sinnoh">SINNOH</ion-select-option>
-                        <ion-select-option value="teselia">TESELIA</ion-select-option>
+                        <ion-select-option value="unova">UNOVA</ion-select-option>
                         <ion-select-option value="kalos">KALOS</ion-select-option>
                         <ion-select-option value="alola">ALOLA</ion-select-option>
                       </ion-select>

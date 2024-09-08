@@ -48,30 +48,33 @@ export class IniregionPage implements OnInit {
       // Inicializamos nuestro firebase con el correo
       this.firebase.inicializar(correo!);
       // Obtenemos el Master pokemon
-      this.master = (await this.firebase.getMaster());
+      this.master = await this.firebase.getMaster();
       // Si no está vacio procedemos a cargar todos los datos del Master
       if (this.master.nick != null && this.master.nick != '') {
-        // Su nombre
+        // Su name
         this.firebase.setDisplayName(this.master.nick);
         // Inicializamos todas las variables necesarias del repositorio
         this.inicializarRepositorio(this.master);
         // Cargamos los pokemon atrapados / capturados
         // Y si de la lista de pokemon con region inicial hay alguno atrapado
         // Lo indicamos añadiendole el tipo de ball con el que fue capturado
-        this.firebase.getPokemonAtrapado().then((resultado) => {
-          pokes = resultado as PokemonInterface[];
-          this.repo.getPokemonsRegionActual().forEach(element => {
-            pokes.forEach(pok => {
-              if (element.numero_nacional === pok.numero_nacional) { element.ball = pok.ball; }
-            });
-          });
-          // una vez que todo está listo, cerramos el loading y vamos a la pagina principal
-          this.loading.dismissLoading();
-          this.router.navigateByUrl('main/avatar');
-        }).catch(() => {
-          this.loading.dismissLoading();
-          return null;
-        }).finally(() => { this.loading.dismissLoading(); });
+        // this.firebase.getPokemonAtrapado().then((resultado) => {
+        //   pokes = resultado as PokemonInterface[];
+        //   this.repo.getPokemonsRegionActual().forEach(element => {
+        //     pokes.forEach(pok => {
+        //       if (element.num_nation === pok.num_nation) { element.ball = pok.ball; }
+        //     });
+        //   });
+        //   // una vez que todo está listo, cerramos el loading y vamos a la pagina principal
+        //   this.loading.dismissLoading();
+        //   this.router.navigateByUrl('main/avatar');
+        // }).catch(() => {
+        //   this.loading.dismissLoading();
+        //   return null;
+        // }).finally(() => { this.loading.dismissLoading(); });
+
+        this.loading.dismissLoading();
+
       } else {
         this.loading.dismissLoading();
         this.alertaServicio.alertaSimple('No hay datos', 'Porfavor registrese o contacte con el soporte tecnico', 'warning');
@@ -96,40 +99,42 @@ export class IniregionPage implements OnInit {
   /**
    * En el caso de iniciar sesión normal, cargaremos todos los datos necesarios y nos dirigeremos a la pagina principal
    */
-  public onSubmit() {
+  public async onSubmit() {
     let master: Master = this.constants.master_empty;
     this.masterData = this.saveMaster();
     let correo = this.repo.getCorreo();
     this.firebase.inicializar(correo!);
-    master = this.inicializarMaestroPokemon(master);
+    master = await this.inicializarMaestroPokemon(master);
     this.inicializarRepositorio(master);
     this.addToFirebase(master);
     this.repo.setAvatar('../../../assets/images/avatar/avatar.png');
-    this.router.navigateByUrl('/main/avatar');
+    this.router.navigateByUrl('/home');
   }
 
   /**
    * Inicializa el Master con los datos Master pokemon obtenidos.
    * @param master Objeto Master para completar los datos restantes.
    */
-  private inicializarMaestroPokemon(master: Master) {
+  private async inicializarMaestroPokemon(master: Master): Promise<Master> {
     master.nick = this.masterData.nick;
     master.region_ini = this.masterData.region;
-    master.poke_ini = this.establecerPokeInicial();
+    master.poke_ini = await this.establecerPokeInicial();
     master.capturados = [];
     master.favoritos = [];
-    master.capturados.push(master.poke_ini);
-    master.team?.push(master.poke_ini);
-    master.favoritos.push(master.poke_ini.numero_nacional);
+    master.team = [];
+    master.favoritos.push(master.poke_ini.num_nation);
     return master;
   }
 
   /**
    * Establece, carga y calcula las estadisticas del pokemon inicial.
    */
-  private establecerPokeInicial(): PokemonInterface {
-    let pokemon: PokemonInterface = this.stats.getStatsPokemon(this.masterData.pokemon);
-    pokemon.nivel = 5; pokemon.ball = 'pokeball'; pokemon.estado = 'nada';
+  private async establecerPokeInicial(): Promise<PokemonInterface> {
+    // let pokemon: PokemonInterface = this.stats.getStatsPokemon(this.masterData.pokemon);
+    console.log(this.masterData);
+    let pokemon: PokemonInterface = await this.stats.getStatsPokemonV2(this.masterData.pokemon, 'es');
+    // console.log(this.lvup.checkEvolutionConditions(pokemon));
+    pokemon.level = 5; pokemon.ball = 'pokeball'; pokemon.state = 'nada';
     return pokemon = this.lvup.calcularStats(pokemon);
   }
 
@@ -137,11 +142,11 @@ export class IniregionPage implements OnInit {
    * Añade todos los datos nuevos a la base de datos Firebase
    * @param master Objeto Master para completar los datos restantes.
    */
-  private addToFirebase(master: Master) {
-    this.firebase.addPokemon(master.poke_ini);
-    this.firebase.addPokemonAtrapado(master.poke_ini);
-    this.firebase.addPokemonFavorito(master.poke_ini);
-    this.firebase.addMaster(master);
+  private async addToFirebase(master: Master) {
+    await this.firebase.addMaster(master);
+    await this.firebase.addPokemon(master.poke_ini);
+    await this.firebase.addPokemonAtrapado(master.poke_ini);  
+    await this.firebase.addPokemonFavorito(master.poke_ini);
   }
 
   /**
@@ -149,12 +154,15 @@ export class IniregionPage implements OnInit {
    * @param master Objeto Master para completar los datos restantes.
    */
   private inicializarRepositorio(master: Master) {
-    master.capturados = []
+    this.repo.setMaster(master);
     this.repo.setRegion(master.region_ini);
-    this.repo.modificarEquipoPokemon(master.poke_ini, 0);
+    // this.repo.modificarEquipoPokemon(master.poke_ini, 0);
     this.repo.getListaPokemonRegion(master.region_ini);
     this.repo.setNick(master.nick);
-    this.repo.setMaster(master);
+  }
+
+  public goMain() {
+    this.router.navigate(['/home'], { replaceUrl: true });;
   }
 
 }

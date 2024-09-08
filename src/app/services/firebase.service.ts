@@ -8,7 +8,7 @@ import { AlertsService } from './alerta.service';
 import { ToastService } from './toast.service';
 import { PokemonInterface } from '../model/Pokemon';
 
-import { Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { ConstantService } from './constant.service';
 
@@ -111,7 +111,7 @@ export class FirebaseService {
     return userRef.delete();
   }
 
-  public setDisplayName(nombre: string) {
+  public setDisplayName(name: string) {
     this.updateUserData(this.repo.getUsuario());
   }
 
@@ -225,7 +225,7 @@ export class FirebaseService {
       this.master = {
         nick: resultado.data()!.nick,
         exp: resultado.data()!.exp,
-        nivel: resultado.data()!.nivel,
+        level: resultado.data()!.level,
         pokeBalls: resultado.data()!.pokeBalls,
         superBalls: resultado.data()!.superBalls,
         ultraBalls: resultado.data()!.ultraBalls,
@@ -255,27 +255,40 @@ export class FirebaseService {
 
   public async addPokemonAtrapado(pokemon: PokemonInterface): Promise<void> {
     let auxMaster: Master = this.repo.getMaster();
-    auxMaster.capturados!.push(pokemon);
+
+    // Verifica si hay hueco en el equipo
+    // Hay espacio en el equipo, se añade directamente al equipo
+    // No hay espacio en el equipo, se añade a los capturados
+    if (auxMaster.team.length < 6) {
+        auxMaster.team.push(pokemon);
+    } else {
+        auxMaster.capturados.push(pokemon);
+    }
+
+    // Guarda los cambios en el repositorio
     this.repo.setMaster(auxMaster);
-    await this.addPokemonTeam(pokemon);
+
+    // Se incluye en la colección de la pokedex
     await this.addPokemon(pokemon);
+
+    // Finalmente, actualiza el master
     return await this.updateMaster(auxMaster);
   }
 
-  public addPokemonFavorito(pokemon: PokemonInterface) {
-    let auxMaster: Master = this.repo.getMaster();
-    auxMaster.favoritos!.push(pokemon.numero_nacional);
-    this.repo.setMaster(auxMaster);
-    this.updateMaster(auxMaster);
-  }
+  // private async addPokemonTeam(pokemon: PokemonInterface) {
+  //   let auxMaster: Master = this.repo.getMaster();
+  //   if (!(auxMaster.team.length >= 6)) {
+  //     auxMaster.team.push(pokemon);
+  //     this.repo.setMaster(auxMaster);
+  //     await this.updateMaster(auxMaster);
+  //   }
+  // }
 
-  public async addPokemonTeam(pokemon: PokemonInterface) {
+  public async addPokemonFavorito(pokemon: PokemonInterface) {
     let auxMaster: Master = this.repo.getMaster();
-    if (!(auxMaster.team.length >= 6)) {
-      auxMaster.team.push(pokemon);
-      this.repo.setMaster(auxMaster);
-      await this.updateMaster(auxMaster);
-    }
+    auxMaster.favoritos!.push(pokemon.num_nation);
+    this.repo.setMaster(auxMaster);
+    await this.updateMaster(auxMaster);
   }
 
   /////////////////////////////////////////////////////////////
@@ -283,10 +296,23 @@ export class FirebaseService {
   /////////////////////////////////////////////////////////////
 
   public async addPokemon(pokemon: PokemonInterface) {
-    return await this.pokeCollection.doc<PokemonInterface>(pokemon.numero_nacional).set(pokemon);
+    return await this.pokeCollection.doc<PokemonInterface>(pokemon.num_nation).set(pokemon);
   }
 
-  public async getPokemonAtrapado(): Promise<PokemonInterface[]> {
+  public async getPokedex() {
+    let pokemons: any = await firstValueFrom(this.pokeCollection.get().pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => {
+          const data = doc.data() as PokemonInterface;
+          return { ...data };
+        });
+      })
+    ));
+
+    this.repo.setPokedex(pokemons)
+  }
+
+  private async getPokemonAtrapado(): Promise<PokemonInterface[]> {
     console.log('INI - firebase.service - getPokemonAtrapado');
     let pokes: PokemonInterface[] = [];
 

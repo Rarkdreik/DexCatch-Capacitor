@@ -1,0 +1,150 @@
+/* ---------------------------------------------------------------------------
+ * Estilos Globales
+ * ---------------------------------------------------------------------------
+ * Estilos que se aplican a todos los elementos de la página.
+ */
+
+* {
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos de Estructura
+ * ---------------------------------------------------------------------------
+ * Controlan la disposición general de los elementos, como el contenido, filas,
+ * columnas y otros elementos de estructura.
+ */
+
+#header {
+    margin: auto;
+    width: inherit;
+    height: 100vw;
+}
+
+.row, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    padding: 0;
+    margin: 0;
+}
+
+#virtualScroll {
+    margin: auto;
+    width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos de Tarjetas de Pokémon
+ * ---------------------------------------------------------------------------
+ * Controlan la apariencia y disposición de las tarjetas y elementos asociados
+ * con los Pokémon, como imágenes, names e íconos.
+ */
+
+.cardPokemon {
+    display: grid;
+    margin: 5%;
+    background-color: var(--background-thr);
+}
+
+.pokeimagen {
+    height: 90px;
+}
+
+.pokename > * {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.pokeiconos:active {
+    box-shadow: 1px 1px #000;
+    transform: translateY(1px) translateX(1px);
+    transition: transform 34ms;
+}
+
+.pokeiconos {
+    background-color:  var(--background-cer);
+    border-radius: 5px;
+    box-shadow: 2px 2px #000;
+    width: 35px;
+    padding: 5px;
+    margin-left: 8px;
+}
+
+.elementos {
+    align-content: end;
+    padding-bottom: 10px;
+}
+
+.elementos > * {
+    font-size: 11px;
+}
+
+.iconos {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos de Poké Balls
+ * ---------------------------------------------------------------------------
+ * Define las imágenes y tamaños de las diferentes Poké Balls.
+ */
+
+.pokeball, .superball, .ultraball, .masterball {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px 100px;
+}
+
+.pokeball {
+    background-image: url('../../../assets/images/item_pokemon/pokeball.png');
+}
+
+.superball {
+    background-image: url('../../../assets/images/item_pokemon/superball.png');
+}
+
+.ultraball {
+    background-image: url('../../../assets/images/item_pokemon/ultraball.png');
+}
+
+.masterball {
+    background-image: url('../../../assets/images/item_pokemon/masterball.png');
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos para Tipos de Pokémon
+ * ---------------------------------------------------------------------------
+ * Controlan la apariencia y posición de los elementos que indican el tipo de 
+ * Pokémon.
+ */
+
+.ball {
+    width: 90%;
+    height: 72px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    justify-self: center;
+}
+
+.tipo {
+    padding-left: unset !important;
+    padding-right: unset !important;
+    border-radius: 100%;
+    font-size: 2.5em;
+    justify-self: center;
+}
+
+.tipo_dos {
+    position: absolute;
+    bottom: -40px;
+    left: 2vw;
+}
+
+.tipo_uno {
+    position: absolute;
+    bottom: -40px;
+    left: -8vw;
+}

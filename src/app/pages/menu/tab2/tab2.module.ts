@@ -7,7 +7,6 @@ import { ExploreContainerComponentModule } from '../../../explore-container/expl
 import { QRCodeModule } from 'angularx-qrcode';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
-import { Tab2ModalComponent } from './tab2-modal.component';
 
 @NgModule({
   schemas: [
@@ -22,6 +21,6 @@ import { Tab2ModalComponent } from './tab2-modal.component';
     Tab2PageRoutingModule,
     QRCodeModule
   ],
-  declarations: [Tab2Page, Tab2ModalComponent]
+  declarations: [Tab2Page]
 })
 export class Tab2PageModule {}

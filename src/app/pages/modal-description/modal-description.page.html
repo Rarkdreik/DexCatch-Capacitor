@@ -1,182 +1,155 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Region {{repo.getRegion()}}</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button routerLink="/main/avatar"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+    <ion-title>Region {{ region }}</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <div id='wrapper' class='wrapper'>
-    <header id="header">
-
-      <div class="row width-100 margin-bottom-15">
+<!-- <ion-content> -->
+  <!-- <div id="wrapper" class="wrapper"> -->
+  <!-- <div class="machine-container"> -->
+    <div id="pokedex" class='pokeball' >
+      <button id="toggle-button"></button>
+      <div class="row">
         <div class="col-12">
-          <!-- Bloque Uno -->
-          <ion-card class="row padding-10">
-            <div class="col-12">
-              <div class="row">
-                <!-- Bloque Imagen Pokemon -->
-                <div class="col-6">
-                  <div class="row">
-                    <div class="col-12">
-                      <img alt='{{ pokemon.numero_nacional }}'
-                        src='../../assets/images/pokemons/{{ pokemon.numero_nacional }}.png' class='{{pokemon.ball}}' />
-                    </div>
-                  </div>
-                </div>
-                <!-- Fin Bloque Imagen Pokemon -->
-                <!-- Bloque elementos -->
-                <div class="col-6">
-                  <!-- Tipo Uno -->
-                  <div class="row">
-                    <div class="col-12">
-                      <div class='tipo tipo{{pokemon.tipo_uno|uppercase}}'>{{pokemon.tipo_uno|uppercase}}</div>
-                    </div>
-                  </div>
-                  <!-- Fin Tipo Uno -->
-                  <!-- Tipo Dos -->
-                  <div class="row">
-                    <div class="col-12">
-                      <div class='tipo tipo{{pokemon.tipo_dos|uppercase}}'>{{pokemon.tipo_dos|uppercase}}</div>
-                    </div>
-                  </div>
-                  <!-- Fin Tipo Dos -->
-                  <!-- Descripcion -->
-                  <div class="row">
-                    <div class="col-12">
-                      <p class="font-size-10 text-justify">{{ pokemon.descripcion }}</p>
-                    </div>
-                  </div>
-                  <!-- Fin Descripcion -->
-                </div>
-                <!-- Fin Bloque elementos -->
-              </div>
+          <div class='pokemon tipo{{pokemon.tipo_uno | uppercase}}' >
+            <!-- <img src="../../../assets/images/pokemons/{{pokemon.num_nation}}.png" alt="" /> -->
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ +num_nation }}.png" alt="" />
+            <div class="tags">
+              <span class='tipo{{ pokemon.tipo_uno | uppercase }}'>{{ pokemon.tipo_uno | uppercase }}</span>
+              <span class='tipo{{ pokemon.tipo_dos | uppercase }}'>{{ pokemon.tipo_dos | uppercase }}</span>
+              <!-- <span class='tipo{{ habitat | uppercase }}'>{{ habitat | uppercase }}</span> -->
             </div>
-          </ion-card>
-          <!-- Fin Bloque Uno -->
 
-          <!-- Bloque Dos Parte 1 -->
-          <ion-card class="row padding-10" *ngIf='!(pokemon.nivel_evolucion === 0);' [ngClass]='ocultar1'>
-            <div class="col-12">
-              <div class="row">
-                <div class="col-12 text-center titulo">Evoluciona al:</div>
-              </div>
-              <div class="row">
-                <div class="col-4">
-                  <img alt='{{ pokemon.numero_nacional }}'
-                    src='../../assets/images/pokemons/{{ pokemon.numero_nacional }}.png' class='{{pokemon.ball}}' />
-                </div>
-                <div class="col-4 margin-auto">
-                  <p class='width-100'>Nivel: {{ pokemon.nivel_evolucion }}</p>
-                </div>
-                <div class="col-4">
-                  <img alt='{{ pokemon.evolucion }}' src='../../assets/images/pokemons/{{ pokemon.evolucion }}.png'
-                    class='{{pokemon.ball}} /'>
-                </div>
-              </div>
-            </div>
-          </ion-card>
-          <!-- Bloque Dos Fin Parte 1 -->
+            <ion-fab vertical='bottom' horizontal='end' id='fab1'>
+              <ion-fab-button (click)='mostrarInfoPokemon()' color='light'>
+                <ion-icon name='paw-outline' role='img' alt="" color="dark"></ion-icon>
+              </ion-fab-button>
+            </ion-fab>
 
-          <!-- Bloque Dos Parte 2 -->
-          <ion-card class="row padding-10 margin-bottom-15" *ngIf='(pokemon.nivel_evolucion === 0);' [ngClass]='ocultar1'>
-            <div class="col-12">
-              <div class="row">
-                <div class="col-12 text-center titulo">No tiene evolución</div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <img alt='{{ pokemon.numero_nacional }}'
-                    src='../../assets/images/pokemons/{{ pokemon.numero_nacional }}.png'
-                    class='no-evolucion {{pokemon.ball}}' />
-                </div>
-              </div>
-            </div>
-          </ion-card>
-          <!-- Bloque Dos Fin Parte 2 -->
+            <ion-fab vertical='bottom' horizontal='start' id='fab2'>
+              <ion-fab-button (click)='capturar(pokemon.num_nation, pokemon.num_evo)' color='light'>
+                <ion-icon name='icon-ball' role='img' alt="" color="dark"></ion-icon>
+              </ion-fab-button>
+            </ion-fab>
+          </div>
+        </div>
 
-          <!-- Bloque Stats -->
-          <ion-card class='row' [ngClass]='ocultar2'>
-            <div class='col-12'>
-              <div class='row margin-bottom-5'>
-                <div class='col-12'>
-                  <div class='text-center'>{{ pokemon.nombre }}</div>
-                </div>
-              </div>
-              <div class='row letra14'>
+        <div class="col-12 background-down">
+          <article *ngIf="info">
+            <h1><span class="poke-name">{{ pokemon.name }}</span><span class="poke-num">#{{ pokemon.num_nation }}</span></h1>
+            <div class="species">{{ this.pokemon.specie }}</div>
+            <p>{{ this.pokemon.descripcion }}</p>
+            <!-- <ul>
+              <li>
+                <label><span>HP</span><span>{{ pokemon.hp }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="255" value="{{ pokemon.hp }}"></meter>
+              </li>
+              <li>
+                <label><span>Speed</span><span>{{ pokemon.speed }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="200" value="{{ pokemon.speed }}"></meter>
+              </li>
+              <li>
+                <label><span>Attack</span><span>{{ pokemon.attack }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="195" value="{{ pokemon.attack }}"></meter>
+              </li>
+              <li>
+                <label><span>Defense</span><span>{{ pokemon.defense }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="255" value="{{ pokemon.defense }}"></meter>
+              </li>
+              <li>
+                <label><span>Sp. Atk</span><span>{{ pokemon.special_attack }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="195" value="{{ pokemon.special_attack }}"></meter>
+              </li>
+              <li>
+                <label><span>Sp. Def:</span><span>{{ pokemon.special_defense }}</span></label>
+                <meter min="1" low="20" high="100" optimum="150" max="250" value="{{ pokemon.special_defense }}"></meter>
+              </li>
+            </ul> -->
+            <ion-row *ngFor="let stat of poke_stats">
+              <ion-col size="6">
+                <span>{{ stat.label }}</span>
+              </ion-col>
+              <ion-col size="2">
+                <span>{{ stat.value }}</span>
+              </ion-col>
+              <ion-col size="4">
+                <meter [min]="stat.min" [low]="stat.low" [high]="stat.high" [optimum]="stat.optimum" [max]="stat.max" [value]="stat.value"></meter>
+              </ion-col>
+            </ion-row>
+          </article>
 
-                <div class='col-12'>
-                  <div class='row'>
-                    <div class='col-6 text-left en-linea'>
-                      <p>Nivel: </p>
-                      <p>{{ pokemon.nivel }}</p>
-                    </div>
-                    <div class='col-3 text-center'>{{ pokemon.numero_nacional }}</div>
-                    <div class='col-3'>
-                      <div class='text-right' *ngIf='genero'>
-                        <ion-icon class='text-right' name='md-female'></ion-icon>
-                      </div>
-                      <div class='text-right' *ngIf='!genero'>
-                        <ion-icon class='text-right' name='md-male'></ion-icon>
+          <article *ngIf="!info">
+            <!-- <div class='tarjeta'>
+              <img alt='{{ extractIdFromUrl(evol_subdata.species_url) }}' src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ extractIdFromUrl(evol_subdata.species_url) }}.png' class='pokemon-img'>
+
+              <ion-icon *ngIf="!evol_subdata" name="add-outline" class="add-icon"></ion-icon>
+            </div> -->
+
+            <!-- Bloque Dos Parte 1 -->
+            <ion-row>
+              <ion-col size="12">
+                <ion-row>
+                  <div class="col-3">
+                    <div class="row">
+                      <div class="col block-evo-cond" *ngFor="let pokemon of evol_data.evolves_to;" >
+                        <div *ngFor="let pokemon_cond of pokemon.evolution_details;" style="display: grid; font-size: 12px;" >
+                          <span *ngIf="pokemon_cond.held_item" >{{ pokemon_cond.held_item }}</span>
+                          <span *ngIf="pokemon_cond.item" >{{ pokemon_cond.item }}</span>
+                          <span *ngIf="pokemon_cond.known_move_type" >Type - {{ pokemon_cond.known_move_type }}</span>
+                          <span *ngIf="pokemon_cond.location" >location: {{ pokemon_cond.location }}</span>
+                          <span *ngIf="pokemon_cond.min_happiness" >Happy - {{ pokemon_cond.min_happiness }}</span>
+                          <span *ngIf="pokemon_cond.min_level" >Lv - {{ pokemon_cond.min_level }}</span>
+                          <span *ngIf="pokemon_cond.time_of_day" >Time - {{ pokemon_cond.time_of_day }}</span>
+                          <span>{{ pokemon_cond.trigger }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <!-- Bloque de ataque -->
-                  <div class='row'>
-                    <div class='col-6 en-linea'>Ataque:
-                      <p class='text-right'>{{ pokemon.ataque }}</p>
-                    </div>
-                    <div class='col-6 en-linea'>Ataque M:
-                      <p class='text-right'>{{ pokemon.ataque_especial }}</p>
-                    </div>
-                  </div>
-                  <!-- Fin Bloque de ataque -->
-                  <!-- Bloque de defensa -->
-                  <div class='row'>
-                    <div class='col-6 en-linea'>Defensa:
-                      <p class='text-right'>{{ pokemon.defensa }}</p>
-                    </div>
-                    <div class='col-6 en-linea'>Defensa M:
-                      <p class='text-right'>{{ pokemon.defensa_especial }}</p>
+                  <div class="col-3">
+                    <div class="row">
+                      <div class="col relative" *ngFor="let pokemon of evol_data.evolves_to;" >
+                        <img alt='{{ extractIdFromUrl(pokemon.species_url) }}' src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ extractIdFromUrl(pokemon.species_url) }}.png' class='pokemon-img' />
+                        <span class='text-poke'>{{ pokemon.species_name }}</span>
+                      </div>
                     </div>
                   </div>
-                  <!-- Fin Bloque de defensa -->
-                  <!-- Bloque de velocidad -->
-                  <div class='row'>
-                    <div class='col-6 en-linea'>Velocidad:
-                      <p class='text-right'>{{ pokemon.velocidad }}</p>
-                    </div>
-                    <div class='col-6 en-linea'>Evoluciona:
-                      <p class='text-right'>{{ pokemon.nivel_evolucion }}</p>
+                  <div class="col-3">
+                    <div class="row" *ngIf="evol_subdata.evolves_to" >
+                      <div class="col block-evo-cond" *ngFor="let pokemon of evol_subdata.evolves_to;" >
+                        <div *ngFor="let pokemon_cond of pokemon.evolution_details;" style="display: grid; font-size: 12px;" >
+                          <span *ngIf="pokemon_cond.held_item" >{{ pokemon_cond.held_item }}</span>
+                          <span *ngIf="pokemon_cond.item" >{{ pokemon_cond.item }}</span>
+                          <span *ngIf="pokemon_cond.known_move_type" >Type - {{ pokemon_cond.known_move_type }}</span>
+                          <span *ngIf="pokemon_cond.location" >location: {{ pokemon_cond.location }}</span>
+                          <span *ngIf="pokemon_cond.min_happiness" >Happy - {{ pokemon_cond.min_happiness }}</span>
+                          <span *ngIf="pokemon_cond.min_level" >Lv - {{ pokemon_cond.min_level }}</span>
+                          <span *ngIf="pokemon_cond.time_of_day" >Time - {{ pokemon_cond.time_of_day }}</span>
+                          <span>{{ pokemon_cond.trigger }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <!-- Fin Bloque de velocidad -->
-                </div>
-              </div>
-            </div>
-          </ion-card>
-          <!-- Fin Bloque Stats -->
+                  <div class="col-3">
+                    <div class="row" *ngIf="evol_subdata.evolves_to" >
+                      <div class="col relative" *ngFor="let pokemon of evol_subdata.evolves_to;" >
+                        <img alt='{{ extractIdFromUrl(pokemon.species_url) }}' src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ extractIdFromUrl(pokemon.species_url) }}.png' class='pokemon-img' />
+                        <span class='text-poke'>{{ pokemon.species_name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </ion-row>
+              </ion-col>
+            </ion-row>
+            <!-- Bloque Dos Fin Parte 1 -->
+          </article>
 
         </div>
+
+        <div class="fondo"></div>
       </div>
-    
-      <ion-fab vertical='bottom' horizontal='end' id='fab1'>
-        <ion-fab-button (click)='mostrarInfoPokemon()' color='light'>
-          <ion-icon name='paw-outline' role='img' color="dark"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-  
-      <ion-fab vertical='bottom' horizontal='start' id='fab2'>
-        <ion-fab-button (click)='capturar(pokemon.numero_nacional, pokemon.numero_evolucion)' color='dark'>
-          <img src='../../../assets/icon/iconBall.png' alt='ball'>
-        </ion-fab-button>
-      </ion-fab>
+    </div>
 
-    </header>
+  <!-- </div> -->
 
-  </div>
-</ion-content>
+<!-- </ion-content> -->

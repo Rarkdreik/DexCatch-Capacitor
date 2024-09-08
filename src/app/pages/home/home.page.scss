@@ -1,0 +1,282 @@
+// ######  Personaje Imagen  ##########################
+.contenedor {
+    height: 100vh;
+    display: unset;
+}
+
+.progress {
+    padding: 0;
+    background-color: #3e7082;
+    height: 8px;
+    width: 95%;
+    margin-left: 5px;
+}
+
+// ######  Bloque derecho  ##########################
+// ###################  Region  #####################
+.letraregion {
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+// ###################  Generar QR   #####################
+
+// ######  Estructura con lineas  ##########################
+
+.bordeabajo {
+    border-bottom: solid 1px white;
+}
+
+.bordederecha {
+    border-right: solid 1px white;
+}
+
+.box-char {
+    margin: 5px;
+    padding: 5px;
+    width: 98vw;
+    border-radius: 5px;
+    background-color: var(--background-two);
+}
+
+.box-team {
+    margin: 5px;
+    padding: 5px;
+    width: 98vw;
+    border-radius: 5px;
+    background-color: var(--background-two);
+}
+
+.box-map {
+    padding: 5px;
+    margin: 5px;
+    width: 98vw;
+    border-radius: 5px;
+    background-color: var(--background-two);
+    display: grid;
+}
+
+.imgAvatar {
+    height: 155px;
+    width: 165px;
+    padding: 5%;
+    object-fit: cover;
+    object-position: 0% 5%;
+    background-color: var(--background-thr);
+    border-radius: 5px;
+}
+
+.main-team {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    width: 95vw;
+    border-radius: 5px;
+}
+
+.box-pokemons {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tarjeta {
+    display: grid;
+    padding: 5px;
+    background-color: var(--background-thr);
+    border-radius: 5px;
+    margin: 0px 5px 5px 0;
+    width: 31%;
+    box-shadow: none;
+    height: 13vh;
+    justify-items: center;
+    align-items: center;
+}
+
+.square-button {
+    background-color: var(--background-two);
+    border-radius: 5px;
+    height: 40px;
+    width: 40px;
+}
+
+.pokemon-img {
+    height: 7vh;
+    object-fit: cover;
+    object-position: 30% 25%;
+    justify-self: center;
+    margin-bottom: 5px;
+}
+
+ion-segment {
+    display: flex;
+    width: 100%;
+}
+
+ion-segment, ion-segment * {
+    font-size: 12px !important;
+}
+
+ion-segment > * {
+    border-radius: 3px;
+    background-color: #26496d;
+    border-bottom: 1px solid white;
+    margin-right: 2px !important;
+    margin-top: 5px !important;
+}
+
+ion-segment-button {
+    padding: 0;
+    min-width: unset;
+    min-height: 20px;
+    margin: 0;
+    display: flex;
+}
+
+ion-segment-button, ion-segment-button > span {
+    width: 9vw !important;
+}
+
+// FONTS
+.main-nick, .main-nick * {
+    font-size: xx-large;
+    line-height: normal;
+    text-align: end;
+    display: block;
+}
+
+.main-level, .main-level * {
+    text-align: end;
+    display: block;
+    color: #2bd7c4;
+}
+
+qrcode, qrcode * {
+    display: grid !important;
+}
+
+.grid-v-center {
+    display: grid;
+    align-items: center;
+}
+
+.grid-end {
+    justify-content: end;
+    margin-right: 5%;
+}
+
+.imgMapa {
+    height: 250px;
+    width: 350px;
+    border-radius: 5px;
+    justify-self: center;
+}
+
+
+/* Para pantallas pequeñas */
+@media (max-width: 400px) {
+    .imgMapa { width: 90vw; height: 15vh; }
+    .box-char { width: 97vw; }
+    .box-team { width: 97vw; }
+    .box-map  { width: 97vw; }
+}
+
+/* Para pantallas pequeñas */
+@media (min-width: 401px) and (max-width: 600px) {
+    .imgMapa { width: 94vw; height: 24vh; }
+}
+
+/* Para pantallas medianas */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .imgMapa { width: 92vw; height: 30vh; }
+}
+
+/* Para pantallas grandes */
+@media (min-width: 1025px) {
+    .imgMapa { width: 92vw; height: 40vh; }
+}
+
+// BUTTON
+// ######  Botones  ##########################
+
+.marginTopButton {
+    margin-top: 10px !important;
+}
+
+.btn {
+    width: 100%;
+}
+
+.button-82-pushable {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    outline-offset: 4px;
+    transition: filter 250ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.button-82-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: hsl(0deg 0% 0% / 0.25);
+    will-change: transform;
+    transform: translateY(2px);
+    transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+}
+
+.button-82-edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: linear-gradient( to left, hsl(0, 0%, 0%) 0%, hsl(211, 46%, 12.4%) 8%, hsl(209, 49.2%, 24.7%) 92%, hsl(0, 0%, 28.2%) 100% );
+}
+
+.button-82-front {
+    display: block;
+    position: relative;
+    padding: 3px 3px;
+    border-radius: 1em;
+    font-size: 1.1rem;
+    color: white;
+    background: hsl(209, 49.2%, 24.7%);
+    will-change: transform;
+    transform: translateY(-4px);
+    transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+    background: linear-gradient( to left, hsl(225, 42.9%, 16.5%) 0%, hsl(208.9, 48.5%, 32%) 100% );
+}
+
+.button-82-pushable:active .button-82-front {
+    transform: translateY(-2px);
+    transition: transform 34ms;
+}
+
+.button-82-pushable:active .button-82-shadow {
+    transform: translateY(1px);
+    transition: transform 34ms;
+}
+
+
+
+
+.pokeiconos:active {
+    box-shadow: 1px 1px #113254;
+    transform: translateY(1px) translateX(1px);
+    transition: transform 34ms;
+}
+
+.pokeiconos {
+    background-color: var(--background-cer);
+    border-radius: 5px;
+    box-shadow: 2px 2px #000;
+    width: 40px;
+    padding: 5px;
+}

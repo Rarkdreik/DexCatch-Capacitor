@@ -1,0 +1,151 @@
+<ion-header [translucent]='true'>
+  <ion-toolbar>
+    <ion-title>Trainer</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class='contenedor'>
+
+    <ion-row class='width-100'>
+      <ion-row class='box-char'>
+        <ion-col size='6' class='centrar' (click)="openViewer(imgElement, 'img-avatar')">
+          <ion-img #imgElement title="Demo" text="Component" scheme="dark" [src]='repo.getAvatar()' class='imgAvatar'></ion-img>
+          <!-- <img alt='' [src]='repo.getAvatar()' class='imgAvatar'> -->
+        </ion-col>
+        <ion-col size='6'>
+          <ion-row>
+            <ion-col size='12'>
+              <ion-row class='grid-end main-nick'><span>{{ master.nick | uppercase }}</span></ion-row>
+              <ion-row class='grid-end main-level'><span>LV. {{ master.level }}</span></ion-row>  
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size='4'>
+
+              <div class="pokeiconos" (click)='galeria()'>
+                <img alt='catch' src='../../../assets/images/iconos/mochila.png'>
+              </div>
+
+              <div class="pokeiconos" (click)='leerQr()'>
+                <img alt='catch' src='../../../assets/images/iconos/read_qr.png'>
+              </div>
+              <!-- <button type="button" (click)="galeria()" class="btn btn-outline-secondary width-padre">
+                <ion-icon name="images-outline"></ion-icon>
+              </button>
+              <button type="button" (click)="leerQr()" class="btn btn-outline-secondary width-padre">
+                <ion-icon name="scan-outline"></ion-icon>
+              </button> -->
+
+            </ion-col>
+            <ion-col size='8' class='grid'>
+              <ion-row class='grid-end' (click)="openViewer(qrcode, 'qrcode')">
+                <qrcode #qrcode [qrdata]='qrData' [width]='90' [errorCorrectionLevel]="'M'"></qrcode>
+              </ion-row>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class='width-100'>
+      <div class='box-map'>
+        <img alt='' src='../../assets/images/mapas/{{ map_poke }}.jpg' class='imgMapa' (click)="goPokedex()">
+        <ion-segment [scrollable]='false' value='johto' (ionChange)='segmentChanged($event)' mode='md'>
+          <ion-segment-button value='kanto'>
+            <span>KANTO</span>
+          </ion-segment-button>
+          <ion-segment-button value='johto'>
+            <span>JOHTO</span>
+          </ion-segment-button>
+          <ion-segment-button value='hoenn'>
+            <span>HOENN</span>
+          </ion-segment-button>
+          <ion-segment-button value='sinnoh'>
+            <span>SINNOH</span>
+          </ion-segment-button>
+          <ion-segment-button value='unova'>
+            <span>UNOVA</span>
+          </ion-segment-button>
+          <ion-segment-button value='kalos'>
+            <span>KALOS</span>
+          </ion-segment-button>
+          <ion-segment-button value='alola'>
+            <span>ALOLA</span>
+          </ion-segment-button>
+          <ion-segment-button value='galar'>
+            <span>GALAR</span>
+          </ion-segment-button>
+          <ion-segment-button value='hisui'>
+            <span>HISUI</span>
+          </ion-segment-button>
+          <ion-segment-button value='paldea'>
+            <span>PALDEA</span>
+          </ion-segment-button>
+          <!-- <ion-segment-button value='kitakami'>
+            <span>KITAKAMI</span>
+          </ion-segment-button> -->
+        </ion-segment>
+      </div>
+    </ion-row>
+
+    <!-- Equipo -->
+    <ion-row class='width-100'>
+      <ion-row class='box-team'>
+        <ion-col size='10' class=''>
+          <div class='box-pokemons'>
+            <div class='tarjeta' *ngFor='let pokemon of team_poke'>
+              <img *ngIf="pokemon" alt='{{ pokemon.num_nation }}' src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ +pokemon.num_nation }}.png' class='pokemon-img'>
+              <div *ngIf="pokemon" class='progress square_corner_simple'>
+                <div class='progress-bar bg-success' role='progressbar' [style.width.%]="calculateHpPercentage(pokemon)" aria-valuenow='25' aria-valuemin='0' aria-valuemax='100'>{{pokemon.hp}}/{{pokemon.hp_max}}</div>
+              </div>
+              <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+            </div>
+          </div>
+        </ion-col>
+        <ion-col size='2' class='main-team-buttons grid-v-center'>
+
+          <!-- <button class="button-82-pushable" role="button" (click)='goTeam()'>
+            <span class="button-82-shadow"></span>
+            <span class="button-82-edge"></span>
+            <span class="button-82-front text">
+              <ion-icon slot="icon-only" src="../../../../assets/images/svg/svg_pokedex.svg"></ion-icon>
+            </span>
+          </button>
+
+          <button class="button-82-pushable" role="button">
+            <span class="button-82-shadow"></span>
+            <span class="button-82-edge"></span>
+            <span class="button-82-front text">
+              <ion-icon slot="icon-only" src="../../../../assets/images/svg/svg_home.svg"></ion-icon>
+            </span>
+          </button> -->
+
+          <!-- <button class="button-82-pushable" role="button">
+            <span class="button-82-shadow"></span>
+            <span class="button-82-edge"></span>
+            <span class="button-82-front text">
+              <ion-icon slot="icon-only" src="../../../../assets/images/svg/svg_poke_center.svg"></ion-icon>
+            </span>
+          </button> -->
+
+          <div class="pokeiconos" (click)='goTeam()'>
+            <img alt='catch' src='../../../assets/images/svg/svg_pokedex.svg'>
+          </div>
+
+          <div class="pokeiconos">
+            <img alt='catch' src='../../../assets/images/svg/svg_home.svg'>
+          </div>
+
+          <div class="pokeiconos" (click)='goPokeCenter()'>
+            <img alt='catch' src='../../../assets/images/svg/svg_poke_center.svg'>
+          </div>
+
+        </ion-col>
+      </ion-row>
+    </ion-row>
+  </div>
+
+</ion-content>

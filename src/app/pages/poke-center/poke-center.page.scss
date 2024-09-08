@@ -1,101 +1,181 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
+/* ---------------------------------------------------------------------------
+ * Contenedores Generales
+ * ---------------------------------------------------------------------------
+ * Estilos para los contenedores principales que controlan la disposición y 
+ * alineación de los elementos en la interfaz.
+ */
+
+.contenedor {
+    display: grid;
     align-items: center;
-    background-color: #f0f0f0;
+    justify-items: center;
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
 }
 
 .machine-container {
-    // width: 90%;
-    // height: 90%;
-    // max-width: 400px;
-    // max-height: 700px;
-    // background-color: #e0e0e0;
-    // border-radius: 20px;
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: space-around;
-    // align-items: center;
-    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    // padding: 20px;
-
-    width: 100%;
+    width: 90%;
     height: 90%;
-    max-width: 400px;
+    max-width: 370px;
     max-height: 700px;
-    background-color: #2f2f2f;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
+    position: relative;
+    background-image: url('../../../assets/images/item_pokemon/heal.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
+
+.overflow-background {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    max-width: unset;
+    overflow: visible;
+    z-index: -1;
+}
+
+/* ---------------------------------------------------------------------------
+ * Encabezado y Pie de Página de la Máquina
+ * ---------------------------------------------------------------------------
+ * Estilos para la cabecera y el pie de página del contenedor de la máquina.
+ */
 
 .machine-header {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 20px;
-}
-
-.pokeball-slot {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.pokeball {
-    // width: 50px;
-    // height: 50px;
-    // background-color: red;
-    // border-radius: 50%;
-    // border: 2px solid white;
-    // position: relative;
-    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-    width: 50px;
-    height: 50px;
-    background-color: red;
-    border-radius: 50%;
-    border: 2px solid white;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transform: rotate(180deg);
-}
-
-.pokeball::before,
-.pokeball::after {
-    content: '';
     position: absolute;
-    background-color: white;
-    border-radius: 50px 50px 0px 0px;
-}
-
-.pokeball::before {
-    width: 100%;
-    height: 50%;
-    top: 0;
-    border-bottom: 2px solid black;
-}
-
-.pokeball::after {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    top: calc(50% - 7.5px);
-    left: calc(50% - 7.5px);
-    border: 2px solid black;
-    background-color: white;
+    top: 10%;
 }
 
 .machine-footer {
-    font-size: 18px;
-    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 55%;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos para Pokémon y Pokeballs
+ * ---------------------------------------------------------------------------
+ * Controlan la apariencia y posición de los elementos Pokémon y Pokeballs.
+ */
+
+.cardPokemon {
+    background-color: var(--background-two);
+    height: 100px;
+    width: 80px;
+}
+
+.pokeball-slot1, .pokeball-slot2 {
+    display: flex;
+    position: relative;
+}
+
+.pokeball-slot1 {
+    bottom: -395px;
+}
+
+.pokeball-slot2 {
+    bottom: -105px;
+}
+
+.pokeball {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    transform: rotate(180deg);
+}
+
+#poke1 {
+    right: 65px;
+}
+
+#poke2 {
+    right: -22px;
+}
+
+#poke3 {
+    right: -110px;
+}
+
+#poke4 {
+    left: -54px;
+}
+
+#poke5 {
+    left: 23px;
+}
+
+#poke6 {
+    right: -100px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos de Imagen y Barras de Vida
+ * ---------------------------------------------------------------------------
+ * Estilos específicos para el manejo de imágenes y barras de vida.
+ */
+
+.imgball {
+    height: 92px;
+    width: 92px;
+    max-width: unset;
+    rotate: 180deg;
+}
+
+.barraVida {
+    height: 5px;
+    margin-bottom: 5px;
+}
+
+.barraVida > img {
+    height: 5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.colorBlack {
+    background-color: rgba(0, 0, 0, 0.69);
+}
+
+.progress {
+    height: 7px;
+    margin: 0 5px !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Estilos para la Animación de Flip
+ * ---------------------------------------------------------------------------
+ * Controlan la animación y la estructura de los elementos que giran (flip).
+ */
+
+.flipper {
+	transition: 0.6s;
+	transform-style: preserve-3d;
+	position: relative;
+}
+
+.front {
+    z-index: 2;
+	backface-visibility: hidden;
+    transform: rotateY(0deg);
+    position: relative;
+}
+
+.back {
+    position: absolute;
+    top: 0;
+    transform: rotateY(180deg);
+    margin: 10px;
+    border-radius: 4px;
 }

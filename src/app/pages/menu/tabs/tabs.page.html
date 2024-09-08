@@ -1,19 +1,16 @@
 <ion-tabs>
 
   <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="tab1" href="/main/tab1">
-      <ion-icon aria-hidden="true" name="triangle"></ion-icon>
-      <ion-label>Tab 1</ion-label>
+    <ion-tab-button tab="tab1" (click)='goPokedex()'>
+      <ion-icon src="../../../../assets/images/svg/svg_pokedex.svg"></ion-icon>
     </ion-tab-button>
 
-    <ion-tab-button tab="avatar" href="/main/avatar">
-      <ion-icon name="person-circle-outline"></ion-icon>
-      <ion-label>Tab 2</ion-label>
+    <ion-tab-button tab="avatar" href="/home">
+      <ion-icon src="../../../../assets/images/svg/svg_home.svg"></ion-icon>
     </ion-tab-button>
 
     <ion-tab-button tab="tab3" href="/main/tab3">
-      <ion-icon aria-hidden="true" name="square"></ion-icon>
-      <ion-label>Tab 3</ion-label>
+      <ion-icon src="../../../../assets/images/svg/svg_poke_center.svg"></ion-icon>
     </ion-tab-button>
   </ion-tab-bar>
 

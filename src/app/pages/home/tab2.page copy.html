@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Trainer</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- <ion-content> -->
+  <div class="contenedor">
+    <header id="header">
+
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12">
+            <div class="row bordeabajo">
+              <div class="col-4">
+                <h6 class="text-center">level {{repo.getMaster().level}}</h6>
+              </div>
+              <div class="col-8 text-center">
+                <h4>{{this.repo.getMaster().nick}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 bordeabajo">
+        <div class="row">
+          <div class="col-6 bordederecha centrar">
+            <img alt="" [src]="repo.getAvatar()" class="imgAvatar">
+          </div>
+          <div class="col-6">
+            <div class="row width100">
+              <div class="col-12" (click)="iraregion()">
+                <h6 class="letraregion bordeabajo text-center width100">{{repo.getRegion()}}</h6>
+                <img alt="" src="../../assets/images/mapas/{{repo.getRegion()}}.jpg" class="imgMapa">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <qrcode [qrdata]="qrData" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" style="margin-top: 0rem">
+        <div class="row">
+          <div class="col-6 bordederecha">
+            <div class="row marginTopButton">
+              <div class="col-12">
+                <button type="button" (click)="galeria()" class="btn btn-outline-secondary width-padre">
+                  <ion-icon name="images-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row marginTopButton">
+              <div class="col-12">
+                <button type="button" (click)="leerQr()" class="btn btn-outline-secondary width-padre">
+                  <ion-icon name="scan-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </header>
+  </div>
+
+  <!-- <app-explore-container name="Tab 2 page"></app-explore-container> -->
+<!-- </ion-content> -->

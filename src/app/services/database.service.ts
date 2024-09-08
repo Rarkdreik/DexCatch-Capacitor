@@ -27,7 +27,7 @@ export class DatabaseService {
     'johto': new BehaviorSubject<PokemonInterface[]>([]),
     'hoenn': new BehaviorSubject<PokemonInterface[]>([]),
     'sinnoh': new BehaviorSubject<PokemonInterface[]>([]),
-    'teselia': new BehaviorSubject<PokemonInterface[]>([]),
+    'unova': new BehaviorSubject<PokemonInterface[]>([]),
     'kalos': new BehaviorSubject<PokemonInterface[]>([]),
     'alola': new BehaviorSubject<PokemonInterface[]>([])
   };
@@ -36,7 +36,7 @@ export class DatabaseService {
   private equipoPokemon = new BehaviorSubject<PokemonInterface[]>([]);
   private MasterDB = new BehaviorSubject<Master[]>([]);
   private entrenador: Master = this.constants.master_empty;
-  private numero_nacional: string = '';
+  private num_nation: string = '';
 
   constructor(
     private plt: Platform,
@@ -114,7 +114,7 @@ export class DatabaseService {
     //   if (data.rows.length > 0) {
     //     for (let i = 0; i < data.rows.length; i++) {
     //       master.push({
-    //         nick: data.rows.item(i).nick, exp: data.rows.item(i).exp, nivel: data.rows.item(i).nivel, pokeBalls: data.rows.item(i).pokeBalls,
+    //         nick: data.rows.item(i).nick, exp: data.rows.item(i).exp, level: data.rows.item(i).level, pokeBalls: data.rows.item(i).pokeBalls,
     //         superBalls: data.rows.item(i).superBalls, ultraBalls: data.rows.item(i).ultraBalls, masterBalls: data.rows.item(i).masterBalls,
     //         region_ini: data.rows.item(i).region_ini, poke_ini: data.rows.item(i).poke_ini, capturados: data.rows.item(i).capturados, favoritos: data.rows.item(i).favoritos
     //       });
@@ -136,7 +136,7 @@ export class DatabaseService {
   public async getEntrenadorPromise(entrenador: Master): Promise<Master> {
     // return this.database.executeSql(`SELECT * FROM entrenador WHERE nick = ?`, [entrenador.nick]).then((data: any) => {
     //   return {
-    //     nick: data.rows.item(0).nick, exp: data.rows.item(0).exp, nivel: data.rows.item(0).nivel, pokeBalls: data.rows.item(0).pokeBalls,
+    //     nick: data.rows.item(0).nick, exp: data.rows.item(0).exp, level: data.rows.item(0).level, pokeBalls: data.rows.item(0).pokeBalls,
     //     superBalls: data.rows.item(0).superBalls, ultraBalls: data.rows.item(0).ultraBalls, masterBalls: data.rows.item(0).masterBalls,
     //     region_ini: data.rows.item(0).region_ini, poke_ini: data.rows.item(0).poke_ini, capturados: data.rows.item(0).capturados, favoritos: data.rows.item(0).favoritos
     //   }
@@ -165,10 +165,10 @@ export class DatabaseService {
     //   if (data.rows.length > 0) {
     //     for (let i = 0; i < data.rows.length; i++) {
     //       poke.push({
-    //         numero_nacional: data.rows.item(i).numero_nacional, numero_regional: data.rows.item(i).numero_regional, region: data.rows.item(i).region, nombre: data.rows.item(i).nombre, tipo_uno: data.rows.item(i).tipo_uno, tipo_dos: data.rows.item(i).tipo_dos,
-    //         genero: data.rows.item(i).genero, descripcion: data.rows.item(i).descripcion, numero_evolucion: data.rows.item(i).numero_evolucion, nivel_evolucion: data.rows.item(i).nivel_evolucion, evolucion: data.rows.item(i).evolucion,
-    //         nivel: data.rows.item(i).nivel, exp: data.rows.item(i).exp, hp: data.rows.item(i).hp, hp_max: data.rows.item(i).hp_max, ataque: data.rows.item(i).ataque, defensa: data.rows.item(i).defensa,
-    //         ataque_especial: data.rows.item(i).ataque_especial, defensa_especial: data.rows.item(i).defensa_especial, velocidad: data.rows.item(i).velocidad, estado: data.rows.item(i).estado,
+    //         num_nation: data.rows.item(i).num_nation, num_region: data.rows.item(i).num_region, region: data.rows.item(i).region, name: data.rows.item(i).name, tipo_uno: data.rows.item(i).tipo_uno, tipo_dos: data.rows.item(i).tipo_dos,
+    //         genero: data.rows.item(i).genero, descripcion: data.rows.item(i).descripcion, num_evo: data.rows.item(i).num_evo, level_evo: data.rows.item(i).level_evo, evo: data.rows.item(i).evo,
+    //         level: data.rows.item(i).level, exp: data.rows.item(i).exp, hp: data.rows.item(i).hp, hp_max: data.rows.item(i).hp_max, attack: data.rows.item(i).attack, defense: data.rows.item(i).defense,
+    //         special_attack: data.rows.item(i).special_attack, special_defense: data.rows.item(i).special_defense, speed: data.rows.item(i).speed, state: data.rows.item(i).state,
     //         IV: data.rows.item(i).IV, EV: data.rows.item(i).EV, ball: data.rows.item(i).ball
     //       });
     //     }
@@ -187,16 +187,16 @@ export class DatabaseService {
 
   public async getPokemonAtrapado(poke: PokemonInterface): Promise<PokemonInterface> {
     console.log('base de datos 11');
-    // return this.database.executeSql(`SELECT * FROM atrapado WHERE numero_nacional = ?`, [poke.numero_nacional]).then((data: any) => {
+    // return this.database.executeSql(`SELECT * FROM atrapado WHERE num_nation = ?`, [poke.num_nation]).then((data: any) => {
     //   return {
-    //     numero_nacional: data.rows.item(0).numero_nacional, numero_regional: data.rows.item(0).numero_regional, region: data.rows.item(0).region, nombre: data.rows.item(0).nombre, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
-    //     genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, numero_evolucion: data.rows.item(0).numero_evolucion, nivel_evolucion: data.rows.item(0).nivel_evolucion, evolucion: data.rows.item(0).evolucion,
-    //     nivel: (data.rows.item(0).nivel !== undefined ? data.rows.item(0).nivel : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
+    //     num_nation: data.rows.item(0).num_nation, num_region: data.rows.item(0).num_region, region: data.rows.item(0).region, name: data.rows.item(0).name, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
+    //     genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, num_evo: data.rows.item(0).num_evo, level_evo: data.rows.item(0).level_evo, evo: data.rows.item(0).evo,
+    //     level: (data.rows.item(0).level !== undefined ? data.rows.item(0).level : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
 
     //     hp: (data.rows.item(0).hp !== undefined ? data.rows.item(0).hp : ''), hp_max: (data.rows.item(0).hp_max !== undefined ? data.rows.item(0).hp_max : ''),
-    //     ataque: (data.rows.item(0).ataque !== undefined ? data.rows.item(0).ataque : ''), defensa: (data.rows.item(0).defensa !== undefined ? data.rows.item(0).defensa : ''),
-    //     ataque_especial: (data.rows.item(0).ataque_especial !== undefined ? data.rows.item(0).ataque_especial : ''), defensa_especial: (data.rows.item(0).defensa_especial !== undefined ? data.rows.item(0).defensa_especial : ''),
-    //     velocidad: (data.rows.item(0).velocidad !== undefined ? data.rows.item(0).velocidad : ''), estado: (data.rows.item(0).estado !== undefined ? data.rows.item(0).estado : ''),
+    //     attack: (data.rows.item(0).attack !== undefined ? data.rows.item(0).attack : ''), defense: (data.rows.item(0).defense !== undefined ? data.rows.item(0).defense : ''),
+    //     special_attack: (data.rows.item(0).special_attack !== undefined ? data.rows.item(0).special_attack : ''), special_defense: (data.rows.item(0).special_defense !== undefined ? data.rows.item(0).special_defense : ''),
+    //     speed: (data.rows.item(0).speed !== undefined ? data.rows.item(0).speed : ''), state: (data.rows.item(0).state !== undefined ? data.rows.item(0).state : ''),
     //     IV: (data.rows.item(0).IV !== undefined ? data.rows.item(0).IV : ''), EV: (data.rows.item(0).EV !== undefined ? data.rows.item(0).EV : ''), capturado: (data.rows.item(0).capturado !== undefined ? data.rows.item(0).capturado : ''), favorito: (data.rows.item(0).favorito !== undefined ? data.rows.item(0).favorito : ''),
     //     ball: (data.rows.item(0).ball !== undefined ? data.rows.item(0).ball : '')
     //   }
@@ -207,15 +207,15 @@ export class DatabaseService {
 
   public async deletePokemonAtrapado(poke: PokemonInterface) {
     console.log('base de datos 12');
-    // return this.database.executeSql(`DELETE FROM atrapado WHERE numero_nacional = ${poke.numero_nacional}`).then(() => {
+    // return this.database.executeSql(`DELETE FROM atrapado WHERE num_nation = ${poke.num_nation}`).then(() => {
     //   this.loadPokemon(poke.region);
     // });
   }
 
   public async updatePokemonAtrapado(poke: PokemonInterface) {
     console.log('base de datos 13');
-    // let data = [poke.numero_nacional, , poke.numero_regional];
-    // return this.database.executeSql(`UPDATE atrapado SET porConstruir WHERE numero_nacional = ${poke.numero_nacional}`, data).then((data: any) => {
+    // let data = [poke.num_nation, , poke.num_region];
+    // return this.database.executeSql(`UPDATE atrapado SET porConstruir WHERE num_nation = ${poke.num_nation}`, data).then((data: any) => {
     //   this.loadPokemon(poke.region);
     // })
   }
@@ -234,10 +234,10 @@ export class DatabaseService {
     //     for (let i = 0; i < data.rows.length; i++) {
 
     //       poke.push({
-    //         numero_nacional: data.rows.item(i).numero_nacional, numero_regional: data.rows.item(i).numero_regional, region: data.rows.item(i).region, nombre: data.rows.item(i).nombre, tipo_uno: data.rows.item(i).tipo_uno, tipo_dos: data.rows.item(i).tipo_dos,
-    //         genero: data.rows.item(i).genero, descripcion: data.rows.item(i).descripcion, numero_evolucion: data.rows.item(i).numero_evolucion, nivel_evolucion: data.rows.item(i).nivel_evolucion, evolucion: data.rows.item(i).evolucion,
-    //         nivel: data.rows.item(i).nivel, exp: data.rows.item(i).exp, hp: data.rows.item(i).hp, hp_max: data.rows.item(i).hp_max, ataque: data.rows.item(i).ataque, defensa: data.rows.item(i).defensa,
-    //         ataque_especial: data.rows.item(i).ataque_especial, defensa_especial: data.rows.item(i).defensa_especial, velocidad: data.rows.item(i).velocidad, estado: data.rows.item(i).estado,
+    //         num_nation: data.rows.item(i).num_nation, num_region: data.rows.item(i).num_region, region: data.rows.item(i).region, name: data.rows.item(i).name, tipo_uno: data.rows.item(i).tipo_uno, tipo_dos: data.rows.item(i).tipo_dos,
+    //         genero: data.rows.item(i).genero, descripcion: data.rows.item(i).descripcion, num_evo: data.rows.item(i).num_evo, level_evo: data.rows.item(i).level_evo, evo: data.rows.item(i).evo,
+    //         level: data.rows.item(i).level, exp: data.rows.item(i).exp, hp: data.rows.item(i).hp, hp_max: data.rows.item(i).hp_max, attack: data.rows.item(i).attack, defense: data.rows.item(i).defense,
+    //         special_attack: data.rows.item(i).special_attack, special_defense: data.rows.item(i).special_defense, speed: data.rows.item(i).speed, state: data.rows.item(i).state,
     //         IV: data.rows.item(i).IV, EV: data.rows.item(i).EV, ball: data.rows.item(i).ball
     //       });
     //     }
@@ -261,16 +261,16 @@ export class DatabaseService {
   }
 
   public async getPokemonEquipo(poke: PokemonInterface): Promise<PokemonInterface> {
-    // return this.database.executeSql(`SELECT * FROM equipo WHERE numero_nacional = ?`, [poke.numero_nacional]).then((data: any) => {
+    // return this.database.executeSql(`SELECT * FROM equipo WHERE num_nation = ?`, [poke.num_nation]).then((data: any) => {
     //   return {
-    //     numero_nacional: data.rows.item(0).numero_nacional, numero_regional: data.rows.item(0).numero_regional, region: data.rows.item(0).region, nombre: data.rows.item(0).nombre, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
-    //     genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, numero_evolucion: data.rows.item(0).numero_evolucion, nivel_evolucion: data.rows.item(0).nivel_evolucion, evolucion: data.rows.item(0).evolucion,
-    //     nivel: (data.rows.item(0).nivel !== undefined ? data.rows.item(0).nivel : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
+    //     num_nation: data.rows.item(0).num_nation, num_region: data.rows.item(0).num_region, region: data.rows.item(0).region, name: data.rows.item(0).name, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
+    //     genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, num_evo: data.rows.item(0).num_evo, level_evo: data.rows.item(0).level_evo, evo: data.rows.item(0).evo,
+    //     level: (data.rows.item(0).level !== undefined ? data.rows.item(0).level : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
 
     //     hp: (data.rows.item(0).hp !== undefined ? data.rows.item(0).hp : ''), hp_max: (data.rows.item(0).hp_max !== undefined ? data.rows.item(0).hp_max : ''),
-    //     ataque: (data.rows.item(0).ataque !== undefined ? data.rows.item(0).ataque : ''), defensa: (data.rows.item(0).defensa !== undefined ? data.rows.item(0).defensa : ''),
-    //     ataque_especial: (data.rows.item(0).ataque_especial !== undefined ? data.rows.item(0).ataque_especial : ''), defensa_especial: (data.rows.item(0).defensa_especial !== undefined ? data.rows.item(0).defensa_especial : ''),
-    //     velocidad: (data.rows.item(0).velocidad !== undefined ? data.rows.item(0).velocidad : ''), estado: (data.rows.item(0).estado !== undefined ? data.rows.item(0).estado : ''),
+    //     attack: (data.rows.item(0).attack !== undefined ? data.rows.item(0).attack : ''), defense: (data.rows.item(0).defense !== undefined ? data.rows.item(0).defense : ''),
+    //     special_attack: (data.rows.item(0).special_attack !== undefined ? data.rows.item(0).special_attack : ''), special_defense: (data.rows.item(0).special_defense !== undefined ? data.rows.item(0).special_defense : ''),
+    //     speed: (data.rows.item(0).speed !== undefined ? data.rows.item(0).speed : ''), state: (data.rows.item(0).state !== undefined ? data.rows.item(0).state : ''),
     //     IV: (data.rows.item(0).IV !== undefined ? data.rows.item(0).IV : ''), EV: (data.rows.item(0).EV !== undefined ? data.rows.item(0).EV : ''), capturado: (data.rows.item(0).capturado !== undefined ? data.rows.item(0).capturado : ''), favorito: (data.rows.item(0).favorito !== undefined ? data.rows.item(0).favorito : ''),
     //     ball: (data.rows.item(0).ball !== undefined ? data.rows.item(0).ball : '')
     //   }
@@ -280,14 +280,14 @@ export class DatabaseService {
   }
 
   public async deletePokemonEquipo(poke: PokemonInterface) {
-    // return this.database.executeSql(`DELETE FROM equipo WHERE numero_nacional = ?`, [poke.numero_nacional]).then(() => {
+    // return this.database.executeSql(`DELETE FROM equipo WHERE num_nation = ?`, [poke.num_nation]).then(() => {
     //   this.loadPokemon(poke.region);
     // });
   }
 
   public async updatePokemonEquipo(poke: PokemonInterface) {
-    let data = [poke.numero_nacional, , poke.numero_regional];
-    // return this.database.executeSql(`UPDATE equipo SET porConstruir WHERE numero_nacional = ${poke.numero_nacional}`, data).then((data: any) => {
+    let data = [poke.num_nation, , poke.num_region];
+    // return this.database.executeSql(`UPDATE equipo SET porConstruir WHERE num_nation = ${poke.num_nation}`, data).then((data: any) => {
     //   this.loadPokemon(poke.region);
     // })
   }
@@ -319,18 +319,18 @@ export class DatabaseService {
   }
 
   public async getPokemon(poke: PokemonInterface): Promise<PokemonInterface> {
-    // return this.database.executeSql(`SELECT * FROM ${poke.region} WHERE numero_nacional = ?`, [poke.numero_nacional]).then((data: any) => {
+    // return this.database.executeSql(`SELECT * FROM ${poke.region} WHERE num_nation = ?`, [poke.num_nation]).then((data: any) => {
     //   let pokemon: PokemonInterface;
     //   return pokemon = data.rows.item(0);
     //   // return {
-    //   //   numero_nacional: data.rows.item(0).numero_nacional, numero_regional: data.rows.item(0).numero_regional, region: data.rows.item(0).region, nombre: data.rows.item(0).nombre, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
-    //   //   genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, numero_evolucion: data.rows.item(0).numero_evolucion, nivel_evolucion: data.rows.item(0).nivel_evolucion, evolucion: data.rows.item(0).evolucion,
-    //   //   nivel: (data.rows.item(0).nivel !== undefined ? data.rows.item(0).nivel : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
+    //   //   num_nation: data.rows.item(0).num_nation, num_region: data.rows.item(0).num_region, region: data.rows.item(0).region, name: data.rows.item(0).name, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
+    //   //   genero: data.rows.item(0).genero, descripcion: data.rows.item(0).descripcion, num_evo: data.rows.item(0).num_evo, level_evo: data.rows.item(0).level_evo, evo: data.rows.item(0).evo,
+    //   //   level: (data.rows.item(0).level !== undefined ? data.rows.item(0).level : ''), exp: (data.rows.item(0).exp !== undefined ? data.rows.item(0).exp : ''),
 
     //   //   hp: (data.rows.item(0).hp !== undefined ? data.rows.item(0).hp : ''), hp_max: (data.rows.item(0).hp_max !== undefined ? data.rows.item(0).hp_max : ''),
-    //   //   ataque: (data.rows.item(0).ataque !== undefined ? data.rows.item(0).ataque : ''), defensa: (data.rows.item(0).defensa !== undefined ? data.rows.item(0).defensa : ''),
-    //   //   ataque_especial: (data.rows.item(0).ataque_especial !== undefined ? data.rows.item(0).ataque_especial : ''), defensa_especial: (data.rows.item(0).defensa_especial !== undefined ? data.rows.item(0).defensa_especial : ''),
-    //   //   velocidad: (data.rows.item(0).velocidad !== undefined ? data.rows.item(0).velocidad : ''), estado: (data.rows.item(0).estado !== undefined ? data.rows.item(0).estado : ''),
+    //   //   attack: (data.rows.item(0).attack !== undefined ? data.rows.item(0).attack : ''), defense: (data.rows.item(0).defense !== undefined ? data.rows.item(0).defense : ''),
+    //   //   special_attack: (data.rows.item(0).special_attack !== undefined ? data.rows.item(0).special_attack : ''), special_defense: (data.rows.item(0).special_defense !== undefined ? data.rows.item(0).special_defense : ''),
+    //   //   speed: (data.rows.item(0).speed !== undefined ? data.rows.item(0).speed : ''), state: (data.rows.item(0).state !== undefined ? data.rows.item(0).state : ''),
     //   //   IV: (data.rows.item(0).IV !== undefined ? data.rows.item(0).IV : ''), EV: (data.rows.item(0).EV !== undefined ? data.rows.item(0).EV : ''), capturado: (data.rows.item(0).capturado !== undefined ? data.rows.item(0).capturado : ''), favorito: (data.rows.item(0).favorito !== undefined ? data.rows.item(0).favorito : ''),
     //   //   ball: (data.rows.item(0).ball !== undefined ? data.rows.item(0).ball : '')
     //   // }
@@ -340,14 +340,14 @@ export class DatabaseService {
   }
 
   public async deletePokemon(poke: PokemonInterface) {
-    // return this.database.executeSql(`DELETE FROM ${poke.region} WHERE numero_nacional = ?`, [poke.numero_nacional]).then(() => {
+    // return this.database.executeSql(`DELETE FROM ${poke.region} WHERE num_nation = ?`, [poke.num_nation]).then(() => {
     //   this.loadPokemon(poke.region);
     // });
   }
 
   public async updatePokemon(poke: PokemonInterface) {
-    let data = [poke.numero_nacional, , poke.numero_regional];
-    // return this.database.executeSql(`UPDATE ${poke.region} SET porConstruir WHERE numero_nacional = ${poke.numero_nacional}`, data).then((data: any) => {
+    let data = [poke.num_nation, , poke.num_region];
+    // return this.database.executeSql(`UPDATE ${poke.region} SET porConstruir WHERE num_nation = ${poke.num_nation}`, data).then((data: any) => {
     //   this.loadPokemon(poke.region);
     // })
   }
@@ -367,32 +367,32 @@ export class DatabaseService {
   }
 
   public async addPokemonBD() {
-    for (let i = 1; i < 806; i++) {
-      let pokemon: PokemonInterface;
-      let num: string;
+    // for (let i = 1; i < 806; i++) {
+    //   let pokemon: PokemonInterface;
+    //   let num: string;
 
-      if (i < 10) {
-        num = '00' + i;
-        pokemon = await this.poke.getStatsPokemon(num);
-        await this.addPokemon(pokemon);
-      } else if (i >= 10 && i < 100) {
-        num = '0' + i;
-        pokemon = await this.poke.getStatsPokemon(num);
-        await this.addPokemon(pokemon);
-      } else if (i >= 100) {
-        num = '' + i;
-        pokemon = await this.poke.getStatsPokemon(num);
-        await this.addPokemon(pokemon);
-      }
-    }
+    //   if (i < 10) {
+    //     num = '00' + i;
+    //     pokemon = await this.poke.getStatsPokemon(num);
+    //     await this.addPokemon(pokemon);
+    //   } else if (i >= 10 && i < 100) {
+    //     num = '0' + i;
+    //     pokemon = await this.poke.getStatsPokemon(num);
+    //     await this.addPokemon(pokemon);
+    //   } else if (i >= 100) {
+    //     num = '' + i;
+    //     pokemon = await this.poke.getStatsPokemon(num);
+    //     await this.addPokemon(pokemon);
+    //   }
+    // }
   }
 
-  public getnumero_nacional() {
-    return this.numero_nacional;
+  public getnum_nation() {
+    return this.num_nation;
   }
 
-  public setnumero_nacional(numero_nacional: string) {
-    this.numero_nacional = numero_nacional;
+  public setnum_nation(num_nation: string) {
+    this.num_nation = num_nation;
   }
 
   public getEntrenador() {

@@ -7,16 +7,16 @@
     width: 100vw;
 }
 
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f0f0f0;
-}
+// body, html {
+//     margin: 0;
+//     padding: 0;
+//     width: 100%;
+//     height: 100%;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     background-color: #f0f0f0;
+// }
 
 .machine-container {
     width: 90%;
@@ -31,7 +31,7 @@ body, html {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
     // BACKGROUND
-    background-image: url('../../../../assets/images/item_pokemon/heal2.png');
+    background-image: url('../../../../assets/images/item_pokemon/heal.png');
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -70,7 +70,7 @@ body, html {
     display: flex;
     justify-content: center;
     position: absolute;
-    top: 50%;
+    top: 55%;
 }
 
 .pokeball-slot1, .pokeball-slot2 {
@@ -286,7 +286,7 @@ body, html {
     position: absolute;
     top: 0;
     transform: rotateY(180deg);
-    // backface-visibility: hidden;  
+    // backface-visibility: hidden;
     // backface-visibility: visible;
     margin: 10px;
     border-radius: 4px;

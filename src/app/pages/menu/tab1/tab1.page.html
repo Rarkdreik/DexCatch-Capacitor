@@ -1,13 +1,8 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Region {{repo.getRegion()}}</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button routerLink="/main/avatar"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-  </ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
 </ion-header>
 
 <ion-content>
@@ -23,11 +18,11 @@
         <div class="col-12">
           <!-- Nombre -->
           <div class="row">
-            <div class="col-4 pokenombre centrar dblock">
-              <p>{{ pokemon.numero_nacional }}</p>
+            <div class="col-4 pokename centrar dblock">
+              <p>{{ pokemon.num_nation }}</p>
             </div>
-            <div class="col-8 pokenombre centrar dblock">
-              <p>{{ pokemon.nombre }}</p>
+            <div class="col-8 pokename centrar dblock">
+              <p>{{ pokemon.name }}</p>
             </div>
           </div>
           <!-- Fin Nombre -->
@@ -36,10 +31,9 @@
               <div class="row">
                 <div class="col-8">
                   <!-- Imagen Pokemon -->
-                  <div class="row" (click)='irDescripcion(pokemon.numero_nacional)'>
+                  <div class="row" (click)='irDescripcion(pokemon.num_nation)'>
                     <div class="col-12 {{pokemon.ball}}">
-                      <img src='../../../../assets/images/pokemons/{{pokemon.numero_nacional}}.png'
-                        class="pokeimagen centrar dblock" [alt]="pokemon.numero_nacional" />
+                      <img src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{{ +pokemon.num_nation }}.png' class="pokeimagen centrar dblock" [alt]="pokemon.num_nation" />
                     </div>
                   </div>
                   <!-- Fin Imagen Pokemon -->
@@ -71,7 +65,7 @@
                       <div class="row iconos">
                         <!-- Icono Pokeball -->
                         <div class="col-6 pokeiconos centrar"
-                          (click)='capturar(pokemon.numero_nacional, pokemon.numero_evolucion)'>
+                          (click)='capturar(pokemon.num_nation, pokemon.num_evo)'>
                           <img alt='ball' src='../../../../assets/images/iconos/iconBallBlanco.png'>
                         </div>
                         <!-- Icono Pokeball -->

@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   id_app: 'CatchDex',
-  googleWebClientId: '446704972713-s73s5csaakd726t2oqnds4ot8un57gab.apps.googleusercontent.com',
+  //googleWebClientId: '446704972713-s73s5csaakd726t2oqnds4ot8un57gab.apps.googleusercontent.com',
+  googleWebClientId: '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
   firebase: {
     apiKey: 'AIzaSyCkS2v2UUNwB1ClI9nnNGstkVBZcHpMLy8',
     authDomain: 'catchdex-2aa7e.firebaseapp.com',

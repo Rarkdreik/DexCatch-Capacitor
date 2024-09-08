@@ -1,0 +1,168 @@
+// #################################################
+// #################################################
+
+.square_corner {
+  --background-color: #19384a;
+  --border-color: #55ddff;
+  --border-width: 0.25em;
+  --edge-size: 1.5em;
+  background: var(--background-color);
+  padding: 0.5em 1.5em;
+  border: 0;
+  position: relative;
+  clip-path: polygon(
+    0% 0%,
+    100% 0,
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    0 100%, 0% var(--edge-size)
+  );
+  transition: color 250ms;
+}
+
+.square_corner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--border-color);
+  z-index: -2;
+}
+
+.square_corner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--background-color);
+  z-index: -1;
+  clip-path: polygon(
+    // top left 1
+      var(--border-width)     calc(var(--edge-size) + var(--border-width) * 0.5),
+    // top left 2
+      calc(var(--edge-size) + var(--border-width) * -5)   var(--border-width),
+    // top right
+      calc(100% - var(--border-width))    var(--border-width),
+    // bottom right - 1
+      calc(100% - var(--border-width))    calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5)),
+    // bottom right - 2
+      calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5))   calc(100% - var(--border-width)),
+    // bottom left
+      calc(var(--border-width)) calc(100% - var(--border-width))
+  );
+  transition: clip-path 500ms;
+}
+
+.square_corner:hover {
+  color: white;
+}
+
+.square_corner:hover::after {
+  // clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%);
+
+  clip-path: polygon(
+    // top left 1
+    calc(100% - var(--border-width))
+      calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5)),
+    // top left 2
+    calc(100% - var(--border-width)) var(--border-width),
+    // top right
+    calc(100% - var(--border-width)) var(--border-width),
+    //bottom right - 1
+    calc(100% - var(--border-width))
+      calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5)),
+    // bottom right - 2
+    calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5))
+      calc(100% - var(--border-width)),
+    // bottom left
+    calc(100% - calc(var(--edge-size) + var(--border-width) * 0.5))
+      calc(100% - var(--border-width))
+  );
+}
+
+// #################################################
+// #################################################
+// #################################################
+
+ion-col, ion-row {
+  padding: 0;
+  margin: 0;
+}
+
+.icon-gender {
+  width: 20px;
+  display: inline-grid;
+  height: 20px;
+  margin-left: 15px;
+}
+
+.female {
+  color: violet;
+}
+
+// #################################################
+// ########## BARRA VIDA ###########################
+.barra-vida {
+    position: relative;
+}
+
+.vida-text {
+    position: absolute;
+    display: block;
+    top: 5%;
+    left: 45%;
+}
+
+// #################################################
+// ########## OTRO #################################
+.pokeballee {
+  background-color: black;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  transition: all 0.25s ease-in-out;
+  top: 50%;
+  left: 20%;
+  transform-origin: center bottom;
+}
+
+.pok_ball {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  border-radius: 50%;
+  z-index: 3;
+}
+
+.catch1 {
+    width: 24px;
+    height: 22px;
+    position: absolute;
+    bottom: 22%;
+    left: 27%;
+    border-radius: 50%;
+    z-index: 3;
+    transform: rotateY(24deg);
+    background: rgba(0, 0, 0, 0);
+}
+
+.star {
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+}
+
+.star1 {
+  opacity: 0;
+  left: 0;
+}
+
+.star2 {
+  opacity: 0;
+  left: 33%;
+}
+
+.star3 {
+  opacity: 0;
+  left: 70%;
+}

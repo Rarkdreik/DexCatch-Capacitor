@@ -4,7 +4,7 @@ import { AlertsService } from './alerta.service';
 import { ToastService } from './toast.service';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { DialogService } from './dialog.service';
-import { Tab2ModalComponent } from '../pages/menu/tab2/tab2-modal.component';
+import { ModalQrComponent } from '../pages/home/modal_qr.component';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 @Injectable({

@@ -1,3 +1,44 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  
+  <div id="pokedex" class='pokedex' >
+    <button id="toggle-button"></button>
+    <div class="tags"></div>
+
+    <svg id="summon-1" width="600px" height="500px" class="summon hidden">
+      <path class="path" d="M100 250 L280 150 L460 215" fill="none" stroke="black" stroke-width="15px" stroke-dasharray="100%" stroke-dashoffset="100%" />
+    </svg>
+    <svg width="500px" height="500px" class="hidden">
+      <defs>
+        <filter id="spawn-line">
+          <feTurbulence id="line-turbulence" in="SourceGraphic" type="fractalNoise" baseFrequency="0.013" numOctaves="1" result="TURBULENCE_1" />
+          <feDisplacementMap id="line-displacement" in="SourceGraphic" in2="TURBULENCE_1" scale="200" xChannelSelector="R" yChannelSelector="G" result="DISPLACEMENT_1" />
+          <feFlood in="DISPLACEMENT_1" flood-color="#fffdc4" flood-opacity="1" result="FLOOD_1" />
+          <feComposite in="FLOOD_1" in2="DISPLACEMENT_1" operator="in" result="COMPOSITE_1" />
+        </filter>
+        <filter id="spawn-pokemon">
+          <feTurbulence id="pokemon-turbulence" in="SourceGraphic" type="fractalNoise" baseFrequency="0.015" numOctaves="1" result="TURBULENCE_1" />
+          <feDisplacementMap id="pokemon-displacement" in="SourceGraphic" in2="TURBULENCE_1" scale="100" xChannelSelector="R" yChannelSelector="G" result="DISPLACEMENT_1" />
+          <feFlood in="DISPLACEMENT_1" flood-color="#fffdc4" flood-opacity="1" result="FLOOD_1" />
+          <feComposite in="FLOOD_1" in2="DISPLACEMENT_1" operator="in" result="COMPOSITE_1" />
+        </filter>
+        <filter id="retrieve-line">
+          <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.015" numOctaves="1"
+            result="TURBULENCE_1" />
+          <feDisplacementMap in="SourceGraphic" in2="TURBULENCE_1" scale="200" xChannelSelector="R" yChannelSelector="G" result="DISPLACEMENT_1" />
+          <feFlood in="DISPLACEMENT_1" flood-color="#fec9c9" flood-opacity="1" result="FLOOD_1" />
+          <feComposite in="FLOOD_1" in2="DISPLACEMENT_1" operator="in" result="COMPOSITE_1" />
+        </filter>
+        <filter id="retrieve-pokemon">
+          <feTurbulence id="retrieve-turbulence" in="SourceGraphic" type="fractalNoise" baseFrequency="0.015" numOctaves="1" result="TURBULENCE_1" />
+          <feDisplacementMap id="retrieve-displacement" in="SourceGraphic" in2="TURBULENCE_1" scale="100" xChannelSelector="R" yChannelSelector="G" result="DISPLACEMENT_1" />
+          <feFlood in="DISPLACEMENT_1" flood-color="#fec9c9" flood-opacity="1" result="FLOOD_1" />
+          <feComposite in="FLOOD_1" in2="DISPLACEMENT_1" operator="in" result="COMPOSITE_1" />
+        </filter>
+      </defs>
+    </svg>
+
+    <ion-router-outlet></ion-router-outlet>
+
+    <div [ngClass]="modal_style"></div>
+  </div>
 </ion-app>

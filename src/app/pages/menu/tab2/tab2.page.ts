@@ -7,11 +7,9 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { QrcodeInterface } from 'src/app/model/Qrcode';
 import { QRScanGenService } from 'src/app/services/qrscan-gen.service';
 import { RepositoryService } from 'src/app/services/repository.service';
-import { Tab2ModalComponent } from './tab2-modal.component';
-import { Barcode, BarcodeFormat, BarcodeScanner, LensFacing } from '@capacitor-mlkit/barcode-scanning';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { DialogService } from 'src/app/services/dialog.service';
-import { FilePicker } from '@capawesome/capacitor-file-picker';
+import { Master } from 'src/app/model/Master';
+import { ConstantService } from 'src/app/services/constant.service';
+import { PokemonInterface } from 'src/app/model/Pokemon';
 
 @Component({
   selector: 'app-tab2',
@@ -19,30 +17,57 @@ import { FilePicker } from '@capawesome/capacitor-file-picker';
   styleUrls: ['tab2.page.scss']
 })
 export class Tab2Page {
+  public master: Master = this.constants.master_empty;
+  public team_poke: PokemonInterface[] = this.constants.pokes_empty;
+  public map_poke: string = 'kanto';
   // Atributos para generar qr
   public qrData: string = 'qwerty qwerty qwerty';
-  public elementType: 'url' | 'canvas' | 'img';
+    // public elementType: 'url' | 'canvas' | 'img';
   // Atributos para mostrar y ocultar la camara qr
-  private ionapp?: HTMLElement;
-  private boton?: HTMLElement;
+    // private ionapp?: HTMLElement;
+    // private boton?: HTMLElement;
 
-  constructor( private route: Router, public repo: RepositoryService, public imagen: ImageService, private qr: QRScanGenService, private loading: LoadingService, private alerta: AlertsService, private fire: FirebaseService ) {
-    this.qrData = 'qwerty qwerty qwerty';
-    this.elementType = 'canvas';
+  constructor( private router: Router, public repo: RepositoryService, public imagen: ImageService, private qr: QRScanGenService, private loading: LoadingService, private alerta: AlertsService, private fire: FirebaseService, private constants: ConstantService ) {
+    // this.qrData = 'qwerty qwerty qwerty';
+    // this.elementType = 'canvas';
   }
 
   public async ngOnInit() {
-    this.qrData = this.repo.getMaster().nick;
+    console.log("INI - tab2 - ngOnInit");
+    this.master = this.repo.getMaster();
+    this.team_poke = this.master.team;
+    this.map_poke = this.master.region_ini;
+    this.repo.setRegion(this.master.region_ini);
+    this.qrData = this.master.nick;
     let codigoQr: QrcodeInterface = { correo: this.repo.getCorreo()!, codigo: this.qrData, usos: 5 }
     await this.fire.crearQr(codigoQr);
+    console.log("FIN - tab2 - ngOnInit");
+  }
+
+  async ngAfterViewInit() {
+    console.log("INI - tab2 - ngAfterViewInit");
+    console.log("FIN - tab2 - ngAfterViewInit");
+  }
+
+  ngOnDestroy() {
+    console.log("INI - tab2 - ngOnDestroy");
+    console.log("FIN - tab2 - ngOnDestroy");
   }
 
   public async galeria() {
     await this.imagen.selectImage();
   }
 
-  public iraregion() {
-    this.route.navigateByUrl('main/tab1');
+  public goMain() {
+    this.router.navigate(['/login'], { replaceUrl: true });;
+  }
+
+  public goPokedex() {
+    this.router.navigate(['/pokedex'], { replaceUrl: true });
+  }
+
+  public goTeam() {
+    this.router.navigate(['/team'], { replaceUrl: true });
   }
 
   public async leerQr() {
@@ -50,6 +75,11 @@ export class Tab2Page {
     this.loading.presentLoading('Cargando Lector Qr');
     await this.qr.startScan().finally(() => { this.loading.dismissLoading(); });
     console.log("FIN - tab2.page - leerQr");
+  }
+
+  public segmentChanged(event: any) {
+    this.map_poke = event.detail.value;
+    this.repo.setRegion(this.map_poke);
   }
 
   /*

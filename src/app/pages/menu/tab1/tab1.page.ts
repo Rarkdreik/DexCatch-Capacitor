@@ -28,11 +28,27 @@ export class Tab1Page {
   }
 
   async ngOnInit() {
-    await this.loadService.presentInfiniteLoading('Actualizando Pokedex');
+    console.log("INI - tab1 - ngOnInit");
+    // this.loadService.dismissLoading();
+    // await this.loadService.presentInfiniteLoading('Actualizando Pokedex');
     //this.pokemons = this.repo.getPokemonsRegionActual();
-    this.pokemons = await this.repo.getListaPokemonRegion(this.repo.getRegion());
+    // this.pokemons = await this.repo.getListaPokemonRegion(this.repo.getRegion());
     //this.generateItems();
+    // this.loadService.dismissLoading();
+    console.log("FIN - tab1 - ngOnInit");
+  }
+
+  async ngAfterViewInit() {
+    console.log("INI - tab1 - ngAfterViewInit");
+    await this.loadService.presentInfiniteLoading('Actualizando Pokedex');
+    this.pokemons = await this.repo.getListaPokemonRegion(this.repo.getRegion());
     this.loadService.dismissLoading();
+    console.log("FIN - tab1 - ngAfterViewInit");
+  }
+
+  ngOnDestroy() {
+    console.log("INI - tab1 - ngOnDestroy");
+    console.log("FIN - tab1 - ngOnDestroy");
   }
 
   private generateItems() {
@@ -65,40 +81,31 @@ export class Tab1Page {
    * o solo mostrar la Ball detrás. Si se mantiene, lo liberas
    * al capturarlo se añade con todas sus características a la base de datos
    */
-  capturar(numPoke: any, pokemox: number) {
-    this.db.setnumero_nacional(numPoke);
-    console.log(`\n\n\n
-    no se que era ${pokemox}
-    \n\n\n`);
-    if (pokemox === 0) {
-      if (this.db.getEntrenador().nivel >= 20) {
-        this.db.setnumero_nacional(numPoke);
-        this.route.navigateByUrl('captura-prueba');
-      } else {
-        alert('Necesitas llegar al nivel 20 para capturar a este pokemon');
-      }
-    } else if (pokemox === 1) {
-      this.db.setnumero_nacional(numPoke);
-      this.route.navigateByUrl('captura-prueba');
-    } else if (pokemox === 2) {
-      if (this.db.getEntrenador().nivel >= 10) {
-        this.db.setnumero_nacional(numPoke);
-        this.route.navigateByUrl('captura-prueba');
-      } else {
-        alert('Necesitas llegar al nivel 10 para capturar a este pokemon');
-      }
-    } else if (pokemox === 3) {
-      if (this.db.getEntrenador().nivel >= 15) {
-        this.db.setnumero_nacional(numPoke);
-        this.route.navigateByUrl('captura-prueba');
-      } else {
-        alert('Necesitas llegar al nivel 15 para capturar a este pokemon');
-      }
+  async capturar(numPoke: any, pokemox: number) {
+    // this.repo.setnum_nation(numPoke);
+    const master = await this.fire.getMaster();
+    const levelMaster = master.level;
+  
+    // Mapa de leveles requeridos para cada tipo de Pokémon
+    const requisitoslevel: { [key: number]: number | undefined } = {
+      0: 20,
+      1: undefined, // Sin restricción de level
+      2: 10,
+      3: 15
+    };
+  
+    // Obtener el level requerido para el tipo de Pokémon
+    const levelRequerido = requisitoslevel[pokemox];
+  
+    if (levelRequerido === undefined || levelMaster >= levelRequerido) {
+      this.route.navigate(['captura/' + numPoke], { replaceUrl: true });
+    } else {
+      alert(`Necesitas llegar al level ${levelRequerido} para capturar a este pokemon`);
     }
   }
 
-  irDescripcion(numero_nacional: string) {
-    this.route.navigateByUrl(`modal2/${numero_nacional}`);
+  irDescripcion(num_nation: string) {
+    this.route.navigateByUrl(`modal2/${num_nation}`);
   }
 
 }

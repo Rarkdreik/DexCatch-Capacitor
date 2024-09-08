@@ -1,40 +1,31 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Iniciar Sesión</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button routerLink="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+    <ion-title>LOG IN</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content class="padding">
 <!-- <ion-content [fullscreen]="true"> -->
-  <!-- <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header> -->
   <div id="wrapper" class="wrapper">
-    <header id="header">
+    <header class="margin-auto">
       <div> </div>
       <div class="content">
         <div class="inner">
           <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
               <div class="row">
-                <div class="col-md-12">
+                <div class="col-12">
                   <form role="form" [formGroup]="loginForm" (submit)="onSubmit()">
 
                     <div class="form-group">
                       <label for="email">Correo</label>
-                      <input type="email" class="form-control btn-outline-secondary" value="a@a.aa" formControlName="email" required>
+                      <input formControlName="email" name="email" type="email" class="form-control btn-outline-secondary" value="a@a.aa" placeholder="a@a.aa" required>
                     </div>
 
                     <div class="form-group">
                       <label for="password">Contraseña</label>
-                      <input type="password" class="form-control btn-outline-secondary" value="aaaaaa" formControlName="password" required>
+                      <input formControlName="password" name="password" type="password" class="form-control btn-outline-secondary" value="aaaaaa" placeholder="aaaaaa" required>
                     </div>
 
                     <button type="submit" class="form-control btn btn-outline-secondary" [disabled]="!this.loginForm.valid" >Iniciar Sesión</button>

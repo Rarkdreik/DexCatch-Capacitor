@@ -28,7 +28,7 @@ export class LoginPage implements OnInit {
 
   login() {
     this.authService.login();
-    this.router.navigate(['/main/avatar']);
+    this.router.navigate(['/home']);
   }
 
   async signIn() {
@@ -58,7 +58,7 @@ export class LoginPage implements OnInit {
     await this.authService.loginUsuario(this.user_data).then(async (usuario: UserData) => {
       await this.authService.saveSession(usuario!).then(async () => {
         await this.alertaServicio.alertaSimple("Sesión Iniciada", "La sesión ha sido iniciada.", "success").then(() => {
-          this.router.navigateByUrl("/main/avatar");
+          this.router.navigateByUrl("/home");
         }).catch((error) => { this.alertaServicio.alertaSimple('Error login 3', error + '. Codigo error: 312189.', 'error'); });
       }).catch((erroneo) => { this.alertaServicio.alertaSimple('Error login 2', erroneo + '. Codigo error: 415563.', 'error'); });
     }).catch(error => { this.alertaServicio.alertaSimple('Error login 1', error + '. Codigo error: 545615.', 'error'); });

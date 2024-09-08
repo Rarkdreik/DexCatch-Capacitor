@@ -1,0 +1,538 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+.proximamente {
+    display: grid;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    border-radius: 20px;
+    border: 1px solid gold;
+    text-align: center;
+    margin-top: auto !important;
+    font-family: Verdana !important;
+    font-weight: bold !important;
+    font-size: 30px !important;
+    width: 90%;
+    color: white;
+}
+
+/**
+* Barcode Scanning
+* -------------------------------------------
+*/
+body.barcode-scanning-active {
+    visibility: hidden;
+    --background: transparent;
+    --ion-background-color: transparent;
+}
+
+.barcode-scanning-modal {
+    visibility: visible;
+}
+
+@media (prefers-color-scheme: dark) {
+    .barcode-scanning-modal {
+        --background: transparent;
+        --ion-background-color: transparent;
+    }
+}
+
+// ########################################################
+// ############ Diseño General ############################
+// ########################################################
+@font-face {
+    font-family: 'RevengerLightLCBB';
+    src: url('./assets/fonts/Revenger/RevengerLightLCBB/RevengerLightLCBB.woff');
+}
+
+* {
+    font-family: 'RevengerLightLCBB';
+    font-weight: bold;
+    --background: unset;
+}
+
+body {
+    display: flex !important;
+    background-color: var(--background-fou);
+}
+
+body.swal2-height-auto {
+    display: contents !important;
+}
+
+.grid {
+    display: grid;
+}
+
+.all-cero {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.toast-message {
+    letter-spacing: 1px;
+}
+
+#wrapper {
+    display: flex;
+    height: 100%;
+}
+
+ion-header {
+    height: 5vh;
+    width: unset;
+    margin: 0 5px 0 5px;
+}
+
+.margin-auto {
+    margin: auto !important;
+}
+
+.contenedor {
+    height: 100%;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
+
+.width-100 {
+    width: 100vw;
+}
+
+.height-100 {
+    height: 100vh;
+}
+
+.menu-home {
+    --width: calc(100vw - 45%);
+}
+
+.swal2-container {
+    position: relative !important;
+}
+
+.absoluto50 {
+    position: absolute;
+    left: 50%;
+    top: 0%;
+}
+
+// ########################################################
+// ########## Barra de Navegacion // Toolbar ##############
+// ########################################################
+
+ion-toolbar > * {
+    color: gold;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    font-family: verdana;
+}
+
+ion-toolbar {
+    display: grid;
+    border-radius: 5px;
+    background-color: var(--background-thr);
+    height: 5vh;
+    align-content: center;
+}
+
+ion-buttons > * {
+    box-shadow: none !important;
+    border: 1px solid gold !important;
+    border-radius: 100px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 25px !important;
+    min-width: 0px !important;
+    min-height: 0px !important;
+    width: 45px !important;
+}
+
+// ########################################################
+// ########## Barra de Ventanas // Tap Bar ##############
+// ########################################################
+
+ion-tab-button > * {
+    color: gold !important;
+}
+
+// ion-tabs {
+//     background-color: #1b1f22 !important;
+// }
+
+ion-tab-bar {
+    border: unset;
+    height: 20px;
+}
+
+// ########################################################
+// ########## Menu Lateral // sidebar menu ################
+// ########################################################
+
+ion-menu > * > * > ion-item {
+    color: white !important;
+}
+
+// ########################################################
+// ##########  Formularios Reactivos iniciales ############
+// ########################################################
+
+ion-title {
+    // color: black;
+    font-weight: bold;
+    font-size: x-large;
+}
+
+ion-list {
+    background-color: rgba(0, 0, 0, 0.4);
+    height: 100%;
+}
+
+ion-item {
+    font-size: x-large;
+    display: grid;
+    justify-content: center;
+}
+
+input {
+    color: gold !important;
+    text-align: center;
+}
+
+ion-select {
+    border-radius: 5px !important;
+    border: 1px solid white;
+    color: gold !important;
+}
+
+.form-control {
+    background-color: var(--background-thr);
+    border-color: var(--border-color);
+    color: white;
+}
+
+.alert-wrapper {
+    width: 100% !important;
+}
+
+.alert-button {
+    width: 45% !important;
+    color: black !important;
+}
+
+// ############ Boton volver atrás #######################
+// ########################################################
+
+// #swal2-content {
+//     color: gray;
+// }
+
+// .borderStyle1 {
+//     border: solid 1px gray;
+//     border-radius: 5px;
+// }
+
+// ########################################################
+// ############ Diseño CSS Elegante #######################
+// ########################################################
+
+.flex {
+    display: flex !important;
+    margin-bottom: 5px;
+}
+
+.prueba {
+    margin-bottom: 5px !important;
+}
+
+.color1 {
+    background-color: #1e8cdfb0 !important;
+}
+
+.toast-wrapper, .toast-content, .toast-container {
+    background-color: #1b1f22 !important;
+    border-radius: 10px !important;
+    border: 1px solid gold !important;
+    color: gold !important;
+    --background-color: unset !important;
+    --color: unset !important;
+}
+
+// ########################################################
+// ######## Lector QR con ocultar app #####################
+// ########################################################
+#cordova-plugin-qrscanner-video-preview {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid gold !important;
+    border-radius: 10px !important;
+    min-height: 80% !important;
+    height: 70% !important;
+    top: 45% !important;
+    position: absolute !important;
+    width: 95% !important;
+    min-width: 90% !important;
+    z-index: 800 !important;
+}
+
+#cordova-plugin-qrscanner-still {
+    background-color: black !important;
+    visibility: visible !important;
+}
+
+.cerrarQrScanner {
+    position: absolute !important;
+    bottom: 20px !important;
+    background-color: #1b1f22 !important;
+    border: 1px solid gold !important;
+    border-radius: 10px !important;
+    width: 90%;
+    margin: 0 5% !important;
+}
+
+app-root.has-camera,
+app-root.has-camera ion-content {
+    display: none;
+    --background: transparent;
+    background: transparent !important;
+}
+
+.generadoQr, .generadoQr > * {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 10px;
+}
+
+// ########################################################
+// ############ Diseño Input Camara #######################
+// ########################################################
+.cordova-camera-select {
+    background-color: #1b1f22 !important;
+    border: 1px solid gold;
+    border-radius: 20px;
+    padding: 20px;
+    margin: auto !important;
+    z-index: 100 !important;
+    overflow: visible;
+}
+
+.cordova-camera-capture {
+    background-color: #1b1f22 !important;
+    border: 3px solid gold;
+    border-radius: 20px;
+    padding: 20px;
+    margin: auto !important;
+    z-index: 100 !important;
+    overflow: visible;
+    color: white;
+}
+
+.cordova-camera-capture>button {
+    border-radius: 25px;
+    margin-top: 10px;
+    display: grid;
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+}
+
+// Texto para elegir
+.action-sheet-container > * > * > * {
+    color:
+        #757575 !important;
+}
+
+// ########################################################
+// ############ Diseño Pokemon y Pokeball #################
+// ########################################################
+
+.capturadoPokeBall {
+    background: round;
+    background-image: url(./assets/images/item_pokemon/pokeball.png);
+    height: 120px;
+}
+
+.capturadoSuperBall {
+    background: round;
+    background-image: url(./assets/images/item_pokemon/superball.png);
+    height: 120px;
+}
+
+.capturadoUltraBall {
+    background: round;
+    background-image: url(./assets/images/item_pokemon/ultraball.png);
+    height: 120px;
+}
+
+.capturadoMasterBall {
+    background: round;
+    background-image: url(./assets/images/item_pokemon/masterball.png);
+    height: 120px;
+}
+
+
+.tipo {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 9px;
+    margin-bottom: 5px !important;
+}
+
+.tipoVACIO {
+    visibility: hidden;
+    color: #000000;
+    background: #000000;
+    background: linear-gradient(to bottom, #000000 0%, #000000 100%);
+    background: -moz-linear-gradient(top, #000000 0%, #000000 100%);
+    background: -webkit-linear-gradient(top, #000000 0%, #000000 100%);
+}
+
+.tipoACERO, .tipoSTEEL {
+    background: var(--background-steel) linear-gradient(to bottom, var(--background-steel) 0%, rgba(180, 184, 188, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-steel) 0%, rgba(180, 184, 188, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-steel) 0%, rgba(180, 184, 188, 0.8) 100%);
+}
+
+.tipoAGUA, .tipoWATER {
+    background: var(--background-water) linear-gradient(to bottom, var(--background-water) 0%, rgba(60, 160, 255, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-water) 0%, rgba(60, 160, 255, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-water) 0%, rgba(60, 160, 255, 0.8) 100%);
+}
+
+.tipoBICHO, .tipoBUG {
+    background: var(--background-bug) linear-gradient(to bottom, var(--background-bug) 0%, rgba(152, 196, 88, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-bug) 0%, rgba(152, 196, 88, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-bug) 0%, rgba(152, 196, 88, 0.8) 100%);
+}
+
+.tipoDRAGON {
+    background: var(--background-dragon) linear-gradient(to bottom, var(--background-dragon) 0%, rgba(245, 149, 2, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-dragon) 0%, rgba(245, 149, 2, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-dragon) 0%, rgba(245, 149, 2, 0.8) 100%);
+}
+
+.tipoELECTRICO, .tipoELECTRIC {
+    background: var(--background-electric) linear-gradient(to bottom, var(--background-electric) 0%, rgba(254, 234, 49, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-electric) 0%, rgba(254, 234, 49, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-electric) 0%, rgba(254, 234, 49, 0.8) 100%);
+}
+
+.tipoFANTASMA, .tipoGHOST {
+    background: var(--background-ghost) linear-gradient(to bottom, var(--background-ghost) 0%, rgba(102, 104, 179, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-ghost) 0%, rgba(102, 104, 179, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-ghost) 0%, rgba(102, 104, 179, 0.8) 100%);
+}
+
+.tipoFUEGO, .tipoFIRE {
+    background: var(--background-fire) linear-gradient(to bottom, var(--background-fire) 0%, rgba(255, 1, 1, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-fire) 0%, rgba(255, 1, 1, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-fire) 0%, rgba(255, 1, 1, 0.8) 100%);
+}
+
+.tipoHADA, .tipoFAIRY {
+    background: var(--background-fairy) linear-gradient(to bottom, var(--background-fairy) 0%, rgba(214, 150, 211, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-fairy) 0%, rgba(214, 150, 211, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-fairy) 0%, rgba(214, 150, 211, 0.8) 100%);
+}
+
+.tipoHIELO, .tipoICE {
+    background: var(--background-ice) linear-gradient(to bottom, var(--background-ice) 0%, rgba(179, 215, 239, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-ice) 0%, rgba(179, 215, 239, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-ice) 0%, rgba(179, 215, 239, 0.8) 100%);
+}
+
+.tipoLUCHA, .tipoFIGHTING, .tipoFIGHT {
+    background: var(--background-fighting) linear-gradient(to bottom, var(--background-fighting) 0%, rgba(213, 84, 63, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-fighting) 0%, rgba(213, 84, 63, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-fighting) 0%, rgba(213, 84, 63, 0.8) 100%);
+}
+
+.tipoNORMAL {
+    background: var(--background-normal) linear-gradient(to bottom, var(--background-normal) 0%, rgba(190, 150, 97, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-normal) 0%, rgba(190, 150, 97, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-normal) 0%, rgba(190, 150, 97, 0.8) 100%);
+}
+
+.tipoPLANTA, .tipoGRASS {
+    background: var(--background-grass) linear-gradient(to bottom, var(--background-grass) 0%, rgba(2, 193, 67, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-grass) 0%, rgba(2, 193, 67, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-grass) 0%, rgba(2, 193, 67, 0.8) 100%);
+}
+
+.tipoPSIQUICO, .tipoPSYCHIC, .tipoPSYCH {
+    background: var(--background-psychic) linear-gradient(to bottom, var(--background-psychic) 0%, rgba(246, 71, 162, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-psychic) 0%, rgba(246, 71, 162, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-psychic) 0%, rgba(246, 71, 162, 0.8) 100%);
+}
+
+.tipoROCA, .tipoROCK {
+    background: var(--background-rock) linear-gradient(to bottom, var(--background-rock) 0%, rgba(105, 105, 105, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-rock) 0%, rgba(105, 105, 105, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-rock) 0%, rgba(105, 105, 105, 0.8) 100%);
+}
+
+.tipoSINIESTRO, .tipoDARK {
+    background: var(--background-dark) linear-gradient(to bottom, var(--background-dark) 0%, rgba(127, 82, 59, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-dark) 0%, rgba(127, 82, 59, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-dark) 0%, rgba(127, 82, 59, 0.8) 100%);
+}
+
+.tipoTIERRA, .tipoGROUND {
+    background: var(--background-ground) linear-gradient(to bottom, var(--background-ground) 0%, rgba(177, 135, 40, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-ground) 0%, rgba(177, 135, 40, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-ground) 0%, rgba(177, 135, 40, 0.8) 100%);
+}
+
+.tipoVENENO, .tipoVENOM {
+    background: var(--background-poison) linear-gradient(to bottom, var(--background-poison) 0%, rgba(102, 68, 152, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-poison) 0%, rgba(102, 68, 152, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-poison) 0%, rgba(102, 68, 152, 0.8) 100%);
+}
+
+.tipoVOLADOR, .tipoFLYING, .tipoFLY {
+    background: var(--background-flying) linear-gradient(to bottom, var(--background-flying) 0%, rgba(146, 173, 191, 0.8) 100%);
+    background: -moz-linear-gradient(top, var(--background-flying) 0%, rgba(146, 173, 191, 0.8) 100%);
+    background: -webkit-linear-gradient(top, var(--background-flying) 0%, rgba(146, 173, 191, 0.8) 100%);
+}
+
+// HOVERS
+.btn:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+// FOCUS
+.form-control:focus {
+    color: gold;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.text-end {
+    text-align: end !important;
+    padding-right: 10px !important;
+}

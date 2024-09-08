@@ -1,13 +1,68 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Team</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Team</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true"class="pokeball-content">
+  <!-- Contenedor del equipo Pokémon -->
+  <div class="row team-container">
+    <div class="col-8 all-cero">
+      <!-- <div class="pokemon-slot" *ngFor="let pokemon of team; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
+        <div class="pokemon-card">
+          <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
+          <span *ngIf="pokemon">{{ pokemon.name }}</span>
+          <div class="item-badge" *ngIf="pokemon?.item"><img [src]="pokemon.item" alt="Item" /></div>
+        </div>
+        <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+      </div> -->
+
+      <ion-grid>
+        <ion-row>
+          <div class="pokemon-slot" *ngFor="let pokemon of team; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
+            <div class="row">
+              <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
+              <span *ngIf="pokemon">{{ pokemon.name }}</span>
+              <div class="item-badge" *ngIf="pokemon?.item" style="background-image: url('../../../assets/images/item_pokemon/{{ pokemon.ball }}.png');"></div>
+            </div>
+            <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+          </div>
+        </ion-row>
+      </ion-grid>
+
+    </div>
+    <div class="col-4 grid">
+      <div class="grid">
+        <ion-button (click)="addOrChangePokemon()">CHANGE</ion-button>
+        <ion-button (click)="assignItem()">ITEMS</ion-button>
+        <ion-button (click)="releasePokemon()">SOLTAR</ion-button>
+        <ion-button (click)="showPokemonInfo()">INFO</ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor de Pokémon capturados -->
+  <div class="captured-container">
+    <ion-grid>
+      <ion-row>
+        <!-- <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemons; let i = index" (click)="selectCapturedPokemon(i)" [class.selected]="selectedCapturedIndex === i" [class.pulsating]="shouldPulse(pokemon, i)"> -->
+        <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemons; let i = index" [class.selected]="selectedCapturedIndex === i" (click)="selectCapturedPokemon(i)">
+          <div class="row">
+            <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
+            <span *ngIf="pokemon">{{ pokemon.name }}</span>
+            <div class="item-badge" *ngIf="pokemon?.item" style="background-image: url('../../../assets/images/item_pokemon/{{ pokemon.ball }}.png');"></div>
+          </div>
+          <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+        </div>
+      </ion-row>
+    </ion-grid>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más Pokémon...">
+        
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
 </ion-content>

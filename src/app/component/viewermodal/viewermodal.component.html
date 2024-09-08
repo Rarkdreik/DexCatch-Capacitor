@@ -1,0 +1,7 @@
+<div class="viewer-container" (click)="closeModal()">
+  <!-- Mostrar la imagen si el tipo es 'image' -->
+  <ion-img *ngIf="type === 'img-avatar'" [src]="data" class="full-image"></ion-img>
+
+  <!-- Mostrar el QR code si el tipo es 'qrcode' -->
+  <qrcode *ngIf="type === 'qrcode'" [qrdata]="qrData" [width]="300" [errorCorrectionLevel]="'M'"></qrcode>
+</div>

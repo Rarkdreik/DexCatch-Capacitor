@@ -2,7 +2,7 @@ import { PokemonInterface } from "./Pokemon";
 
 export interface Master {
     nick: string;
-    nivel: number;
+    level: number;
     exp: number;
     pokeBalls: number;
     superBalls: number;
@@ -15,7 +15,7 @@ export interface Master {
     poke_ini: PokemonInterface;
     // Array de los pokemons atrapados
     capturados: PokemonInterface[];
-    // Array del numero nacional de cada pokemon
+    // Array del numero nation de cada pokemon
     favoritos: string[];
     // Array de los pokemons team
     team: PokemonInterface[];

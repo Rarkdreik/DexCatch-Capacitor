@@ -8,9 +8,13 @@ import { RepositoryService } from './repository.service';
 import { FirebaseService } from './firebase.service';
 
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Auth, GoogleAuthProvider, signInWithCredential, UserCredential } from '@angular/fire/auth';
+import { Auth, signInWithCredential, UserCredential } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { ConstantService } from './constant.service';
+
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, User, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +22,8 @@ import { ConstantService } from './constant.service';
 export class AuthService {
   private isAuth: boolean = false;
   private user_empty: UserData = { uid: '', email: '', photoURL: '', displayName: '', password: '' };
+  private auththy: Auth | undefined;
+  private provider: any;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -27,15 +33,30 @@ export class AuthService {
     private fireServicio: FirebaseService,
     private repo: RepositoryService,
     private auth: Auth,
-    private constants: ConstantService
+    private constants: ConstantService,
   ) {
     this.initializeApp();
   }
 
-  initializeApp() {
-    this.platform.ready().then(() => {
-      GoogleAuth.initialize();
+  async initializeApp() {
+    // Initialize Firebase
+    const app = await initializeApp(environment.firebase);
+
+    // Initialize Firebase Authentication and get a reference to the service
+    this.auththy = await getAuth(app);
+    this.auththy.languageCode = 'es';
+
+    await this.platform.ready().then(async () => {
+      await GoogleAuth.initialize();
     })
+
+    this.provider = new GoogleAuthProvider();
+
+
+    // Inicializar Firebase
+    // if (!firebase.apps.length) {
+    //   firebase.initializeApp(firebaseConfig);
+    // }
   }
 
   login() {
@@ -53,7 +74,19 @@ export class AuthService {
    * @param userdata Los datos del usuario.
    */
   public async loginUsuario(userdata: UserData): Promise<UserData> {
-    let credential = await this.afAuth.signInWithEmailAndPassword(userdata.email, userdata.password!);
+    // let credential = await this.afAuth.signInWithEmailAndPassword(userdata.email, userdata.password!);
+
+    const auth = getAuth();
+    let credential = await signInWithEmailAndPassword(auth, userdata.email, userdata.password!);
+      // .then((userCredential) => {
+      //   // Signed in 
+      //   const user = userCredential.user;
+      //   // ...
+      // })
+      // .catch((error) => {
+      //   const errorCode = error.code;
+      //   const errorMessage = error.message;
+      // });
 
     return new Promise<UserData> (async (resolve) => {
       return await this.fireServicio.getDatosUsuario(credential.user!).then((user: any) => {
@@ -72,9 +105,21 @@ export class AuthService {
    * Registra un usuario en firebase con el metodo createUserDataWithEmailAndPassword.
    * @param userdata Los datos del usuario.
    */
-  public async registroUsuario(userdata: UserData): Promise<UserData> {
-    const credential = await this.afAuth.createUserWithEmailAndPassword(userdata.email, userdata.password!);
-    return new Promise((resolve) => { resolve(this.fireServicio.updateUserData(credential.user)) });
+  public async registroUsuario(userdata: UserData): Promise<UserData | User> {
+    // const credential = await this.afAuth.createUserWithEmailAndPassword(userdata.email, userdata.password!);
+    const auth = await getAuth();
+    const credential = await createUserWithEmailAndPassword(auth, userdata.email, userdata.password!).then((userCredential) => {
+        // Signed in
+        // ...
+        return userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        return this.constants.user_empty;
+        // ..
+      });
+    return new Promise((resolve) => { resolve(this.fireServicio.updateUserData(credential)) });
   }
 
   public isAuthenticated(): boolean {
@@ -82,7 +127,7 @@ export class AuthService {
   }
 
   /**
-   * Almacena el usuario en local con el nombre 'user'
+   * Almacena el usuario en local con el name 'user'
    * @param user el usuario a almacenar, en caso de omisión eliminará el usuario -> se emplea cuando cerramos sesión.
    */
   public async saveSession(userData: UserData): Promise<void> {
@@ -103,7 +148,7 @@ export class AuthService {
   }
 
   /**
-   * Almacena el usuario en local con el nombre 'user'
+   * Almacena el usuario en local con el name 'user'
    * @param user el usuario a almacenar, en caso de omisión
    * saveSession() emilinará el usuario-> se emplea cuando cerramos
    * sesión.
@@ -126,13 +171,37 @@ export class AuthService {
   public async iniciarSesionGoogle(): Promise<UserData> {
     console.log("INI - auth.service - iniciarSesionGoogle");
     let promesa: UserData;
+    // const provider = new firebase.auth.GoogleAuthProvider();
+
+    const auth = getAuth();
+    const _credential = await signInWithPopup(auth, this.provider)
+      .then(async (result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        return await GoogleAuthProvider.credentialFromResult(result);
+          // const token = credential!.accessToken;
+        // The signed-in user info.
+          // const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+      }).catch(async (error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+          // const credential = GoogleAuthProvider.credentialFromError(error);
+        return await GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+
 
     if (this.platform.is('capacitor')) {
       console.log("capacitor");
-      const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
-      console.log(environment.googleWebClientId);
+      // const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
+      // console.log(environment.googleWebClientId);
 
-      promesa = await signInWithCredential(this.auth, _credential).then(async (credenciales) => {
+      promesa = await signInWithCredential(this.auth, _credential!).then(async (credenciales) => {
         console.log(credenciales);
         let usuario: UserData = { uid: credenciales.user.uid, email: credenciales.user.email!, photoURL: credenciales.user.photoURL!, displayName: credenciales.user.displayName! };
         console.log(usuario);
@@ -141,10 +210,12 @@ export class AuthService {
 
     } else {
       console.log("browser");
-      const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
       console.log(environment.googleWebClientId);
+      // await GoogleAuth.initialize({'clientId': environment.googleWebClientId, scopes: ['profile', 'email'], grantOfflineAccess: true });
+      // const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
+      // console.log(environment.googleWebClientId);
 
-      promesa = await signInWithCredential(this.auth, _credential).then(async (credenciales) => {
+      promesa = await signInWithCredential(this.auth, _credential!).then(async (credenciales) => {
         console.log(credenciales);
         let usuario: UserData = { uid: credenciales.user.uid, email: credenciales.user.email!, photoURL: credenciales.user.photoURL!, displayName: credenciales.user.displayName! };
         console.log(usuario);

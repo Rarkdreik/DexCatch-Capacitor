@@ -1,28 +1,17 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>PokeCenter</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button routerLink="/main/avatar"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<!-- <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">PokeCenter</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content> -->
+<!-- <ion-content [fullscreen]="true">  -->
 
 <div class="contenedor">
     <div class="machine-container">
-        <img alt="" src="../../../../assets/images/item_pokemon/heal2.png" class="overflow-background">
+        <img alt="" src="../../../../assets/images/item_pokemon/heal.png" class="overflow-background">
         <div class="machine-header">
-
 
           <!-- <ion-card class="row" *ngFor="let pokemon of pokemons;" class='cardPokemon'> -->
           <div class='cardalgo'>
@@ -45,8 +34,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[0].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[0].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[0].hp}} / {{pokemons[0].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[0].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[0].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[0].hp}} / {{pokemons[0].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -55,8 +44,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[1].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[1].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[1].hp}} / {{pokemons[1].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[1].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[1].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[1].hp}} / {{pokemons[1].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -65,8 +54,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[2].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[2].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[2].hp}} / {{pokemons[2].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[2].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[2].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[2].hp}} / {{pokemons[2].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -82,8 +71,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[3].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[3].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[3].hp}} / {{pokemons[3].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[3].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[3].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[3].hp}} / {{pokemons[3].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -92,8 +81,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[4].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[4].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[4].hp}} / {{pokemons[4].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[4].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[4].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[4].hp}} / {{pokemons[4].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -102,8 +91,8 @@
 
                       <div class="col-4 flipper">
                         <ion-card class='cardPokemon front'>
-                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[5].numero_nacional}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[5].numero_nacional" /></div></div>
-                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]="barraHP"></div><div class="textoImgCentrado1 none">{{pokemons[5].hp}} / {{pokemons[5].hp_max}}</div></div></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><img src='../../../../assets/images/pokemons/{{pokemons[5].num_nation}}.png' class="pokeimagen centrar dblock" [alt]="pokemons[5].num_nation" /></div></div>
+                          <div class="flexrow"><div class="col-12 padding0"><div class="flexrow"><div class="colorBlack barraVida"><img src="../../../assets/images/item_pokemon/barra_hp.png" alt="hp" [ngStyle]='barraHP'></div><div class="textoImgCentrado1 none">{{pokemons[5].hp}} / {{pokemons[5].hp_max}}</div></div></div></div>
                         </ion-card>
                         
                         <ion-card class='cardPokemon back'></ion-card>
@@ -123,7 +112,7 @@
           <!-- <button type="button" (click)="heal()" class="btn btn-outline-secondary width-padre">
             <ion-icon name="medkit-outline"></ion-icon>
           </button> -->
-          <img _ngcontent-ng-c828252101="" alt="" src="../../../../assets/images/hum.png" style=" transform: rotate3d(0, 0, 1, 0deg); height: 65px; ">
+          <ion-img alt="" src="../../../../assets/images/hum2.png" style=" transform: rotate3d(0, 0, 1, 0deg); height: 65px; "></ion-img>
           <!-- <ul>
             <li>
               <a (click)="heal()">
@@ -139,25 +128,25 @@
 
         <div class="pokeball-slot1">
             <div id="poke4" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[3].ball}}.png' class="imgball" [alt]="pokemons[3].numero_nacional" [hidden]="pokemons[3].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[3].ball}}.png' class="imgball" [alt]="pokemons[3].num_nation" [hidden]="pokemons[3].ball === ''"/>
             </div>
             <div id="poke5" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[4].ball}}.png' class="imgball" [alt]="pokemons[4].numero_nacional" [hidden]="pokemons[4].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[4].ball}}.png' class="imgball" [alt]="pokemons[4].num_nation" [hidden]="pokemons[4].ball === ''"/>
             </div>
             <div id="poke6" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[5].ball}}.png' class="imgball" [alt]="pokemons[5].numero_nacional" [hidden]="pokemons[5].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[5].ball}}.png' class="imgball" [alt]="pokemons[5].num_nation" [hidden]="pokemons[5].ball === ''"/>
             </div>
         </div>
 
         <div class="pokeball-slot2">
             <div id="poke1" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[0].ball}}.png' class="imgball" [alt]="pokemons[0].numero_nacional" [hidden]="pokemons[0].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[0].ball}}.png' class="imgball" [alt]="pokemons[0].num_nation" [hidden]="pokemons[0].ball === ''"/>
             </div>
             <div id="poke2" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[1].ball}}.png' class="imgball" [alt]="pokemons[1].numero_nacional" [hidden]="pokemons[1].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[1].ball}}.png' class="imgball" [alt]="pokemons[1].num_nation" [hidden]="pokemons[1].ball === ''"/>
             </div>
             <div id="poke3" class="pokeball">
-              <img src='../../../../assets/images/item_pokemon/{{pokemons[2].ball}}.png' class="imgball" [alt]="pokemons[2].numero_nacional" [hidden]="pokemons[2].ball === ''"/>
+              <img src='../../../../assets/images/item_pokemon/{{pokemons[2].ball}}.png' class="imgball" [alt]="pokemons[2].num_nation" [hidden]="pokemons[2].ball === ''"/>
             </div>
         </div>
 
