@@ -11,6 +11,7 @@ import { PokemonInterface } from '../model/Pokemon';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { ConstantService } from './constant.service';
+import { LocalDbService } from './local-db.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class FirebaseService {
   private master: Master = this.constants.master_empty;
   itemss$: Observable<any[]> | undefined;
 
-  constructor(private af: AngularFirestore, private repo: RepositoryService, private alert: AlertsService, private toast: ToastService, private constants: ConstantService) { }
+  constructor(private af: AngularFirestore, private repo: RepositoryService, private alert: AlertsService, private toast: ToastService, private constants: ConstantService, private localDb: LocalDbService) { }
 
   public inicializar(correo: string) {
     this.catchdex_fb = this.af.collection(environment.id_app).doc(correo);
@@ -54,6 +55,7 @@ export class FirebaseService {
     });
 
     this.repo.setUsuario(auxUser);
+    await this.localDb.setUser(auxUser);
     this.master = await this.getMaster();
     this.repo.setMaster(this.master);
     this.repo.setRegion(this.master.region_ini);
@@ -69,15 +71,16 @@ export class FirebaseService {
     console.log("INI - firebase.service - setDatosUsuario");
     console.log(user.email!);
     const userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email!).doc('correo');
-    const auxUser: UserData = { uid: user.uid, email: user.email, photoURL: user.photoURL, displayName: user.displayName, };
+    const auxUser: UserData = {
+      uid: user.uid ?? '',
+      email: user.email,
+      photoURL: user.photoURL || 'assets/images/avatar/avatar.png',
+      displayName: user.displayName || '',
+    };
 
-    if (user.displayName == null || user.displayName == '') {
-      auxUser.displayName = '';
-      auxUser.photoURL = '../../assets/images/avatar/avatar.png';
-    }
-
-    userRef.set(auxUser);
+    userRef.set(auxUser, { merge: true });
     this.repo.setUsuario(auxUser);
+    void this.localDb.setUser(auxUser);
 
     console.log(auxUser);
     console.log("FIN - firebase.service - setDatosUsuario");
@@ -88,19 +91,25 @@ export class FirebaseService {
    *
    * @param user qwerty
    */
-  public updateUserData(user: any): UserData {
+  public async updateUserData(user: { email?: string | null; uid?: string | null; photoURL?: string | null; displayName?: string | null }): Promise<UserData> {
     console.log("INI - firebase.service - updateUserData");
     console.log(user);
-    const userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email).doc('correo');
-    const auxUser = { uid: user.uid, email: user.email, photoURL: user.photoURL, displayName: user.displayName, };
 
-    if (user.displayName == null || user.displayName == '') {
-      auxUser.displayName = '';
-      auxUser.photoURL = '../../assets/images/avatar/avatar.png';
+    if (!user.email) {
+      throw new Error('No hay email de usuario para actualizar sus datos.');
     }
 
-    userRef.update(auxUser).then((resultado) => { }).catch((erroneo) => { userRef.set(auxUser, { merge: true }); });
+    const userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email).doc('correo');
+    const auxUser: UserData = {
+      uid: user.uid ?? '',
+      email: user.email,
+      photoURL: user.photoURL || 'assets/images/avatar/avatar.png',
+      displayName: user.displayName || '',
+    };
+
+    await userRef.set(auxUser, { merge: true });
     this.repo.setUsuario(auxUser);
+    await this.localDb.setUser(auxUser);
 
     console.log("FIN - firebase.service - updateUserData");
     return auxUser;
@@ -112,7 +121,8 @@ export class FirebaseService {
   }
 
   public setDisplayName(name: string) {
-    this.updateUserData(this.repo.getUsuario());
+    const usuario = { ...this.repo.getUsuario(), displayName: name };
+    void this.updateUserData(usuario);
   }
 
   /////////////////////////////////////////////////////////////
@@ -221,36 +231,60 @@ export class FirebaseService {
   /////////////////////////////////////////////////////////////
 
   public async getMaster(): Promise<Master> {
-    await this.masterCollection.doc<Master>('ash').ref.get().then(resultado => {
-      this.master = {
-        nick: resultado.data()!.nick,
-        exp: resultado.data()!.exp,
-        level: resultado.data()!.level,
-        pokeBalls: resultado.data()!.pokeBalls,
-        superBalls: resultado.data()!.superBalls,
-        ultraBalls: resultado.data()!.ultraBalls,
-        masterBalls: resultado.data()!.masterBalls,
-        region_ini: resultado.data()!.region_ini,
-        poke_ini: resultado.data()!.poke_ini,
-        capturados: resultado.data()!.capturados,
-        favoritos: resultado.data()!.favoritos,
-        team: resultado.data()!.team,
-      };
-    });
+    const correo = this.repo.getCorreo();
 
-    return this.master;
+    try {
+      await this.masterCollection.doc<Master>('ash').ref.get().then(resultado => {
+        this.master = {
+          nick: resultado.data()!.nick,
+          exp: resultado.data()!.exp,
+          level: resultado.data()!.level,
+          pokeBalls: resultado.data()!.pokeBalls,
+          superBalls: resultado.data()!.superBalls,
+          ultraBalls: resultado.data()!.ultraBalls,
+          masterBalls: resultado.data()!.masterBalls,
+          region_ini: resultado.data()!.region_ini,
+          poke_ini: resultado.data()!.poke_ini,
+          capturados: resultado.data()!.capturados,
+          favoritos: resultado.data()!.favoritos,
+          team: resultado.data()!.team,
+        };
+      });
+
+      if (correo) {
+        await this.localDb.setMaster(correo, this.master);
+      }
+
+      return this.master;
+    } catch (error) {
+      if (correo) {
+        const cachedMaster = await this.localDb.getMaster(correo);
+        if (cachedMaster) {
+          this.master = cachedMaster;
+          return cachedMaster;
+        }
+      }
+
+      throw error;
+    }
   }
 
   public async addMaster(master: Master) {
     await this.masterCollection.doc<Master>('ash').set(master);
+    const correo = this.repo.getCorreo();
+    if (correo) { await this.localDb.setMaster(correo, master); }
   }
 
   public async updateMaster(master: Master) {
     await this.masterCollection.doc<Master>('ash').set(master, { merge: true });
+    const correo = this.repo.getCorreo();
+    if (correo) { await this.localDb.setMaster(correo, master); }
   }
 
   public async deleteMaster(master: Master) {
     await this.masterCollection.doc<Master>('ash').delete();
+    const correo = this.repo.getCorreo();
+    if (correo) { await this.localDb.clearUserData(correo); }
   }
 
   public async addPokemonAtrapado(pokemon: PokemonInterface): Promise<void> {
@@ -300,16 +334,33 @@ export class FirebaseService {
   }
 
   public async getPokedex() {
-    let pokemons: any = await firstValueFrom(this.pokeCollection.get().pipe(
-      map(snapshot => {
-        return snapshot.docs.map(doc => {
-          const data = doc.data() as PokemonInterface;
-          return { ...data };
-        });
-      })
-    ));
+    const correo = this.repo.getCorreo();
 
-    this.repo.setPokedex(pokemons)
+    try {
+      let pokemons: PokemonInterface[] = await firstValueFrom(this.pokeCollection.get().pipe(
+        map(snapshot => {
+          return snapshot.docs.map(doc => {
+            const data = doc.data() as PokemonInterface;
+            return { ...data };
+          });
+        })
+      ));
+
+      this.repo.setPokedex(pokemons);
+      if (correo) {
+        await this.localDb.setPokedex(correo, pokemons);
+      }
+    } catch (error) {
+      if (correo) {
+        const cachedPokedex = await this.localDb.getPokedex(correo);
+        if (cachedPokedex) {
+          this.repo.setPokedex(cachedPokedex);
+          return;
+        }
+      }
+
+      throw error;
+    }
   }
 
   private async getPokemonAtrapado(): Promise<PokemonInterface[]> {

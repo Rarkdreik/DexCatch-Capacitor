@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, ViewWillEnter } from '@ionic/angular';
+import { ViewerModalComponent } from 'src/app/component/viewermodal/viewermodal.component';
 import { Master } from 'src/app/model/Master';
 import { PokemonInterface } from 'src/app/model/Pokemon';
 import { QrcodeInterface } from 'src/app/model/Qrcode';
@@ -12,13 +13,6 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { QRScanGenService } from 'src/app/services/qrscan-gen.service';
 import { RepositoryService } from 'src/app/services/repository.service';
 import { ModalQrComponent } from './modal_qr.component';
-import { ViewerModalComponent } from 'src/app/component/viewermodal/viewermodal.component';
-
-// import { Tab2ModalComponent } from './home-modal.component';
-// import { Barcode, BarcodeFormat, BarcodeScanner, LensFacing } from '@capacitor-mlkit/barcode-scanning';
-// import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-// import { DialogService } from 'src/app/services/dialog.service';
-// import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 @Component({
   selector: 'app-home',
@@ -29,56 +23,71 @@ export class HomePage implements OnInit, ViewWillEnter {
   public master: Master = this.constants.master_empty;
   public team_poke: any[] = this.constants.pokes_empty;
   public map_poke: string = 'kanto';
+  public avatarSrc: string = 'assets/images/avatar/avatar.png';
 
-  // Atributos para generar qr
   public qrData: string = 'qwerty qwerty qwerty';
 
-  constructor(private router: Router, public repo: RepositoryService, public imagen: ImageService, private qr: QRScanGenService, private loading: LoadingService, private alerta: AlertsService, private fire: FirebaseService, private constants: ConstantService, private modalController: ModalController) {
-  }
+  constructor(
+    private router: Router,
+    public repo: RepositoryService,
+    public imagen: ImageService,
+    private qr: QRScanGenService,
+    private loading: LoadingService,
+    private alerta: AlertsService,
+    private fire: FirebaseService,
+    private constants: ConstantService,
+    private modalController: ModalController,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   async ionViewWillEnter() {
-    console.log("INI - home - ionViewWillEnter");
+    console.log('INI - home - ionViewWillEnter');
     this.master = this.repo.getMaster();
     this.team_poke = this.master.team;
+    await this.cargarAvatar();
 
-    // Rellenar para asegurar que hay 6 elementos
     while (this.team_poke.length < 6) {
       this.team_poke.push(null);
     }
 
-    console.log("FIN - home - ionViewWillEnter");
+    console.log('FIN - home - ionViewWillEnter');
   }
 
   public async ngOnInit() {
-    console.log("INI - home - ngOnInit");
+    console.log('INI - home - ngOnInit');
     this.master = this.repo.getMaster();
     this.team_poke = this.master.team;
+    await this.cargarAvatar();
     this.map_poke = this.master.region_ini;
     this.repo.setRegion(this.master.region_ini);
     this.qrData = this.master.nick;
-    let codigoQr: QrcodeInterface = { correo: this.repo.getCorreo()!, codigo: this.qrData, usos: 5 }
+    const codigoQr: QrcodeInterface = { correo: this.repo.getCorreo()!, codigo: this.qrData, usos: 5 };
     await this.fire.crearQr(codigoQr);
 
-    // Rellenar para asegurar que hay 6 elementos
     while (this.team_poke.length < 6) {
       this.team_poke.push(null);
     }
 
-    console.log("FIN - home - ngOnInit");
+    console.log('FIN - home - ngOnInit');
   }
 
   async ngAfterViewInit() {
-    console.log("INI - home - ngAfterViewInit");
-    console.log("FIN - home - ngAfterViewInit");
+    console.log('INI - home - ngAfterViewInit');
+    console.log('FIN - home - ngAfterViewInit');
   }
 
   ngOnDestroy() {
-    console.log("INI - home - ngOnDestroy");
-    console.log("FIN - home - ngOnDestroy");
+    console.log('INI - home - ngOnDestroy');
+    console.log('FIN - home - ngOnDestroy');
   }
 
   public async galeria() {
-    await this.imagen.selectImage();
+    const avatarUrl = await this.imagen.selectImage();
+
+    if (avatarUrl) {
+      this.avatarSrc = avatarUrl;
+      this.cdr.detectChanges();
+    }
   }
 
   public goMain() {
@@ -98,10 +107,10 @@ export class HomePage implements OnInit, ViewWillEnter {
   }
 
   public async leerQr() {
-    console.log("INI - home.page - leerQr");
+    console.log('INI - home.page - leerQr');
     this.loading.presentLoading('Cargando Lector Qr');
     await this.qr.startScan().finally(() => { this.loading.dismissLoading(); });
-    console.log("FIN - home.page - leerQr");
+    console.log('FIN - home.page - leerQr');
   }
 
   public segmentChanged(event: any) {
@@ -116,7 +125,7 @@ export class HomePage implements OnInit, ViewWillEnter {
     return await modal.present();
   }
 
-  calculateHpPercentage(pokemon: any): number {
+  calculateHpPercentage(pokemon: PokemonInterface): number {
     return (pokemon.hp / pokemon.hp_max) * 100;
   }
 
@@ -124,7 +133,7 @@ export class HomePage implements OnInit, ViewWillEnter {
     const modal = await this.modalController.create({
       component: ViewerModalComponent,
       componentProps: {
-        src: this.repo.getAvatar(),
+        src: this.avatarSrc || this.getAvatarSrc(),
         type: type,
         some: anyy
       },
@@ -132,8 +141,24 @@ export class HomePage implements OnInit, ViewWillEnter {
       keyboardClose: true,
       showBackdrop: true
     });
-  
+
     return await modal.present();
+  }
+
+  private async cargarAvatar(): Promise<void> {
+    const avatarRepo = this.repo.getAvatar();
+
+    if (avatarRepo) {
+      this.avatarSrc = avatarRepo;
+      return;
+    }
+
+    const avatarLocal = await this.imagen.getLocalAvatarDataUrl();
+    this.avatarSrc = avatarLocal || this.getAvatarSrc();
+    this.cdr.detectChanges();
+  }
+  private getAvatarSrc(): string {
+    return this.repo.getAvatar() || 'assets/images/avatar/avatar.png';
   }
 
 }

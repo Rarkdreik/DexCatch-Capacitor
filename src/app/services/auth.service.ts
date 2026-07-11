@@ -11,6 +11,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Auth, signInWithCredential, UserCredential } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { ConstantService } from './constant.service';
+import { LocalDbService } from './local-db.service';
 
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, User, signInWithPopup } from "firebase/auth";
@@ -34,6 +35,7 @@ export class AuthService {
     private repo: RepositoryService,
     private auth: Auth,
     private constants: ConstantService,
+    private localDb: LocalDbService,
   ) {
     this.initializeApp();
   }
@@ -127,46 +129,36 @@ export class AuthService {
   }
 
   /**
-   * Almacena el usuario en local con el name 'user'
-   * @param user el usuario a almacenar, en caso de omisión eliminará el usuario -> se emplea cuando cerramos sesión.
+   * Guarda o elimina la sesion local del usuario.
    */
   public async saveSession(userData: UserData): Promise<void> {
     try {
-      if (userData as UserData) {
+      if (userData?.uid && userData?.email) {
         this.repo.setUsuario(userData);
         this.login();
-
-        return window.localStorage.setItem('user', this.userData_toString(userData));
-      } else {
-        this.repo.setUsuario(this.user_empty);
-
-        return window.localStorage.removeItem('user');
+        await this.localDb.setUser(userData);
+        return;
       }
+
+      this.isAuth = false;
+      this.repo.setUsuario(this.user_empty);
+      await this.localDb.clearUser();
+      window.localStorage.removeItem('user');
     } catch (erroneo) {
       this.alertaServicio.alertaSimple('Error', erroneo, 'error');
     }
   }
 
   /**
-   * Almacena el usuario en local con el name 'user'
-   * @param user el usuario a almacenar, en caso de omisión
-   * saveSession() emilinará el usuario-> se emplea cuando cerramos
-   * sesión.
+   * Restaura la sesion local si existe.
    */
   public async cargarSession(): Promise<void> {
-    return new Promise(async (resolve) => {
-      try {
-        this.saveSession(this.parseUserData(window.localStorage.getItem('user')!));
-      } catch (err) {
-        this.saveSession(this.user_empty);
-      } finally { 
-        resolve();
-      }
-    })
+    const user = await this.localDb.getUser();
+    await this.saveSession(user ?? this.user_empty);
   }
 
   /**
-   * Inicia sesión con google
+   * Inicia sesion con google
    */
   public async iniciarSesionGoogle(): Promise<UserData> {
     console.log("INI - auth.service - iniciarSesionGoogle");

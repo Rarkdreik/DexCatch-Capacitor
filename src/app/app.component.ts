@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GsapService } from 'src/app/services/gsap-service.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +11,10 @@ import { GsapService } from 'src/app/services/gsap-service.service';
 export class AppComponent {
   public modal_style: any = 'modal modal-lock';
 
-  constructor(public gsapp: GsapService, public router: Router) {}
+  constructor(public gsapp: GsapService, public router: Router, private authService: AuthService) {}
 
   async ngOnInit() {
+    await this.authService.cargarSession();
 
     const togglePokedex = (event: Event): void => {
       event.preventDefault();

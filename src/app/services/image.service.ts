@@ -1,103 +1,201 @@
 import { Injectable } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
+import { Directory, Filesystem } from '@capacitor/filesystem';
 import { RepositoryService } from './repository.service';
 import { FirebaseService } from './firebase.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Preferences } from '@capacitor/preferences';
+import { ToastService } from './toast.service';
+import { UserData } from '../model/UserData';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
-  //private imagenAvatar: string;
+  private readonly avatarMaxWidth = 384;
+  private readonly avatarMaxHeight = 384;
+  private readonly avatarQuality = 0.74;
+  private readonly localAvatarPath = 'avatars/avatar.jpg';
 
-  constructor(public actionSheetController: ActionSheetController, private repo: RepositoryService, private fire: FirebaseService) {
-    //this.imagenAvatar = '../../assets/images/avatar/avatar.png';
-  }
+  constructor(
+    public actionSheetController: ActionSheetController,
+    private repo: RepositoryService,
+    private fire: FirebaseService,
+    private toast: ToastService
+  ) { }
 
-  public async pickImage(source: CameraSource) {
+  public async pickImage(source: CameraSource): Promise<string> {
     const image = await Camera.getPhoto({
-      quality: 100,
+      quality: 85,
       allowEditing: false,
-      resultType: CameraResultType.Base64, // Puede ser Base64 o DataUrl según tu necesidad
+      resultType: CameraResultType.DataUrl,
       source: source
     });
 
-    // Devuelve la imagen en formato base64: image.base64String
-    this.redimensionarImage(image.base64String!, 100, 400, 700).then((dataurl) => {
-      let base64Image = 'data:image/jpeg;base64,' + dataurl;
-      // this.imagenAvatar = base64Image;
-      this.guardarImagenAvatar(base64Image);
-    });
+    if (!image.dataUrl) {
+      throw new Error('El plugin Camera no devolvio una imagen valida.');
+    }
+
+    const avatarDataUrl = await this.redimensionarImage(
+      image.dataUrl,
+      this.avatarMaxWidth,
+      this.avatarMaxHeight,
+      this.avatarQuality
+    );
+
+    return this.guardarImagenAvatar(avatarDataUrl);
   }
 
-  public async selectImage() {
+  public async selectImage(): Promise<string | null> {
+    let finished = false;
+    let resolveResult: (value: string | null) => void = () => undefined;
+    const result = new Promise<string | null>((resolve) => {
+      resolveResult = resolve;
+    });
+
+    const finish = (avatarUrl: string | null) => {
+      if (!finished) {
+        finished = true;
+        resolveResult(avatarUrl);
+      }
+    };
+
+    const chooseImage = (source: CameraSource) => {
+      void this.pickImage(source)
+        .then((avatarUrl) => {
+          finish(avatarUrl);
+        })
+        .catch(async (error: unknown) => {
+          console.error('No se pudo actualizar el avatar', error);
+
+          if (!this.isCancelError(error)) {
+            await this.toast.presentarToast('No se pudo actualizar el avatar.', 'danger', 3000);
+          }
+
+          finish(null);
+        });
+    };
+
     const actionSheet = await this.actionSheetController.create({
-      header: "Select Image source",
+      header: 'Selecciona imagen',
       buttons: [
-        { text: 'Imagen de la galeria', handler: () => { this.pickImage(CameraSource.Photos) } },
-        { text: 'Usar Camara', handler: () => { this.pickImage(CameraSource.Camera) } },
-        { text: 'Cancelar', role: 'cancel' }
+        { text: 'Imagen de la galeria', handler: () => { chooseImage(CameraSource.Photos); } },
+        { text: 'Usar camara', handler: () => { chooseImage(CameraSource.Camera); } },
+        { text: 'Cancelar', role: 'cancel', handler: () => { finish(null); } }
       ]
     });
 
+    void actionSheet.onDidDismiss().then(({ role }) => {
+      if (role === 'cancel' || role === 'backdrop') {
+        finish(null);
+      }
+    });
+
     await actionSheet.present();
-    return actionSheet;
+    return result;
   }
 
-  private redimensionarImage(img: string, quality: number = 100, MAX_WIDTH: number, MAX_HEIGHT: number) {
+  public async getLocalAvatarDataUrl(): Promise<string | null> {
+    try {
+      const result = await Filesystem.readFile({
+        path: this.localAvatarPath,
+        directory: Directory.Data
+      });
+
+      const base64 = typeof result.data === 'string'
+        ? result.data
+        : await this.blobToBase64(result.data);
+
+      return `data:image/jpeg;base64,${base64}`;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  private redimensionarImage(img: string, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      const canvas: any = document.createElement('canvas');
+      const canvas = document.createElement('canvas');
       const image = new Image();
-      image.crossOrigin = 'Anonymous';
-      image.src = img;
+
       image.onload = () => {
         let width = image.width;
         let height = image.height;
-        if (!MAX_HEIGHT) {
-          MAX_HEIGHT = image.height;
-        }
-        if (!MAX_WIDTH) {
-          MAX_WIDTH = image.width;
-        }
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
+
+        const scale = Math.min(1, maxWidth / width, maxHeight / height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          reject(new Error('No se pudo preparar el canvas para redimensionar la imagen.'));
+          return;
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
         ctx.drawImage(image, 0, 0, width, height);
-        const dataUrl = canvas
-          .toDataURL('image/png', quality)
-          .replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
-        resolve(dataUrl);
+        resolve(canvas.toDataURL('image/jpeg', quality));
       };
-      image.onerror = e => {
-        reject(e);
+
+      image.onerror = (error) => {
+        reject(error);
       };
+
+      image.src = img;
     });
   }
 
-  // public getImagen(): string {
-  //   return this.imagenAvatar;
-  // }
+  private async guardarImagenAvatar(avatarDataUrl: string): Promise<string> {
+    const usuario = this.repo.getUsuario();
 
-  // public setImagen(imagen: string): void {
-  //   this.imagenAvatar = imagen;
-  // }
+    if (!usuario.uid || !usuario.email) {
+      throw new Error('No hay usuario autenticado para guardar el avatar.');
+    }
 
-  private guardarImagenAvatar(avatar: string) {
-    this.repo.setAvatar(avatar);
-    this.fire.updateUserData(this.repo.getUsuario());
+    await this.guardarAvatarLocal(avatarDataUrl);
+
+    const usuarioActualizado: UserData = { ...usuario, photoURL: avatarDataUrl };
+    this.repo.setUsuario(usuarioActualizado);
+    await this.fire.updateUserData(usuarioActualizado);
+
+    return avatarDataUrl;
+  }
+
+  private async guardarAvatarLocal(avatarDataUrl: string): Promise<void> {
+    await Filesystem.writeFile({
+      path: this.localAvatarPath,
+      directory: Directory.Data,
+      data: this.extraerBase64(avatarDataUrl),
+      recursive: true
+    });
+  }
+
+  private extraerBase64(dataUrl: string): string {
+    return dataUrl.replace(/^data:image\/(png|jpg|jpeg|webp);base64,/, '');
+  }
+
+  private blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result;
+        if (typeof result !== 'string') {
+          reject(new Error('No se pudo leer el avatar local.'));
+          return;
+        }
+
+        resolve(this.extraerBase64(result));
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  private isCancelError(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return /cancel|cancelled|canceled|dismiss/i.test(message);
   }
 
 }
