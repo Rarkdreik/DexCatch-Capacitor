@@ -13,7 +13,7 @@ export class ViewerModalComponent  implements OnInit {
   type: string = 'qrcode';
 
   // Atributos para generar qr
-  public qrData: string = 'qwerty qwerty qwerty';
+  public qrData: string = '';
 
   constructor(private navParams: NavParams, private modalController: ModalController) {}
 
@@ -22,6 +22,8 @@ export class ViewerModalComponent  implements OnInit {
     this.type = this.navParams.get('type');
     this.data = this.navParams.get('src');
     this.some = this.navParams.get('some');
+    this.qrData = this.navParams.get('qrData') || '';
+    console.log('Viewer QR payload', this.qrData);
 
     console.log('Image Source:', this.src);
     console.log('type:', this.type);

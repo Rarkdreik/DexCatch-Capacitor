@@ -41,7 +41,7 @@
 
             </ion-col>
             <ion-col size='8' class='grid'>
-              <ion-row class='grid-end' (click)="openViewer(qrcode, 'qrcode')">
+              <ion-row *ngIf="qrData" class='grid-end' (click)="openViewer(qrcode, 'qrcode')">
                 <qrcode #qrcode [qrdata]='qrData' [width]='90' [errorCorrectionLevel]="'M'"></qrcode>
               </ion-row>
             </ion-col>
@@ -135,7 +135,7 @@
             <img alt='catch' src='../../../assets/images/svg/svg_pokedex.svg'>
           </div>
 
-          <div class="pokeiconos">
+          <div class="pokeiconos" (click)='goShop()'>
             <img alt='catch' src='../../../assets/images/svg/svg_home.svg'>
           </div>
 

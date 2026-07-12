@@ -18,7 +18,7 @@
             <ion-col size='8' class='grid'>
               <ion-row class='grid-end main-nick'><span>{{ master.nick | uppercase }}</span></ion-row>
               <ion-row class='grid-end main-level'><span>LV. {{ master.level }}</span></ion-row>
-              <ion-row class='grid-end'><qrcode [qrdata]='qrData' [width]='90' [errorCorrectionLevel]="'M'"></qrcode></ion-row>
+              <ion-row *ngIf="qrData" class='grid-end'><qrcode [qrdata]='qrData' [width]='90' [errorCorrectionLevel]="'M'"></qrcode></ion-row>
             </ion-col>
           </ion-row>
         </ion-col>

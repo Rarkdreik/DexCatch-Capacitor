@@ -5,6 +5,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { ImageService } from 'src/app/services/image.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { QrcodeInterface } from 'src/app/model/Qrcode';
+import { ToastService } from 'src/app/services/toast.service';
 import { QRScanGenService } from 'src/app/services/qrscan-gen.service';
 import { RepositoryService } from 'src/app/services/repository.service';
 import { Master } from 'src/app/model/Master';
@@ -21,14 +22,13 @@ export class Tab2Page {
   public team_poke: PokemonInterface[] = this.constants.pokes_empty;
   public map_poke: string = 'kanto';
   // Atributos para generar qr
-  public qrData: string = 'qwerty qwerty qwerty';
+  public qrData: string = '';
     // public elementType: 'url' | 'canvas' | 'img';
   // Atributos para mostrar y ocultar la camara qr
     // private ionapp?: HTMLElement;
     // private boton?: HTMLElement;
 
-  constructor( private router: Router, public repo: RepositoryService, public imagen: ImageService, private qr: QRScanGenService, private loading: LoadingService, private alerta: AlertsService, private fire: FirebaseService, private constants: ConstantService ) {
-    // this.qrData = 'qwerty qwerty qwerty';
+  constructor( private router: Router, public repo: RepositoryService, public imagen: ImageService, private qr: QRScanGenService, private loading: LoadingService, private toast: ToastService, private alerta: AlertsService, private fire: FirebaseService, private constants: ConstantService ) {
     // this.elementType = 'canvas';
   }
 
@@ -38,9 +38,14 @@ export class Tab2Page {
     this.team_poke = this.master.team;
     this.map_poke = this.master.region_ini;
     this.repo.setRegion(this.master.region_ini);
-    this.qrData = this.master.nick;
-    let codigoQr: QrcodeInterface = { correo: this.repo.getCorreo()!, codigo: this.qrData, usos: 5 }
-    await this.fire.crearQr(codigoQr);
+    const correo = this.repo.getCorreo();
+
+    if (correo) {
+      let codigoQr: QrcodeInterface = { correo, codigo: '', usos: 5 }
+      const qrPublicado = await this.fire.crearQr(codigoQr);
+      this.qrData = this.fire.buildQrPayload(qrPublicado);
+      console.log('Tab2 QR payload', this.qrData);
+    }
     console.log("FIN - tab2 - ngOnInit");
   }
 
@@ -72,9 +77,25 @@ export class Tab2Page {
 
   public async leerQr() {
     console.log("INI - tab2.page - leerQr");
-    this.loading.presentLoading('Cargando Lector Qr');
-    await this.qr.startScan().finally(() => { this.loading.dismissLoading(); });
-    console.log("FIN - tab2.page - leerQr");
+
+    const codigo = await this.qr.startScan();
+    console.log('QR scan raw result', codigo);
+
+    if (!codigo) {
+      await this.toast.presentarToast('No se ha leido ningun QR.', 'warning', 5000, true);
+      console.log("FIN - tab2.page - leerQr");
+      return;
+    }
+
+    await this.loading.presentInfiniteLoading('Canjeando QR');
+
+    try {
+      const resultado = await this.fire.prueba(codigo);
+      await this.toast.presentarToast(resultado.message, resultado.ok ? 'success' : 'warning', 5000, true);
+    } finally {
+      await this.loading.dismissLoading();
+      console.log("FIN - tab2.page - leerQr");
+    }
   }
 
   public segmentChanged(event: any) {

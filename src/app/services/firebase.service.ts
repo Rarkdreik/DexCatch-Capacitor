@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Master } from '../model/Master';
-import { QrcodeInterface } from '../model/Qrcode';
+import { QrcodeInterface, QrPayloadInterface, QrRedemptionResult, QrRewardItem } from '../model/Qrcode';
 import { UserData } from '../model/UserData';
 import { environment } from 'src/environments/environment';
 import { RepositoryService } from './repository.service';
@@ -78,9 +78,16 @@ export class FirebaseService {
       displayName: user.displayName || '',
     };
 
+    if (user.displayName == null || user.displayName == '') {
+      auxUser.displayName = '';
+      auxUser.photoURL = '../../assets/images/avatar/avatar.png';
+    }
+
     userRef.set(auxUser, { merge: true });
     this.repo.setUsuario(auxUser);
-    void this.localDb.setUser(auxUser);
+    void this.localDb.setUser(auxUser).catch(error => {
+      console.error('Error guardando el usuario localmente', error);
+    });
 
     console.log(auxUser);
     console.log("FIN - firebase.service - setDatosUsuario");
@@ -129,42 +136,39 @@ export class FirebaseService {
   //////////////////  Codigo Qr  //////////////////////////////
   /////////////////////////////////////////////////////////////
 
-  /**
-   * 
-   * @param correo 
-   * @param codigo 
-   * @param uso 
-   * @param tiempo 
-   */
-  public async crearQr(codigoQr: QrcodeInterface) {
-    console.log("INI - firebase.service - crearQr");
-    console.log(codigoQr);
-    this.leerQr(codigoQr).then((resultado) => {}).catch((erroneo) => {
-      this.toast.presentarToast('No se ha podido crear el codigo qr. ' + erroneo, 'warning', 3000)
-    });
-    const qrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').doc<QrcodeInterface>(codigoQr.correo);
+  public buildQrPayload(codigoQr: QrcodeInterface): string {
+    const payload: QrPayloadInterface = {
+      type: 'dexcatch-qr',
+      version: 1,
+      correo: codigoQr.correo,
+      codigo: codigoQr.codigo,
+    };
 
-    const data: QrcodeInterface = { codigo: codigoQr.codigo, correo: codigoQr.correo, usos: codigoQr.usos };
-
-    await qrRef.set(data);
-    console.log("FIN - firebase.service - crearQr");
+    return JSON.stringify(payload);
   }
 
-  private async leerQr(codigoQr: QrcodeInterface) {
-    console.log("INI - firebase.service - leerQr");
+  /**
+   * Crea o actualiza el QR publico del entrenador sin regenerarlo en cada carga.
+   */
+  public async crearQr(codigoQr: QrcodeInterface): Promise<QrcodeInterface> {
+    console.log('INI - firebase.service - crearQr');
+
     const qrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').doc<QrcodeInterface>(codigoQr.correo);
-
-    return new Promise(async (resolve, reject) => {
-      await qrRef.ref.get().then(resultado => {
-        const qr: QrcodeInterface = { codigo: resultado.data()!.codigo, correo: resultado.data()!.correo, usos: resultado.data()!.usos, };
-        resolve(qr);
-
-      }).catch(async (erroneo) => {
-        // this.toast.cerrarToast();
-        this.toast.presentarToast('No se ha podido leer el codigo qr. ' + erroneo, 'warning', 3000)//.then(() => { reject(null); });
-      });
-      console.log("FIN - firebase.service - leerQr");
+    const snapshot = await qrRef.ref.get().catch((erroneo) => {
+      console.error('No se ha podido leer el QR existente.', erroneo);
+      return null;
     });
+    const currentQr = snapshot?.exists ? snapshot.data() : undefined;
+
+    const data: QrcodeInterface = {
+      codigo: currentQr?.codigo || codigoQr.codigo || this.generateQrCode(),
+      correo: codigoQr.correo,
+      usos: typeof currentQr?.usos === 'number' ? currentQr.usos : codigoQr.usos,
+    };
+
+    await qrRef.set(data, { merge: true });
+    console.log('FIN - firebase.service - crearQr');
+    return data;
   }
 
   public async actualizarQr(codigoQr: QrcodeInterface) {
@@ -174,7 +178,7 @@ export class FirebaseService {
       this.toast.presentarToast('Codigo qr actualizado.', 'warning', 3000);
     }).catch(async (erroneo) => {
       this.toast.cerrarToast();
-      this.toast.presentarToast('No se ha podido actualizar el codigo qr. ' + erroneo, 'warning', 3000);
+      this.toast.presentarToast('No se ha podido actualizar el codigo qr. ' + erroneo, 'warning', 5000, true);
     });
   }
 
@@ -183,49 +187,118 @@ export class FirebaseService {
     return await qrRef.delete();
   }
 
-  public async prueba(codigo: string) {
-    let codigosQrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').ref;
+  public async prueba(codigo: string): Promise<QrRedemptionResult> {
+    console.log('QR scan text read', codigo);
+    const payload = this.parseQrPayload(codigo);
+    console.log('QR scan parsed payload', payload);
+    const correoActual = this.repo.getCorreo();
 
-    let query = await codigosQrRef.get().then(async snapshot => {
-      if (snapshot.empty) {
-        this.toast.presentarToast('No existen codigos Qr', 'danger', 3000);
-        return;
+    if (!correoActual) {
+      return this.qrFailure('No hay una cuenta activa para canjear el QR.');
+    }
+
+    if (!payload) {
+      return this.qrFailure('El QR no pertenece a DexCatch o usa un formato antiguo.');
+    }
+
+    const qrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').doc<QrcodeInterface>(payload.correo);
+    const masterRef = this.masterCollection.doc<Master>('ash');
+    const rewards = this.getQrRewards();
+    let updatedMaster: Master | null = null;
+
+    try {
+      const result = await this.af.firestore.runTransaction<QrRedemptionResult>(async (transaction) => {
+        const qrSnapshot = await transaction.get(qrRef.ref);
+
+        if (!qrSnapshot.exists) {
+          return this.qrFailure('El QR no existe o ya no esta disponible.');
+        }
+
+        const qrData = qrSnapshot.data() as QrcodeInterface;
+
+        if (qrData.correo !== payload.correo || qrData.codigo !== payload.codigo) {
+          return this.qrFailure('El QR no coincide con el codigo publicado.');
+        }
+
+        if ((qrData.usos ?? 0) <= 0) {
+          return this.qrFailure('Ya no se puede usar este codigo QR.');
+        }
+
+        const masterSnapshot = await transaction.get(masterRef.ref);
+        const masterBase = (masterSnapshot.exists ? masterSnapshot.data() : this.repo.getMaster()) as Master;
+        const nextMaster: Master = {
+          ...masterBase,
+          pokeBalls: (masterBase.pokeBalls ?? 0) + 5,
+          superBalls: (masterBase.superBalls ?? 0) + 3,
+          ultraBalls: (masterBase.ultraBalls ?? 0) + 2,
+          masterBalls: (masterBase.masterBalls ?? 0) + 1,
+          favoritos: masterBase.favoritos ?? [],
+        };
+
+        transaction.set(masterRef.ref, nextMaster, { merge: true });
+        transaction.update(qrRef.ref, { usos: qrData.usos - 1 });
+        updatedMaster = nextMaster;
+
+        return {
+          ok: true,
+          message: 'QR leido correctamente. Recompensa obtenida.',
+          rewards,
+          ownerEmail: payload.correo,
+          remainingUses: qrData.usos - 1,
+        };
+      });
+
+      if (result.ok && updatedMaster) {
+        this.repo.setMaster(updatedMaster);
+        await this.localDb.setMaster(correoActual, updatedMaster);
       }
 
-      snapshot.forEach(async doc => {
-        if (codigo === doc.data()['codigo']) {
-          if (doc.data()['usos'] >= 1) {
-            let codeQr = doc.data() as QrcodeInterface;
-            let pokeMaestro = this.repo.getMaster();
-            pokeMaestro.pokeBalls += 5;
-            pokeMaestro.superBalls += 3;
-            pokeMaestro.ultraBalls += 2;
-            pokeMaestro.masterBalls += 1;
-
-            if (pokeMaestro.favoritos == undefined) { pokeMaestro.favoritos = []; }
-
-            this.repo.setMaster(pokeMaestro);
-            await this.addMaster(pokeMaestro);
-
-            this.toast.presentarToast('Has conseguido:' +
-              '\n\tx' + pokeMaestro.pokeBalls + ' pokeballs' +
-              '\n\tx' + pokeMaestro.superBalls + ' Superballs' +
-              '\n\tx' + pokeMaestro.ultraBalls + ' Ultraballs' +
-              '\n\tx' + pokeMaestro.masterBalls + ' Masterballs',
-              'success', 5000
-            );
-
-            codeQr.usos -= 1;
-            this.actualizarQr(codeQr);
-          } else {
-            this.toast.cerrarToast();
-            this.toast.presentarToast('Ya no se puede usar este codigo qr', 'warning', 5000);
-          }
-        }
-      });
-    }).catch(err => { });
+      return result;
+    } catch (error) {
+      console.error('No se ha podido canjear el QR.', error);
+      return this.qrFailure('No se ha podido canjear el QR. Revisa permisos o conexion.');
+    }
   }
 
+  private parseQrPayload(value: string): QrPayloadInterface | null {
+    try {
+      const data = JSON.parse(value.trim()) as Partial<QrPayloadInterface> & { t?: string; v?: number; e?: string; c?: string };
+      const type = data.type || data.t;
+      const correo = data.correo || data.e;
+      const codigo = data.codigo || data.c;
+      const version = data.version || data.v || 1;
+
+      if (type !== 'dexcatch-qr' || typeof correo !== 'string' || typeof codigo !== 'string' || !correo || !codigo) {
+        return null;
+      }
+
+      return { type: 'dexcatch-qr', version, correo, codigo };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  private generateQrCode(): string {
+    if (globalThis.crypto?.randomUUID) {
+      return globalThis.crypto.randomUUID();
+    }
+
+    const randomPart = Math.random().toString(36).slice(2);
+    return `${Date.now()}-${randomPart}`;
+  }
+
+  private getQrRewards(): QrRewardItem[] {
+    return [
+      { key: 'pokeBalls', nombre: 'Pokeball', cantidad: 5, imagen: 'assets/images/item_pokemon/pokeball.png' },
+      { key: 'superBalls', nombre: 'Superball', cantidad: 3, imagen: 'assets/images/item_pokemon/superball.png' },
+      { key: 'ultraBalls', nombre: 'Ultraball', cantidad: 2, imagen: 'assets/images/item_pokemon/ultraball.png' },
+      { key: 'masterBalls', nombre: 'Masterball', cantidad: 1, imagen: 'assets/images/item_pokemon/masterball.png' },
+    ];
+  }
+
+  private qrFailure(message: string): QrRedemptionResult {
+    return { ok: false, message, rewards: [] };
+  }
   /////////////////////////////////////////////////////////////
   //////////////////  Master  /////////////////////////////
   /////////////////////////////////////////////////////////////
@@ -248,6 +321,8 @@ export class FirebaseService {
           capturados: resultado.data()!.capturados,
           favoritos: resultado.data()!.favoritos,
           team: resultado.data()!.team,
+          money: resultado.data()!.money,
+          items: resultado.data()!.items,
         };
       });
 
@@ -291,8 +366,8 @@ export class FirebaseService {
     let auxMaster: Master = this.repo.getMaster();
 
     // Verifica si hay hueco en el equipo
-    // Hay espacio en el equipo, se añade directamente al equipo
-    // No hay espacio en el equipo, se añade a los capturados
+    // Hay espacio en el equipo, se aÃ±ade directamente al equipo
+    // No hay espacio en el equipo, se aÃ±ade a los capturados
     if (auxMaster.team.length < 6) {
         auxMaster.team.push(pokemon);
     } else {
@@ -302,7 +377,7 @@ export class FirebaseService {
     // Guarda los cambios en el repositorio
     this.repo.setMaster(auxMaster);
 
-    // Se incluye en la colección de la pokedex
+    // Se incluye en la colecciÃ³n de la pokedex
     await this.addPokemon(pokemon);
 
     // Finalmente, actualiza el master

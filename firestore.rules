@@ -20,6 +20,33 @@ service cloud.firestore {
       && request.resource.data.email == email;
     }
 
+    function isValidQrDocument(email) {
+      return request.resource.data.keys().hasOnly([
+        'codigo',
+        'correo',
+        'usos'
+      ])
+      && request.resource.data.codigo is string
+      && request.resource.data.correo == email
+      && request.resource.data.usos is int
+      && request.resource.data.usos >= 0
+      && request.resource.data.usos <= 20;
+    }
+
+    function isValidQrRedeem() {
+      return isSignedIn()
+      && request.resource.data.keys().hasOnly([
+        'codigo',
+        'correo',
+        'usos'
+      ])
+      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usos'])
+      && request.resource.data.codigo == resource.data.codigo
+      && request.resource.data.correo == resource.data.correo
+      && request.resource.data.usos == resource.data.usos - 1
+      && resource.data.usos > 0;
+    }
+
     match /{email}/correo {
       allow read, delete: if ownsEmail(email);
       allow create, update: if ownsEmail(email) && isValidUserDocument(email);
@@ -38,7 +65,11 @@ service cloud.firestore {
     }
 
     match /CatchDex/codigos/qr/{email} {
-      allow read, create, update, delete: if ownsEmail(email);
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if ownsEmail(email) && isValidQrDocument(email);
+      allow update: if (ownsEmail(email) && isValidQrDocument(email)) || isValidQrRedeem();
+      allow delete: if ownsEmail(email);
     }
 
     match /{document=**} {

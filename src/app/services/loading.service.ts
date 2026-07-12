@@ -45,7 +45,13 @@ export class LoadingService {
    * Devuelve un Promise.
    */
   public async dismissLoading(): Promise<any> {
-    return await this.loadingController.dismiss();
+    const loading = await this.loadingController.getTop();
+
+    if (!loading) {
+      return null;
+    }
+
+    return await loading.dismiss();
   }
 
 }

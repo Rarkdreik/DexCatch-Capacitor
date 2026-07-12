@@ -9,6 +9,7 @@ import { HomePageRoutingModule } from './home-routing.module';
 import { HomePage } from './home.page';
 import { ModalQrComponent } from './modal_qr.component';
 import { ViewerModalComponent } from 'src/app/component/viewermodal/viewermodal.component';
+import { QrRewardModalComponent } from './qr-reward-modal.component';
 
 @NgModule({
   imports: [
@@ -20,6 +21,6 @@ import { ViewerModalComponent } from 'src/app/component/viewermodal/viewermodal.
     HomePageRoutingModule,
     QRCodeModule
   ],
-  declarations: [HomePage, ModalQrComponent, ViewerModalComponent]
+  declarations: [HomePage, ModalQrComponent, ViewerModalComponent, QrRewardModalComponent]
 })
 export class HomePageModule {}

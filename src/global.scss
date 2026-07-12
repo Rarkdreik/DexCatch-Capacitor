@@ -555,3 +555,61 @@ app-root.has-camera ion-content {
     text-align: end !important;
     padding-right: 10px !important;
 }
+
+/* QR reward modal */
+ion-modal.qr-reward-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: auto;
+    --width: min(92vw, 440px);
+    --height: fit-content;
+    --min-height: min(36vh, 360px);
+    --max-height: min(86vh, 620px);
+    --border-radius: 8px;
+    --box-shadow: 0 18px 48px rgba(0, 0, 0, 0.58);
+    --backdrop-opacity: 0.64;
+    align-items: center;
+    justify-content: center;
+}
+
+ion-modal.qr-reward-modal::part(content) {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: min(36vh, 360px);
+    max-height: min(86vh, 620px);
+    border: 1px solid rgba(255, 224, 64, 0.22);
+    border-radius: 8px;
+    background: #050814;
+}
+
+ion-modal.qr-reward-modal::part(backdrop) {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.72);
+}
+
+@media (max-width: 380px) {
+    ion-modal.qr-reward-modal {
+        --width: calc(100vw - 20px);
+        --min-height: 320px;
+        --max-height: calc(100vh - 32px);
+    }
+
+    ion-modal.qr-reward-modal::part(content) {
+        min-height: 320px;
+        max-height: calc(100vh - 32px);
+    }
+}
+
+@media (min-width: 720px) {
+    ion-modal.qr-reward-modal {
+        --width: 460px;
+    }
+}
