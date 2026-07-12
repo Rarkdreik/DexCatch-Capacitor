@@ -1,19 +1,7 @@
-// .pokeball-content {
-//     background-color: #0a0a0a; /* Fondo oscuro */
-//     padding: 10px;
-// }
 
-// .team-container {
-//     background-color: var(--background-two);
-//     padding: 5px;
-//     border-radius: 5px;
-//     margin: 5px;
-// }
-.team-container {
-    background-color: var(--background-two);
-    padding: 5px;
-    border-radius: 5px;
-    margin: 5px;
+ion-grid {
+    padding: 0;
+    margin: 0;
 }
 
 .team-grid {
@@ -22,24 +10,19 @@
     gap: 10px;
 }
 
-// .pokemon-slot {
-//     background-color: var(--background-thr);
-//     padding: 10px;
-//     border-radius: 5px;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//     position: relative;
-// }
+.team-container {
+    background-color: var(--background-two);
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px;
+}
 
-// .pokemon-slot {
-//     background-color: var(--background-thr);
-//     padding: 10px;
-//     border-radius: 5px;
-//     position: relative;
-//     height: 95px;
-// }
+.captured-container {
+    background-color: var(--background-two);
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+}
 
 .pokemon-slot {
     position: relative;
@@ -59,7 +42,6 @@
 }
 
 .pokemon-slot.selected {
-    // border: 2px solid yellow; /* Indicador de selección */
     animation: pulse 1.5s infinite;
     background-color: var(--background-cer);
 }
@@ -72,7 +54,7 @@
     background-color: var(--background-thr);
     margin: 5px;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     align-items: center;
     justify-content: center;
     height: 95px;
@@ -82,7 +64,6 @@
 }
 
 .pokemon-catch-slot.selected {
-    // border: 2px solid yellow; /* Indicador de selección */
     animation: pulse 1.5s infinite;
     background-color: var(--background-cer);
 }
@@ -98,11 +79,6 @@
     width: unset !important;
     max-width: unset !important;
 }
-
-// .pokemon-card p {
-//     color: #ffffff;
-//     font-size: 14px;
-// }
 
 .pokemon-card span, .row span {
     position: absolute;
@@ -125,6 +101,9 @@
     right: 5px;
     width: 20px;
     height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-x: center;
 }
 
 .item-badge img {
@@ -132,29 +111,10 @@
     height: 100%;
 }
 
-// .team-actions {
-//     margin-top: 20px;
-//     display: flex;
-//     justify-content: space-around;
-// }
-
 div > ion-button {
     background-color: var(--background-cer);
     border-radius: 5px;
     box-shadow: 3px 3px var(--background-fou);
-}
-
-// .captured-container {
-//     background-color: #0a0a0a;
-//     padding: 10px;
-//     border-radius: 15px;
-// }
-
-.captured-container {
-    background-color: var(--background-two);
-    padding: 5px;
-    margin: 5px;
-    border-radius: 5px;
 }
 
 .pulsating {
@@ -168,43 +128,4 @@ div > ion-button {
     50% {
         transform: scale(1.1);
     }
-}
-
-
-
-
-
-
-
-
-
-.item-badge {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position-x: center;
-}
-
-// .pokemon-catch-slot {
-//     background-color: #1c3b5a;
-//     padding: 10px;
-//     border-radius: 10px;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//     position: relative;
-//     max-width: unset !important;
-//     width: 30% !important;
-//     margin: 5px;
-//     flex: unset !important;
-// }
-
-ion-grid {
-    padding: 0;
-    margin: 0;
 }

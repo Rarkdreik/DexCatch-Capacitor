@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { TeamPageRoutingModule } from './team-routing.module';
 
 import { TeamPage } from './team.page';
+import { PokeModalComponent } from 'src/app/component/poke-modal/poke-modal.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { TeamPage } from './team.page';
     IonicModule,
     TeamPageRoutingModule
   ],
-  declarations: [TeamPage]
+  declarations: [TeamPage, PokeModalComponent]
 })
 export class TeamPageModule {}
