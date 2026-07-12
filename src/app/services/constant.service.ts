@@ -31,7 +31,7 @@ export class ConstantService {
                                         };
 
   public pokes_empty: PokemonInterface[] = [];
-  public master_empty: Master = { nick: '', level: 1, exp: 0, pokeBalls: 5, superBalls: 0, ultraBalls: 0, masterBalls: 0, region_ini: '', poke_ini: this.poke_empty, capturados: this.pokes_empty, team: this.pokes_empty, favoritos: [] };
+  public master_empty: Master = { nick: '', level: 1, exp: 0, pokeBalls: 5, superBalls: 0, ultraBalls: 0, masterBalls: 0, region_ini: '', poke_ini: this.poke_empty, capturados: this.pokes_empty, team: this.pokes_empty, favoritos: [], money: 1500, items: [] };
   public masters_empty: Master[] = [];
 
   public pageLogin: string = 'Login';

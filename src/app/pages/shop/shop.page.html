@@ -1,13 +1,60 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>shop</ion-title>
+    <ion-title>Shop</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">shop</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  <!-- Contenedor del equipo Pokémon -->
+  <div class="row team-container">
+    <div class="col-8 all-cero">
+      <ion-grid>
+        <ion-row>
+          <div class="pokemon-slot" *ngFor="let item_c of cart; let i = index" [class.selected]="selectedCartIndex === i" (click)="selectCartItem(i)">
+            <div class="row">
+              <img *ngIf="item_c" [src]="item_c.img" alt="{{item_c.name}}" />
+              <span *ngIf="item_c">{{ item_c.display_name }}</span>
+              <div *ngIf="item_c" class="item-badge">{{ item_c.count }}</div>
+            </div>
+            <ion-icon *ngIf="!item_c" name="add-outline" class="add-icon"></ion-icon>
+          </div>
+        </ion-row>
+      </ion-grid>
+
+    </div>
+    <div class="col-4 grid">
+      <div class="grid">
+        <ion-button (click)="payShopItems()">PAY</ion-button>
+        <ion-button (click)="showPokemonInfo()">INFO</ion-button>
+        <input type="text" placeholder="0 €" [(ngModel)]="totalMoney" [disabled]="true">
+        <input type="text" placeholder="- 0 €" [(ngModel)]="totalCost" [disabled]="true">
+        <input type="text" placeholder="0 €" [(ngModel)]="totalTotal" [disabled]="true">
+      </div>
+    </div>
+  </div>
+
+<ion-content [fullscreen]="true"class="pokeball-content">
+  <!-- Contenedor de Pokémon capturados -->
+  <div class="captured-container">
+    <ion-grid>
+      <ion-row>
+        <div class="col-4 pokemon-catch-slot" *ngFor="let item_s of items_shop; let i = index" [class.selected]="selectedShopIndex === i" (click)="selectShopItem(i)">
+          <div class="row">
+            <img *ngIf="item_s" [src]="item_s.img" alt="{{ item_s.name }}" />
+            <span *ngIf="item_s">{{ item_s.display_name }}</span>
+            <div *ngIf="item_s" class="item-badge">{{ item_s.cost }}</div>
+          </div>
+          <ion-icon *ngIf="!item_s" name="add-outline" class="add-icon"></ion-icon>
+        </div>
+      </ion-row>
+    </ion-grid>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más Pokémon...">
+        
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
 </ion-content>

@@ -19,4 +19,6 @@ export interface Master {
     favoritos: string[];
     // Array de los pokemons team
     team: PokemonInterface[];
+    money: number;
+    items: any[]
 }
