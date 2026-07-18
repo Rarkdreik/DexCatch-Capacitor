@@ -6,6 +6,7 @@ import { FirebaseService } from './firebase.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ToastService } from './toast.service';
 import { UserData } from '../model/UserData';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,8 @@ export class ImageService {
     public actionSheetController: ActionSheetController,
     private repo: RepositoryService,
     private fire: FirebaseService,
-    private toast: ToastService
+    private toast: ToastService,
+    private logger: LoggerService
   ) { }
 
   public async pickImage(source: CameraSource): Promise<string> {
@@ -65,7 +67,7 @@ export class ImageService {
           finish(avatarUrl);
         })
         .catch(async (error: unknown) => {
-          console.error('No se pudo actualizar el avatar', error);
+          this.logger.error('ImageService.selectImage', 'No se pudo actualizar el avatar', error);
 
           if (!this.isCancelError(error)) {
             await this.toast.presentarToast('No se pudo actualizar el avatar.', 'danger', 3000);

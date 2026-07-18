@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 // import { NativeAudio } from '@capacitor-community/native-audio'
+import { LoggerService } from './logger.service';
 
 interface Sound {
   key: string;
@@ -17,7 +18,7 @@ export class AudioService {
   private audioPlayer: HTMLAudioElement = new Audio();
   private forceWebAudio: Boolean = true;
 
-  constructor(private platform: Platform, /*private nativeAudio: NativeAudio*/) { }
+  constructor(private platform: Platform, private logger: LoggerService, /*private nativeAudio: NativeAudio*/) { }
 
   /**
    * Carga en memoria un audio dandole un name que la identifica y la ruta del archivo deseado.
@@ -55,7 +56,7 @@ export class AudioService {
       this.audioPlayer.src = soundToPlay.asset;
       this.audioPlayer.play();
     } else {
-      console.warn(`Sound with key ${key} not found`);
+      this.logger.warn('AudioService.play', 'Sonido no encontrado', { key });
     }
   }
 
@@ -95,7 +96,7 @@ export class AudioService {
       // console.log(`Stopped web audio: ${audio}`);
     }
     else {
-      console.warn(`Sound with key ${audio} not found or not currently playing`);
+      this.logger.warn('AudioService.stopAudio', 'Sonido no encontrado o no reproducido', { key: audio });
     }
   }
 
@@ -120,12 +121,12 @@ export class AudioService {
         this.audioPlayer.pause();
         this.audioPlayer.currentTime = 0;
         this.audioPlayer.src = '';
-        console.log(`Unloaded web audio: ${audio}`);
+        this.logger.debug('AudioService.quitarAudio', 'Audio web descargado', { key: audio });
       }
 
       this.sounds.splice(soundIndex, 1);
     } else {
-      console.warn(`Sound with key ${audio} not found`);
+      this.logger.warn('AudioService.quitarAudio', 'Sonido no encontrado', { key: audio });
     }
   }
 

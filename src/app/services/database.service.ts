@@ -10,6 +10,7 @@ import { StatsService } from './stats.service';
 import { AlertsService } from './alerta.service';
 import { ConstantService } from './constant.service';
 import { environment } from 'src/environments/environment';
+import { LoggerService } from './logger.service';
 
 interface ssubjects {
   [key: string]: BehaviorSubject<PokemonInterface[]>;
@@ -45,7 +46,8 @@ export class DatabaseService {
     // private http: HttpClient,
     private poke: StatsService,
     private alerta: AlertsService,
-    private constants: ConstantService
+    private constants: ConstantService,
+    private logger: LoggerService
   ) {
     this.plt.ready().then(() => {
       this.initializeDatabase();
@@ -178,7 +180,7 @@ export class DatabaseService {
   }
 
   public async addPokemonAtrapado(poke: PokemonInterface) {
-    console.log('base de datos 10');
+    this.logger.verbose('DatabaseService.addPokemonAtrapado', 'Stub DB local invocado');
     let data = Object.values(poke);
     // return this.database.executeSql(environment.sql_insert + `atrapado` + environment.sql_poke_columnas, data).then((ok: any) => {
     //   this.loadPokemonAtrapado();
@@ -186,7 +188,7 @@ export class DatabaseService {
   }
 
   public async getPokemonAtrapado(poke: PokemonInterface): Promise<PokemonInterface> {
-    console.log('base de datos 11');
+    this.logger.verbose('DatabaseService.getPokemonAtrapado', 'Stub DB local invocado');
     // return this.database.executeSql(`SELECT * FROM atrapado WHERE num_nation = ?`, [poke.num_nation]).then((data: any) => {
     //   return {
     //     num_nation: data.rows.item(0).num_nation, num_region: data.rows.item(0).num_region, region: data.rows.item(0).region, name: data.rows.item(0).name, tipo_uno: data.rows.item(0).tipo_uno, tipo_dos: data.rows.item(0).tipo_dos,
@@ -206,14 +208,14 @@ export class DatabaseService {
   }
 
   public async deletePokemonAtrapado(poke: PokemonInterface) {
-    console.log('base de datos 12');
+    this.logger.verbose('DatabaseService.deletePokemonAtrapado', 'Stub DB local invocado');
     // return this.database.executeSql(`DELETE FROM atrapado WHERE num_nation = ${poke.num_nation}`).then(() => {
     //   this.loadPokemon(poke.region);
     // });
   }
 
   public async updatePokemonAtrapado(poke: PokemonInterface) {
-    console.log('base de datos 13');
+    this.logger.verbose('DatabaseService.updatePokemonAtrapado', 'Stub DB local invocado');
     // let data = [poke.num_nation, , poke.num_region];
     // return this.database.executeSql(`UPDATE atrapado SET porConstruir WHERE num_nation = ${poke.num_nation}`, data).then((data: any) => {
     //   this.loadPokemon(poke.region);
@@ -226,7 +228,7 @@ export class DatabaseService {
   *************************************************/
 
   public async loadPokemonEquipo() {
-    console.log('base de datos 14');
+    this.logger.verbose('DatabaseService.loadPokemonEquipo', 'Stub DB local invocado');
     // return this.database.executeSql(`SELECT * FROM equipo`, []).then((data: any) => {
     //   let poke: PokemonInterface[] = [];
 
@@ -247,7 +249,7 @@ export class DatabaseService {
   }
 
   public async addPokemonEquipo(poke: PokemonInterface) {
-    console.log('base de datos 15');
+    this.logger.verbose('DatabaseService.addPokemonEquipo', 'Stub DB local invocado');
     // this.equipoPokemon.subscribe((pokemons) => {
     //   if (pokemons.length <= 6) {
     //     let data = Object.values(poke);

@@ -4,6 +4,7 @@ import { Barcode, BarcodeFormat, BarcodeScanner, LensFacing } from '@capacitor-m
 import { Capacitor } from '@capacitor/core';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { ToastService } from './toast.service';
+import { LoggerService } from './logger.service';
 
 type WebDetectedBarcode = {
   rawValue?: string;
@@ -32,7 +33,7 @@ export class QRScanGenService {
     googleBarcodeScannerModuleInstallProgress: new UntypedFormControl(0),
   });
 
-  constructor(private toast: ToastService, private readonly ngZone: NgZone) { }
+  constructor(private toast: ToastService, private readonly ngZone: NgZone, private logger: LoggerService) { }
 
   public async ngOnInit(): Promise<void> {
     if (this.isWebPlatform()) {
@@ -61,21 +62,21 @@ export class QRScanGenService {
     } catch (error) {
       this.isSupported = false;
       this.isPermissionGranted = false;
-      console.warn('QR scanner initialization failed:', error);
+      this.logger.warn('QRScanGenService.ngOnInit', 'Inicializacion del lector QR fallida', error);
     }
   }
 
   public async startScan(): Promise<string> {
-    console.log('INI - QrScanGen.service - startScan');
+    this.logger.info('QRScanGenService.startScan', 'Inicio lectura QR');
 
     if (this.isWebPlatform()) {
       const result = await this.scanInBrowser();
-      console.log('FIN - QrScanGen.service - startScan');
+      this.logger.info('QRScanGenService.startScan', 'Fin lectura QR');
       return result;
     }
 
     if (!(await this.ensureNativeScannerAvailable())) {
-      console.log('FIN - QrScanGen.service - startScan');
+      this.logger.info('QRScanGenService.startScan', 'Fin lectura QR');
       return '';
     }
 
@@ -84,18 +85,18 @@ export class QRScanGenService {
 
       const hasPermission = await this.ensureCameraPermission();
       if (!hasPermission) {
-        console.log('FIN - QrScanGen.service - startScan');
+        this.logger.info('QRScanGenService.startScan', 'Fin lectura QR');
         return '';
       }
 
       const result = await this.getNativeScanResult();
-      console.log('QR scan raw result', result);
-      console.log('FIN - QrScanGen.service - startScan');
+      this.logger.debug('QRScanGenService.startScan', 'Resultado QR bruto', { hasResult: !!result, length: result?.length ?? 0 });
+      this.logger.info('QRScanGenService.startScan', 'Fin lectura QR');
       return result;
     } catch (error) {
-      console.error('Error during QR scan:', error);
+      this.logger.error('QRScanGenService.startScan', 'Error durante lectura QR', error);
       await this.toast.presentarToast('No se ha podido leer el codigo QR.', 'warning', 5000, true);
-      console.log('FIN - QrScanGen.service - startScan');
+      this.logger.info('QRScanGenService.startScan', 'Fin lectura QR');
       return '';
     } finally {
       await this.stopScan();
@@ -103,23 +104,23 @@ export class QRScanGenService {
   }
 
   public async scan(): Promise<string> {
-    console.log('INI - QrScanGen.service - scan');
+    this.logger.debug('QRScanGenService.scan', 'Inicio scan');
     const result = await this.startScan();
-    console.log('FIN - QrScanGen.service - scan');
+    this.logger.debug('QRScanGenService.scan', 'Fin scan');
     return result;
   }
 
   public async readBarcodeFromImage(): Promise<void> {
-    console.log('INI - QrScanGen.service - readBarcodeFromImage');
+    this.logger.info('QRScanGenService.readBarcodeFromImage', 'Inicio lectura QR desde imagen');
 
     if (this.isWebPlatform()) {
       await this.toast.presentarToast('La lectura de QR desde imagen solo esta disponible en Android/iOS.', 'warning', 5000, true);
-      console.log('FIN - QrScanGen.service - readBarcodeFromImage');
+      this.logger.info('QRScanGenService.readBarcodeFromImage', 'Fin lectura QR desde imagen');
       return;
     }
 
     if (!(await this.ensureNativeScannerAvailable())) {
-      console.log('FIN - QrScanGen.service - readBarcodeFromImage');
+      this.logger.info('QRScanGenService.readBarcodeFromImage', 'Fin lectura QR desde imagen');
       return;
     }
 
@@ -128,7 +129,7 @@ export class QRScanGenService {
       const path = files[0]?.path;
 
       if (!path) {
-        console.log('FIN - QrScanGen.service - readBarcodeFromImage');
+        this.logger.info('QRScanGenService.readBarcodeFromImage', 'Fin lectura QR desde imagen');
         return;
       }
 
@@ -138,11 +139,11 @@ export class QRScanGenService {
       });
       this.barcodes = barcodes;
     } catch (error) {
-      console.error('Error reading QR image:', error);
+      this.logger.error('QRScanGenService.readBarcodeFromImage', 'Error leyendo imagen QR', error);
       await this.toast.presentarToast('No se ha podido leer la imagen QR.', 'warning', 5000, true);
     }
 
-    console.log('FIN - QrScanGen.service - readBarcodeFromImage');
+    this.logger.info('QRScanGenService.readBarcodeFromImage', 'Fin lectura QR desde imagen');
   }
 
   public async openSettings(): Promise<void> {
@@ -182,12 +183,12 @@ export class QRScanGenService {
     try {
       await BarcodeScanner.stopScan();
     } catch (error) {
-      console.warn('QR scanner stop ignored:', error);
+      this.logger.warn('QRScanGenService.stopScan', 'Stop del lector QR ignorado', error);
     }
   }
 
   private async getNativeScanResult(): Promise<string> {
-    console.log('INI - QrScanGen.service - getNativeScanResult');
+    this.logger.debug('QRScanGenService.getNativeScanResult', 'Inicio lectura nativa');
 
     const scanResult = await BarcodeScanner.scan({ formats: this.getSelectedFormats() });
     this.barcodes = scanResult.barcodes;
@@ -196,10 +197,10 @@ export class QRScanGenService {
     const result = barcode?.rawValue || barcode?.displayValue || '';
 
     if (!result) {
-      console.warn('No barcodes found');
+      this.logger.warn('QRScanGenService.getNativeScanResult', 'No se han encontrado codigos');
     }
 
-    console.log('FIN - QrScanGen.service - getNativeScanResult');
+    this.logger.debug('QRScanGenService.getNativeScanResult', 'Fin lectura nativa', { hasResult: !!result, length: result?.length ?? 0 });
     return result;
   }
 
@@ -271,7 +272,7 @@ export class QRScanGenService {
           } catch (error) {
             if (!frameErrorLogged) {
               frameErrorLogged = true;
-              console.warn('Web QR scan frame failed:', error);
+              this.logger.warn('QRScanGenService.scanInBrowser', 'Fallo leyendo frame QR web', error);
             }
           }
 
@@ -281,10 +282,10 @@ export class QRScanGenService {
         frameId = requestAnimationFrame(() => { void scanFrame(); });
       });
 
-      console.log('QR scan raw result', result);
+      this.logger.debug('QRScanGenService.startScan', 'Resultado QR bruto', { hasResult: !!result, length: result?.length ?? 0 });
       return result;
     } catch (error) {
-      console.error('Error opening browser camera:', error);
+      this.logger.error('QRScanGenService.scanInBrowser', 'Error abriendo camara web', error);
       await this.toast.presentarToast('No se ha podido abrir la camara para leer el QR.', 'warning', 5000, true);
       return '';
     } finally {
@@ -419,7 +420,7 @@ export class QRScanGenService {
       return support.supported;
     } catch (error) {
       this.isSupported = false;
-      console.warn('QR scanner support check failed:', error);
+      this.logger.warn('QRScanGenService.ensureNativeScannerAvailable', 'No se pudo comprobar soporte QR', error);
       await this.toast.presentarToast('El lector QR no esta disponible en este dispositivo.', 'warning', 5000, true);
       return false;
     }
@@ -437,7 +438,7 @@ export class QRScanGenService {
         await BarcodeScanner.installGoogleBarcodeScannerModule();
       }
     } catch (error) {
-      console.warn('Google Barcode Scanner module check failed:', error);
+      this.logger.warn('QRScanGenService.ensureGoogleBarcodeScannerModule', 'No se pudo comprobar modulo Google Barcode Scanner', error);
     }
   }
 
