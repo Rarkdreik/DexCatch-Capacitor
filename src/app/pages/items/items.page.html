@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mochila</ion-title>
+    <ion-buttons slot="start"><ion-back-button icon="chevron-back-outline" defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-buttons slot="end"><ion-button><ion-icon name="menu-outline"></ion-icon></ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="items-content">
+  <div class="action-panel">
+    <div class="selection-copy">
+      <span>Item</span>
+      <strong>{{ selectedItem?.display_name || 'Selecciona item' }}</strong>
+      <small *ngIf="selectedItem">x{{ selectedItem.count }} - {{ selectedItem.cost }} EUR</small>
+    </div>
+    <div class="selection-copy">
+      <span>Pokemon</span>
+      <strong>{{ selectedPokemon?.name || 'Selecciona Pokemon' }}</strong>
+      <small *ngIf="selectedPokemon">PS {{ selectedPokemon.hp }} / {{ selectedPokemon.hp_max }}</small>
+    </div>
+    <div class="actions">
+      <ion-button size="small" (click)="showItemInfo()" [disabled]="!selectedItem">INFO</ion-button>
+      <ion-button size="small" (click)="runEquipAction()" [disabled]="!canRunEquipAction">{{ equipActionLabel }}</ion-button>
+      <ion-button size="small" (click)="useSelectedItem()" [disabled]="!selectedItem || !selectedPokemon || !canUseSelectedItem()">USAR</ion-button>
+    </div>
+  </div>
+
+  <div class="inventory-container">
+    <ion-grid>
+      <ion-row>
+        <div class="col-4 item-slot" *ngFor="let item of items; let i = index" [class.selected]="selectedItemIndex === i" (click)="selectItem(i)">
+          <div class="row">
+            <img [src]="item.img" [alt]="item.display_name || item.name" />
+            <span>{{ item.display_name || item.name }}</span>
+            <div class="item-badge">x{{ item.count }}</div>
+          </div>
+        </div>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div class="team-container">
+    <h2>Equipo</h2>
+    <ion-grid>
+      <ion-row>
+        <div class="pokemon-slot" *ngFor="let pokemon of teamSlots; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamPokemon(i)">
+          <div class="row" *ngIf="pokemon">
+            <img [src]="getPokemonImage(pokemon)" [alt]="pokemon.name" />
+            <span>{{ pokemon.name }}</span>
+            <div class="held-item" *ngIf="pokemon.heldItem?.img" [style.background-image]="'url(' + pokemon.heldItem?.img + ')'" ></div>
+          </div>
+          <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+        </div>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div class="team-container">
+    <h2>Capturados</h2>
+    <ion-grid>
+      <ion-row>
+        <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemonSlots; let i = index" [class.selected]="selectedCapturedIndex === i" (click)="selectCapturedPokemon(i)">
+          <div class="row" *ngIf="pokemon">
+            <img [src]="getPokemonImage(pokemon)" [alt]="pokemon.name" />
+            <span>{{ pokemon.name }}</span>
+            <div class="held-item" *ngIf="pokemon.heldItem?.img" [style.background-image]="'url(' + pokemon.heldItem?.img + ')'" ></div>
+          </div>
+          <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
+        </div>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+
+
+

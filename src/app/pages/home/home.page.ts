@@ -110,6 +110,10 @@ export class HomePage implements OnInit, ViewWillEnter {
     setTimeout(() => { this.router.navigateByUrl('/shop'); }, 900);
   }
 
+  public goItems() {
+    setTimeout(() => { this.router.navigateByUrl('/items'); }, 900);
+  }
+
   public goPokeCenter() {
     setTimeout(() => { this.router.navigateByUrl('/poke-center'); }, 900);
   }

@@ -1,3 +1,40 @@
-<p>
-  items-modal works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ item.display_name || item.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="item-modal-content">
+  <div class="item-summary">
+    <img [src]="item.img" [alt]="item.display_name || item.name">
+    <div>
+      <h2>{{ item.display_name || item.name }}</h2>
+      <p class="item-code">{{ item.name }}</p>
+      <div class="item-meta">
+        <span>x{{ item.count }}</span>
+        <span>{{ item.cost }} EUR</span>
+        <span>{{ item.kind || 'item' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <section *ngIf="item.description">
+    <h3>Descripcion</h3>
+    <p>{{ item.description }}</p>
+  </section>
+
+  <section *ngIf="item.short_effect">
+    <h3>Efecto</h3>
+    <p>{{ item.short_effect }}</p>
+  </section>
+
+  <section *ngIf="item.long_effect && item.long_effect !== item.short_effect">
+    <h3>Detalle</h3>
+    <p>{{ item.long_effect }}</p>
+  </section>
+</ion-content>

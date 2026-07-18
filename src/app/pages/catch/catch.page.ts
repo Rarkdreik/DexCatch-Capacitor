@@ -3,23 +3,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AnimationController } from '@ionic/angular';
 import { timeInterval } from 'rxjs';
 import { Master } from 'src/app/model/Master';
+import { CaptureBallType } from 'src/app/model/Item';
 import { PokemonInterface } from 'src/app/model/Pokemon';
 import { AudioService } from 'src/app/services/audio.service';
 import { ConstantService } from 'src/app/services/constant.service';
 import { DatabaseService } from 'src/app/services/database.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LvupService } from 'src/app/services/lvup.service';
+import { ItemService } from 'src/app/services/item.service';
 import { PosibilidadCapturaService } from 'src/app/services/posibilidad-captura.service';
 import { RepositoryService } from 'src/app/services/repository.service';
 import { StatsService } from 'src/app/services/stats.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-interface MasterBalls {
-  pokeBalls: number;
-  superBalls: number;
-  ultraBalls: number;
-  masterBalls: number;
-}
 
 @Component({
   selector: 'app-catch',
@@ -69,6 +64,7 @@ export class CatchPage implements OnInit {
     private lvup: LvupService,
     private toast: ToastService,
     private constants: ConstantService,
+    private itemService: ItemService,
     private animationCtrl: AnimationController
   ) {
     this.numNacional = '';
@@ -168,51 +164,45 @@ export class CatchPage implements OnInit {
     this.calcular_variables(this.pokemonBatalla, this.pokeSalvaje);
   }
 
-  public async capturarPokemon(ballType: 'poke' | 'super' | 'ultra' | 'master') {
-    const ballMap = {
+  public async capturarPokemon(ballType: CaptureBallType) {
+    const ballMap: Record<CaptureBallType, { img: string; ocultar: string[] }> = {
       poke: {
-        stock: 'pokeBalls' as keyof MasterBalls,
         img: '../../../assets/images/item_pokemon/pokeball.png',
         ocultar: ['show', 'hide', 'hide', 'hide'],
       },
       super: {
-        stock: 'superBalls' as keyof MasterBalls,
         img: '../../../assets/images/item_pokemon/superball.png',
         ocultar: ['hide', 'show', 'hide', 'hide'],
       },
       ultra: {
-        stock: 'ultraBalls' as keyof MasterBalls,
         img: '../../../assets/images/item_pokemon/ultraball.png',
         ocultar: ['hide', 'hide', 'show', 'hide'],
       },
       master: {
-        stock: 'masterBalls' as keyof MasterBalls,
         img: '../../../assets/images/item_pokemon/masterball.png',
         ocultar: ['hide', 'hide', 'hide', 'show'],
       }
     };
   
     const ball = ballMap[ballType];
-    const master = this.repo.getMaster();
-    
-    console.log(master);
-    // Aseguramos que el stock es un número
-    const ballCount = master[ball.stock] as number;
-    console.log(master[ball.stock]);
-    console.log(ballCount);
+    const master = this.itemService.ensureMasterItems(this.repo.getMaster());
+    const ballItem = this.itemService.getBallItem(master, ballType);
+    const ballCount = Number(ballItem?.count) || 0;
     
     if (ballCount > 0) {
-      master[ball.stock] = ballCount - 1;
+      this.itemService.consumeBall(master, ballType);
+      this.repo.setMaster(master);
+      await this.fire.updateMaster(master);
       this.modal = false; 
       setTimeout(() => { this.modal = true; }, 7000);
-      this.imagenUrl = ball.img;
+      this.imagenUrl = ballItem?.img || ball.img;
       this.startAnimation();
       this.audio.play('audioAtrapando');
       this.pokeOculto = 'hide';
       [this.ocultar1, this.ocultar2, this.ocultar3, this.ocultar4] = ball.ocultar;
   
       if (this.captura(this.pokeSalvaje.num_nation, ballType)) {
-        this.pokeSalvaje.ball = ballType + 'ball';
+        this.pokeSalvaje.ball = this.itemService.getPokemonBallName(ballType);
   
         setTimeout(() => {
           this.audio.stopAudio('audioAtrapando');
@@ -250,6 +240,9 @@ export class CatchPage implements OnInit {
     }
   }
 
+  public getBallCount(ballType: CaptureBallType): number {
+    return this.itemService.getBallCount(this.itemService.ensureMasterItems(this.repo.getMaster()), ballType);
+  }
   /**
    * Determina si captura o no a un pokemon.
    * Bonus:

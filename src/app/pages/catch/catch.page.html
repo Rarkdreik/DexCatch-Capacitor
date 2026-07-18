@@ -159,7 +159,7 @@
       <div class="tarjeta2">
         <a class="badge_ball" href="/captura/{{pokeSalvaje.num_nation}}#pokeball">
           <img alt="pokeball" src="../../../assets/images/item_pokemon/pokeball.png" class="balle center" (click)="capturarPokemon('poke')">
-          <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().pokeBalls }}</ion-badge>
+          <ion-badge fixed slot="end" class="medalla">{{ getBallCount('poke') }}</ion-badge>
         </a>
       </div>
     </ion-col>
@@ -167,7 +167,7 @@
       <div class="tarjeta2">
         <a class="badge_ball" href="/captura/{{pokeSalvaje.num_nation}}#superball">
           <img alt="superball" src="../../../assets/images/item_pokemon/superball.png" class="balle center" (click)="capturarPokemon('super')">
-          <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().superBalls }}</ion-badge>
+          <ion-badge fixed slot="end" class="medalla">{{ getBallCount('super') }}</ion-badge>
         </a>
       </div>
     </ion-col>
@@ -175,7 +175,7 @@
       <div class="tarjeta2">
         <a class="badge_ball" href="/captura/{{pokeSalvaje.num_nation}}#ultraball">
           <img alt="ultraball" src="../../../assets/images/item_pokemon/ultraball.png" class="balle center" (click)="capturarPokemon('ultra')">
-          <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().ultraBalls }}</ion-badge>
+          <ion-badge fixed slot="end" class="medalla">{{ getBallCount('ultra') }}</ion-badge>
         </a>
       </div>
     </ion-col>
@@ -183,7 +183,7 @@
       <div class="tarjeta2">
         <a class="badge_ball" href="/captura/{{pokeSalvaje.num_nation}}#masterball">
           <img alt="masterball" src="../../../assets/images/item_pokemon/masterball.png" class="balle center" (click)="capturarPokemon('master')">
-          <ion-badge fixed slot="end" class="medalla">{{ repo.getMaster().masterBalls }}</ion-badge>
+          <ion-badge fixed slot="end" class="medalla">{{ getBallCount('master') }}</ion-badge>
         </a>
       </div>
     </ion-col>

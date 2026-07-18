@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { RepositoryService } from 'src/app/services/repository.service';
+import { ItemInterface } from 'src/app/model/Item';
+import { ItemService } from 'src/app/services/item.service';
 
 @Component({
   selector: 'app-shop',
@@ -12,7 +14,7 @@ export class ShopPage implements OnInit {
   selectedCartIndex: any = null;
   selectedShopIndex: any = null;
   cart:       any[] = [];
-  items_shop: any[] = [];
+  items_shop: ItemInterface[] = [];
   total:   number = 0.00;
   myMoney: number = 0.00;
   myCost:  number = 0.00;
@@ -20,7 +22,7 @@ export class ShopPage implements OnInit {
   totalMoney: string = '0.00 €';
   totalCost:  string = '0.00 €';
 
-  constructor(public router: Router, public fire: FirebaseService, public repo: RepositoryService) {
+  constructor(public router: Router, public fire: FirebaseService, public repo: RepositoryService, private itemService: ItemService) {
     
     for (let i = 0; i < 6; i++) {
       //let anyItem: any = { name: 'Potion', img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${i+1}.png` };
@@ -167,26 +169,14 @@ export class ShopPage implements OnInit {
     const master = this.repo.getMaster();
     master.items = Array.isArray(master.items) ? master.items : [];
 
-    const anyItems: any[] = this.cart.filter(item => item !== null);
-    anyItems.forEach(item => { this.addOrUpdateMasterItem(master.items, item); });
+    const anyItems: ItemInterface[] = this.cart.filter((item): item is ItemInterface => item !== null);
+    anyItems.forEach(item => { this.itemService.addOrUpdateItem(master.items, item); });
 
     master.money = this.myMoney - Math.abs(this.myCost);
     this.repo.setMaster(master);
     this.fire.addMaster(master);
 
     this.router.navigate(['/home'], { replaceUrl: true });;
-  }
-
-  private addOrUpdateMasterItem(items: any[], item: any): void {
-    const itemCount = Number(item.count) || 0;
-    const existingItem = items.find(masterItem => masterItem?.name === item.name);
-
-    if (existingItem) {
-      existingItem.count = (Number(existingItem.count) || 0) + itemCount;
-      return;
-    }
-
-    items.push({ ...item, count: itemCount });
   }
 
   private syncMasterShopState(): void {
@@ -196,7 +186,7 @@ export class ShopPage implements OnInit {
       master.money = 1500;
     }
 
-    master.items = Array.isArray(master.items) ? master.items : [];
+    this.itemService.ensureMasterItems(master);
     this.repo.setMaster(master);
 
     this.myMoney = master.money;
@@ -232,83 +222,16 @@ export class ShopPage implements OnInit {
     }
   }
 
-  async fetchItemData(url: string, lang?: string): Promise<any> {
-    const response = await fetch(url);
-    const data = await response.json();
+  async fetchItemData(url: string, lang?: string): Promise<ItemInterface[]> {
+    const itemsData = await this.itemService.fetchCategoryItems(url, lang || 'es');
 
-    // Fetch additional data for each item in the category
-    const itemsData = await Promise.all(data.items.map(async (item: any) => {
-      const itemResponse = await fetch(item.url);
-      const itemData = await itemResponse.json();
+    itemsData.forEach(item => {
+      const exists = this.items_shop.some(shopItem => shopItem.name === item.name);
 
-      let name = itemData.name;
-      let display_name = '';
-      let img = '';
-      let cost = itemData.cost;
-      let description = '';
-      let long_effect = '';
-      let short_effect = '';
-      let count = 1;
-
-      try {
-        display_name = await itemData.names.filter((entry: any) => entry.language.name === lang)[0].name.replace(/\n/g, ' ');
-      } catch (error) {
-        try {
-          display_name = await itemData.names[0].name.replace(/\n/g, ' ');
-        } catch (error) {
-          display_name = '';
-        }
+      if (!exists && item.img !== '' && !item.name.toLowerCase().startsWith('la') && !item.name.toLowerCase().startsWith('sport') && item.cost > 0) {
+        this.items_shop.push({ ...item });
       }
-
-      try {
-        description = await itemData.flavor_text_entries.filter((entry: any) => entry.language.name === lang)[0].text.replace(/\n/g, ' ');
-      } catch (error) {
-        try {
-          description = await itemData.flavor_text_entries[0].text.replace(/\n/g, ' ');
-        } catch (error) {
-          description = '';
-        }
-      }
-
-      try {
-        long_effect = await itemData.effect_entries.filter((entry: any) => entry.language.name === lang)[0].effect.replace(/\n/g, ' ');
-      } catch (error) {
-        try {
-          long_effect = await itemData.effect_entries[0].effect.replace(/\n/g, ' ');
-        } catch (error) {
-          long_effect = '';
-        }
-      }
-
-      try {
-        short_effect = await itemData.effect_entries.filter((entry: any) => entry.language.name === lang)[0].short_effect.replace(/\n/g, ' ');
-      } catch (error) {
-        try {
-          short_effect = await itemData.effect_entries[0].short_effect.replace(/\n/g, ' ');
-        } catch (error) {
-          short_effect = '';
-        }
-      }
-
-      let aux_item:any = {
-        name: name,
-        display_name: display_name,
-        img: itemData.sprites?.default || '',
-        cost: cost,
-        description: description,
-        long_effect: long_effect,
-        short_effect: short_effect,
-        count: count,
-      };
-
-      if (aux_item.img !== '')
-        if (!aux_item.name.toLowerCase().startsWith('la'))
-          if (!aux_item.name.toLowerCase().startsWith('sport'))
-            if (aux_item.cost > 0)
-              this.items_shop.push({ ...aux_item });
-
-      return aux_item;
-    }));
+    });
 
     return itemsData;
   }

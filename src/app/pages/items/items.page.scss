@@ -1,0 +1,161 @@
+ion-grid {
+    padding: 0;
+    margin: 0;
+}
+
+.action-panel,
+.inventory-container,
+.team-container {
+    background-color: var(--background-two);
+    padding: 8px;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.action-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.selection-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.selection-copy span,
+.selection-copy small {
+    font-size: 11px;
+    opacity: 0.72;
+}
+
+.selection-copy strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.team-container h2 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: #ffe040;
+}
+
+.item-slot,
+.pokemon-slot,
+.pokemon-catch-slot {
+    position: relative;
+    display: flex;
+    flex: unset !important;
+    flex-direction: column;
+    background-color: var(--background-thr);
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    height: 95px;
+    max-width: unset !important;
+    overflow: hidden;
+}
+
+.item-slot,
+.pokemon-catch-slot {
+    width: calc(3 / var(--ion-grid-columns, 12) * 100% - 10px) !important;
+}
+
+.pokemon-slot {
+    width: calc(4 / var(--ion-grid-columns, 12) * 100% - 10px) !important;
+}
+
+.item-slot.selected,
+.pokemon-slot.selected,
+.pokemon-catch-slot.selected {
+    animation: pulse 1.5s infinite;
+    background-color: var(--background-cer);
+}
+
+.row img {
+    position: absolute;
+    display: grid;
+    height: 9vh;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: unset !important;
+    max-width: unset !important;
+}
+
+.row span {
+    position: absolute;
+    font-size: small;
+    letter-spacing: 1px;
+    bottom: 3px;
+    left: 5px;
+    right: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: min-content;
+    background: var(--background-one);
+    border-radius: 5px;
+    padding: 0 5px;
+    color: #75d6c6;
+}
+
+.held-item {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.add-icon {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+@media (max-width: 480px) {
+    .action-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .actions {
+        justify-content: stretch;
+    }
+
+    .actions ion-button {
+        flex: 1 1 30%;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
