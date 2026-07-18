@@ -12,6 +12,7 @@ import { Auth, signInWithCredential, UserCredential } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { ConstantService } from './constant.service';
 import { LocalDbService } from './local-db.service';
+import { LoggerService } from './logger.service';
 
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, User, signInWithPopup } from "firebase/auth";
@@ -25,6 +26,7 @@ export class AuthService {
   private user_empty: UserData = { uid: '', email: '', photoURL: '', displayName: '', password: '' };
   private auththy: Auth | undefined;
   private provider: any;
+  private masterSetupRequired: boolean = false;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -36,6 +38,7 @@ export class AuthService {
     private auth: Auth,
     private constants: ConstantService,
     private localDb: LocalDbService,
+    private logger: LoggerService,
   ) {
     this.initializeApp();
   }
@@ -69,6 +72,10 @@ export class AuthService {
     return this.isAuth;
   }
 
+  needsMasterSetup(): boolean {
+    return this.masterSetupRequired;
+  }
+
   // ########################################
 
   /**
@@ -76,31 +83,27 @@ export class AuthService {
    * @param userdata Los datos del usuario.
    */
   public async loginUsuario(userdata: UserData): Promise<UserData> {
-    // let credential = await this.afAuth.signInWithEmailAndPassword(userdata.email, userdata.password!);
+    this.masterSetupRequired = false;
+    this.logger.info('AuthService.loginUsuario', 'Inicio de login con email/password', { email: userdata.email || '(empty)' });
 
     const auth = getAuth();
-    let credential = await signInWithEmailAndPassword(auth, userdata.email, userdata.password!);
-      // .then((userCredential) => {
-      //   // Signed in 
-      //   const user = userCredential.user;
-      //   // ...
-      // })
-      // .catch((error) => {
-      //   const errorCode = error.code;
-      //   const errorMessage = error.message;
-      // });
+    const credential = await signInWithEmailAndPassword(auth, userdata.email, userdata.password!);
+    this.logger.info('AuthService.loginUsuario', 'Firebase Auth correcto', { uid: credential.user.uid, email: credential.user.email });
 
-    return new Promise<UserData> (async (resolve) => {
-      return await this.fireServicio.getDatosUsuario(credential.user!).then((user: any) => {
-        resolve(this.fireServicio.updateUserData(user));
-      }).catch((erroneo) => {
-        return this.alertaServicio.alertaSimple('Información invalida', 'No se ha encontrado la información de la cuenta ' + erroneo + ', intenta registrarte como un nuevo master, o contacta al soporte técnico.', 'info').then(() => {
-          this.fireServicio.setDatosUsuario(credential.user)
-          this.router.navigateByUrl('/iniregion');
-          return this.constants.user_empty;
-        });
-      });
-    });
+    try {
+      const user = await this.fireServicio.getDatosUsuario(credential.user!);
+      this.logger.info('AuthService.loginUsuario', 'Datos de usuario y master encontrados', { email: user?.email || '(empty)', uid: user?.uid || '(empty)' });
+      return await this.fireServicio.updateUserData(user);
+    } catch (erroneo) {
+      this.masterSetupRequired = true;
+      this.logger.warn('AuthService.loginUsuario', 'No hay datos de usuario/master; se requiere alta de region', { email: credential.user.email, error: erroneo });
+
+      await this.alertaServicio.alertaSimple('Informacion invalida', 'No se ha encontrado la informacion de la cuenta ' + erroneo + ', intenta registrarte como un nuevo master, o contacta al soporte tecnico.', 'info');
+      const newUser = this.fireServicio.setDatosUsuario(credential.user);
+      this.login();
+      this.logger.info('AuthService.loginUsuario', 'Sesion temporal creada para alta de region', { email: newUser.email, uid: newUser.uid });
+      return newUser;
+    }
   }
 
   /**
@@ -134,12 +137,14 @@ export class AuthService {
   public async saveSession(userData: UserData): Promise<void> {
     try {
       if (userData?.uid && userData?.email) {
+        this.logger.info('AuthService.saveSession', 'Guardando sesion local', { email: userData.email, uid: userData.uid });
         this.repo.setUsuario(userData);
         this.login();
         await this.localDb.setUser(userData);
         return;
       }
 
+      this.logger.warn('AuthService.saveSession', 'Limpiando sesion local por usuario vacio', userData);
       this.isAuth = false;
       this.repo.setUsuario(this.user_empty);
       await this.localDb.clearUser();
@@ -161,7 +166,7 @@ export class AuthService {
    * Inicia sesion con google
    */
   public async iniciarSesionGoogle(): Promise<UserData> {
-    console.log("INI - auth.service - iniciarSesionGoogle");
+    this.logger.info('AuthService.iniciarSesionGoogle', 'Inicio login Google');
     let promesa: UserData;
     // const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -189,33 +194,33 @@ export class AuthService {
 
 
     if (this.platform.is('capacitor')) {
-      console.log("capacitor");
+      this.logger.debug('AuthService.iniciarSesionGoogle', 'Login Google en Capacitor');
       // const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
       // console.log(environment.googleWebClientId);
 
       promesa = await signInWithCredential(this.auth, _credential!).then(async (credenciales) => {
-        console.log(credenciales);
+        this.logger.verbose('AuthService.iniciarSesionGoogle', 'Credenciales Google recibidas', { uid: credenciales.user.uid, email: credenciales.user.email });
         let usuario: UserData = { uid: credenciales.user.uid, email: credenciales.user.email!, photoURL: credenciales.user.photoURL!, displayName: credenciales.user.displayName! };
-        console.log(usuario);
+        this.logger.verbose('AuthService.iniciarSesionGoogle', 'Usuario Google preparado', { uid: usuario.uid, email: usuario.email });
         return await this.fireServicio.getDatosUsuario(usuario);
       });
 
     } else {
-      console.log("browser");
-      console.log(environment.googleWebClientId);
+      this.logger.debug('AuthService.iniciarSesionGoogle', 'Login Google en navegador');
+      this.logger.verbose('AuthService.iniciarSesionGoogle', 'Google Web Client configurado', { hasClientId: !!environment.googleWebClientId });
       // await GoogleAuth.initialize({'clientId': environment.googleWebClientId, scopes: ['profile', 'email'], grantOfflineAccess: true });
       // const _credential = GoogleAuthProvider.credential((await GoogleAuth.signIn()).authentication.idToken);
       // console.log(environment.googleWebClientId);
 
       promesa = await signInWithCredential(this.auth, _credential!).then(async (credenciales) => {
-        console.log(credenciales);
+        this.logger.verbose('AuthService.iniciarSesionGoogle', 'Credenciales Google recibidas', { uid: credenciales.user.uid, email: credenciales.user.email });
         let usuario: UserData = { uid: credenciales.user.uid, email: credenciales.user.email!, photoURL: credenciales.user.photoURL!, displayName: credenciales.user.displayName! };
-        console.log(usuario);
+        this.logger.verbose('AuthService.iniciarSesionGoogle', 'Usuario Google preparado', { uid: usuario.uid, email: usuario.email });
         return await this.fireServicio.getDatosUsuario(usuario);
       });
     }
 
-    console.log("FIN - auth.service - iniciarSesionGoogle");
+    this.logger.info('AuthService.iniciarSesionGoogle', 'Fin login Google');
     return promesa;
   }
 
@@ -319,7 +324,7 @@ export class AuthService {
     try {
       return JSON.parse(userString) as UserData;
     } catch (error) {
-      console.error('Error parsing user data:', error);
+      this.logger.error('AuthService.parseUserData', 'Error parseando datos de usuario', error);
       return this.user_empty;
     }
   }

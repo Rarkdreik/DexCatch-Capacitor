@@ -12,6 +12,8 @@ import { firstValueFrom, map, Observable } from 'rxjs';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { ConstantService } from './constant.service';
 import { LocalDbService } from './local-db.service';
+import { ItemService } from './item.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +27,18 @@ export class FirebaseService {
   private master: Master = this.constants.master_empty;
   itemss$: Observable<any[]> | undefined;
 
-  constructor(private af: AngularFirestore, private repo: RepositoryService, private alert: AlertsService, private toast: ToastService, private constants: ConstantService, private localDb: LocalDbService) { }
+  constructor(private af: AngularFirestore, private repo: RepositoryService, private alert: AlertsService, private toast: ToastService, private constants: ConstantService, private localDb: LocalDbService, private itemService: ItemService, private logger: LoggerService) { }
 
   public inicializar(correo: string) {
-    this.catchdex_fb = this.af.collection(environment.id_app).doc(correo);
+    const correoNormalizado = correo?.trim();
+    this.logger.debug('FirebaseService.inicializar', 'Inicializando referencias Firestore', { correo: correoNormalizado || '(empty)', idApp: environment.id_app });
+
+    if (!correoNormalizado) {
+      this.logger.error('FirebaseService.inicializar', 'Correo vacio al inicializar Firebase');
+      throw new Error('No hay correo de usuario para inicializar Firebase.');
+    }
+
+    this.catchdex_fb = this.af.collection(environment.id_app).doc(correoNormalizado);
     this.pokeCollection = this.catchdex_fb.collection('pokedex');
     this.masterCollection = this.catchdex_fb.collection('master');
     this.qrDocument = this.af.collection(environment.id_app).doc('codigos');
@@ -41,25 +51,35 @@ export class FirebaseService {
   /////////////////////////////////////////////////////////////
 
   public async getDatosUsuario(user: any): Promise<UserData> {
-    console.log("INI - firebase.service - getDatosUsuario");
+    this.logger.info('FirebaseService.getDatosUsuario', 'Inicio lectura de datos de usuario', { email: user.email || '(empty)', uid: user.uid || '(empty)' });
     this.inicializar(user.email!);
     let userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email!).doc('correo');
+    this.logger.debug('FirebaseService.getDatosUsuario', 'Leyendo documento de usuario', { path: `${user.email}/correo` });
     let auxUser: UserData = this.constants.user_empty;
 
-    auxUser = await userRef.ref.get().then(resultado => {
-      let user: UserData = { uid: resultado.data()!.uid, email: resultado.data()!.email, photoURL: resultado.data()!.photoURL, displayName: resultado.data()!.displayName, };
-      return user;
+    auxUser = await userRef.ref.get().then(result => {
+      const data = result.data();
+      this.logger.debug('FirebaseService.getDatosUsuario', 'Snapshot usuario recibido', { exists: result.exists, email: user.email });
+      let userData: UserData = {
+        uid: data?.uid ?? user.uid ?? '',
+        email: data?.email ?? user.email ?? '',
+        photoURL: data?.photoURL ?? user.photoURL ?? 'assets/images/avatar/avatar.png',
+        displayName: data?.displayName ?? user.displayName ?? '',
+      };
+      return userData;
     }).catch(async (erroneo) => {
-      console.error(erroneo);
+      this.logger.error('FirebaseService.getDatosUsuario', 'Error leyendo documento de usuario', erroneo);
       return auxUser;
     });
 
+    this.logger.debug('FirebaseService.getDatosUsuario', 'Usuario preparado para repo/local', { email: auxUser.email || '(empty)', uid: auxUser.uid || '(empty)' });
     this.repo.setUsuario(auxUser);
     await this.localDb.setUser(auxUser);
+    this.logger.debug('FirebaseService.getDatosUsuario', 'Leyendo master tras usuario', { email: auxUser.email || '(empty)' });
     this.master = await this.getMaster();
     this.repo.setMaster(this.master);
     this.repo.setRegion(this.master.region_ini);
-    console.log("FIN - firebase.service - getDatosUsuario");
+    this.logger.info('FirebaseService.getDatosUsuario', 'Fin lectura de datos de usuario', { email: auxUser.email || '(empty)', masterNick: this.master.nick || '(empty)' });
     return auxUser;
   }
 
@@ -68,9 +88,14 @@ export class FirebaseService {
    * @param user qwerty
    */
   public setDatosUsuario(user: any): UserData {
-    console.log("INI - firebase.service - setDatosUsuario");
-    console.log(user.email!);
-    const userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email!).doc('correo');
+    this.logger.info('FirebaseService.setDatosUsuario', 'Guardando documento de usuario', { email: user.email || '(empty)', uid: user.uid || '(empty)' });
+
+    if (!user.email) {
+      this.logger.error('FirebaseService.setDatosUsuario', 'Email vacio al guardar usuario', user);
+      throw new Error('No hay email de usuario para guardar sus datos.');
+    }
+
+    const userRef: AngularFirestoreDocument<UserData> = this.af.collection(user.email).doc('correo');
     const auxUser: UserData = {
       uid: user.uid ?? '',
       email: user.email,
@@ -86,11 +111,10 @@ export class FirebaseService {
     userRef.set(auxUser, { merge: true });
     this.repo.setUsuario(auxUser);
     void this.localDb.setUser(auxUser).catch(error => {
-      console.error('Error guardando el usuario localmente', error);
+      this.logger.error('FirebaseService.setDatosUsuario', 'Error guardando el usuario localmente', error);
     });
 
-    console.log(auxUser);
-    console.log("FIN - firebase.service - setDatosUsuario");
+    this.logger.info('FirebaseService.setDatosUsuario', 'Documento de usuario guardado/local actualizado', { email: auxUser.email, uid: auxUser.uid });
     return auxUser;
   }
 
@@ -99,10 +123,10 @@ export class FirebaseService {
    * @param user qwerty
    */
   public async updateUserData(user: { email?: string | null; uid?: string | null; photoURL?: string | null; displayName?: string | null }): Promise<UserData> {
-    console.log("INI - firebase.service - updateUserData");
-    console.log(user);
+    this.logger.info('FirebaseService.updateUserData', 'Actualizando datos de usuario', { email: user.email || '(empty)', uid: user.uid || '(empty)' });
 
     if (!user.email) {
+      this.logger.error('FirebaseService.updateUserData', 'Email vacio al actualizar usuario');
       throw new Error('No hay email de usuario para actualizar sus datos.');
     }
 
@@ -118,7 +142,7 @@ export class FirebaseService {
     this.repo.setUsuario(auxUser);
     await this.localDb.setUser(auxUser);
 
-    console.log("FIN - firebase.service - updateUserData");
+    this.logger.info('FirebaseService.updateUserData', 'Datos de usuario actualizados', { email: auxUser.email, uid: auxUser.uid });
     return auxUser;
   }
 
@@ -151,11 +175,11 @@ export class FirebaseService {
    * Crea o actualiza el QR publico del entrenador sin regenerarlo en cada carga.
    */
   public async crearQr(codigoQr: QrcodeInterface): Promise<QrcodeInterface> {
-    console.log('INI - firebase.service - crearQr');
+    this.logger.info('FirebaseService.crearQr', 'Inicio crear/actualizar QR', { correo: codigoQr.correo || '(empty)' });
 
     const qrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').doc<QrcodeInterface>(codigoQr.correo);
     const snapshot = await qrRef.ref.get().catch((erroneo) => {
-      console.error('No se ha podido leer el QR existente.', erroneo);
+      this.logger.warn('FirebaseService.crearQr', 'No se ha podido leer el QR existente', erroneo);
       return null;
     });
     const currentQr = snapshot?.exists ? snapshot.data() : undefined;
@@ -167,7 +191,7 @@ export class FirebaseService {
     };
 
     await qrRef.set(data, { merge: true });
-    console.log('FIN - firebase.service - crearQr');
+    this.logger.info('FirebaseService.crearQr', 'Fin crear/actualizar QR', { correo: data.correo || '(empty)', usos: data.usos });
     return data;
   }
 
@@ -188,9 +212,9 @@ export class FirebaseService {
   }
 
   public async prueba(codigo: string): Promise<QrRedemptionResult> {
-    console.log('QR scan text read', codigo);
+    this.logger.debug('FirebaseService.prueba', 'QR leido para canje', { length: codigo?.length ?? 0 });
     const payload = this.parseQrPayload(codigo);
-    console.log('QR scan parsed payload', payload);
+    this.logger.verbose('FirebaseService.prueba', 'Payload QR parseado', payload);
     const correoActual = this.repo.getCorreo();
 
     if (!correoActual) {
@@ -203,7 +227,8 @@ export class FirebaseService {
 
     const qrRef = this.af.collection(environment.id_app).doc('codigos').collection('qr').doc<QrcodeInterface>(payload.correo);
     const masterRef = this.masterCollection.doc<Master>('ash');
-    const rewards = this.getQrRewards();
+    const rewardItems = this.itemService.buildQrRewardItems();
+    const rewards = this.itemService.toQrRewards(rewardItems);
     let updatedMaster: Master | null = null;
 
     try {
@@ -226,18 +251,18 @@ export class FirebaseService {
 
         const masterSnapshot = await transaction.get(masterRef.ref);
         const masterBase = (masterSnapshot.exists ? masterSnapshot.data() : this.repo.getMaster()) as Master;
-        const nextMaster: Master = {
+        const nextMaster: Master = this.itemService.ensureMasterItems({
           ...masterBase,
-          pokeBalls: (masterBase.pokeBalls ?? 0) + 5,
-          superBalls: (masterBase.superBalls ?? 0) + 3,
-          ultraBalls: (masterBase.ultraBalls ?? 0) + 2,
-          masterBalls: (masterBase.masterBalls ?? 0) + 1,
           favoritos: masterBase.favoritos ?? [],
-        };
+          items: Array.isArray(masterBase.items) ? [...masterBase.items] : [],
+        });
 
-        transaction.set(masterRef.ref, nextMaster, { merge: true });
+        rewardItems.forEach(item => this.itemService.addOrUpdateItem(nextMaster.items, item));
+
+        const cleanNextMaster = this.sanitizeForFirestore(nextMaster);
+        transaction.set(masterRef.ref, cleanNextMaster, { merge: true });
         transaction.update(qrRef.ref, { usos: qrData.usos - 1 });
-        updatedMaster = nextMaster;
+        updatedMaster = cleanNextMaster;
 
         return {
           ok: true,
@@ -255,7 +280,7 @@ export class FirebaseService {
 
       return result;
     } catch (error) {
-      console.error('No se ha podido canjear el QR.', error);
+      this.logger.error('FirebaseService.prueba', 'No se ha podido canjear el QR', error);
       return this.qrFailure('No se ha podido canjear el QR. Revisa permisos o conexion.');
     }
   }
@@ -288,12 +313,7 @@ export class FirebaseService {
   }
 
   private getQrRewards(): QrRewardItem[] {
-    return [
-      { key: 'pokeBalls', nombre: 'Pokeball', cantidad: 5, imagen: 'assets/images/item_pokemon/pokeball.png' },
-      { key: 'superBalls', nombre: 'Superball', cantidad: 3, imagen: 'assets/images/item_pokemon/superball.png' },
-      { key: 'ultraBalls', nombre: 'Ultraball', cantidad: 2, imagen: 'assets/images/item_pokemon/ultraball.png' },
-      { key: 'masterBalls', nombre: 'Masterball', cantidad: 1, imagen: 'assets/images/item_pokemon/masterball.png' },
-    ];
+    return this.itemService.toQrRewards(this.itemService.buildQrRewardItems());
   }
 
   private qrFailure(message: string): QrRedemptionResult {
@@ -305,55 +325,66 @@ export class FirebaseService {
 
   public async getMaster(): Promise<Master> {
     const correo = this.repo.getCorreo();
+    this.logger.info('FirebaseService.getMaster', 'Inicio lectura de master', { correo: correo || '(empty)' });
 
     try {
       await this.masterCollection.doc<Master>('ash').ref.get().then(resultado => {
-        this.master = {
-          nick: resultado.data()!.nick,
-          exp: resultado.data()!.exp,
-          level: resultado.data()!.level,
-          pokeBalls: resultado.data()!.pokeBalls,
-          superBalls: resultado.data()!.superBalls,
-          ultraBalls: resultado.data()!.ultraBalls,
-          masterBalls: resultado.data()!.masterBalls,
-          region_ini: resultado.data()!.region_ini,
-          poke_ini: resultado.data()!.poke_ini,
-          capturados: resultado.data()!.capturados,
-          favoritos: resultado.data()!.favoritos,
-          team: resultado.data()!.team,
-          money: resultado.data()!.money,
-          items: resultado.data()!.items,
-        };
+        this.logger.debug('FirebaseService.getMaster', 'Snapshot master recibido', { exists: resultado.exists, correo: correo || '(empty)' });
+
+        if (!resultado.exists) {
+          throw new Error('No existe documento master ash.');
+        }
+
+        const data = resultado.data()!;
+        this.master = this.itemService.ensureMasterItems({
+          nick: data.nick,
+          exp: data.exp,
+          level: data.level,
+          region_ini: data.region_ini,
+          poke_ini: data.poke_ini,
+          capturados: data.capturados,
+          favoritos: data.favoritos,
+          team: data.team,
+          money: data.money,
+          items: data.items,
+        });
       });
 
       if (correo) {
         await this.localDb.setMaster(correo, this.master);
       }
 
+      this.logger.info('FirebaseService.getMaster', 'Master cargado', { correo: correo || '(empty)', nick: this.master.nick || '(empty)', items: this.master.items?.length ?? 0 });
       return this.master;
     } catch (error) {
       if (correo) {
         const cachedMaster = await this.localDb.getMaster(correo);
         if (cachedMaster) {
-          this.master = cachedMaster;
-          return cachedMaster;
+          this.master = this.itemService.ensureMasterItems(cachedMaster);
+          this.logger.info('FirebaseService.getMaster', 'Master cargado desde cache local', { correo, nick: this.master.nick || '(empty)', items: this.master.items?.length ?? 0 });
+          return this.master;
         }
       }
 
+      this.logger.warn('FirebaseService.getMaster', 'No se pudo cargar master remoto ni cache', { correo: correo || '(empty)', error });
       throw error;
     }
   }
 
   public async addMaster(master: Master) {
-    await this.masterCollection.doc<Master>('ash').set(master);
+    const normalizedMaster = this.sanitizeForFirestore(this.itemService.ensureMasterItems(master));
+    this.logger.info('FirebaseService.addMaster', 'Guardando master', { nick: normalizedMaster.nick, team: normalizedMaster.team?.length ?? 0, capturados: normalizedMaster.capturados?.length ?? 0, items: normalizedMaster.items?.length ?? 0 });
+    await this.masterCollection.doc<Master>('ash').set(normalizedMaster);
     const correo = this.repo.getCorreo();
-    if (correo) { await this.localDb.setMaster(correo, master); }
+    if (correo) { await this.localDb.setMaster(correo, normalizedMaster); }
   }
 
   public async updateMaster(master: Master) {
-    await this.masterCollection.doc<Master>('ash').set(master, { merge: true });
+    const normalizedMaster = this.sanitizeForFirestore(this.itemService.ensureMasterItems(master));
+    this.logger.debug('FirebaseService.updateMaster', 'Actualizando master', { nick: normalizedMaster.nick, team: normalizedMaster.team?.length ?? 0, capturados: normalizedMaster.capturados?.length ?? 0, items: normalizedMaster.items?.length ?? 0 });
+    await this.masterCollection.doc<Master>('ash').set(normalizedMaster, { merge: true });
     const correo = this.repo.getCorreo();
-    if (correo) { await this.localDb.setMaster(correo, master); }
+    if (correo) { await this.localDb.setMaster(correo, normalizedMaster); }
   }
 
   public async deleteMaster(master: Master) {
@@ -364,23 +395,16 @@ export class FirebaseService {
 
   public async addPokemonAtrapado(pokemon: PokemonInterface): Promise<void> {
     let auxMaster: Master = this.repo.getMaster();
+    this.logger.info('FirebaseService.addPokemonAtrapado', 'Anadiendo Pokemon atrapado al master', { numNation: pokemon.num_nation || '(empty)', name: pokemon.name || '(empty)', team: auxMaster.team?.length ?? 0, capturados: auxMaster.capturados?.length ?? 0 });
 
-    // Verifica si hay hueco en el equipo
-    // Hay espacio en el equipo, se aÃ±ade directamente al equipo
-    // No hay espacio en el equipo, se aÃ±ade a los capturados
     if (auxMaster.team.length < 6) {
-        auxMaster.team.push(pokemon);
+      auxMaster.team.push(pokemon);
     } else {
-        auxMaster.capturados.push(pokemon);
+      auxMaster.capturados.push(pokemon);
     }
 
-    // Guarda los cambios en el repositorio
     this.repo.setMaster(auxMaster);
-
-    // Se incluye en la colecciÃ³n de la pokedex
     await this.addPokemon(pokemon);
-
-    // Finalmente, actualiza el master
     return await this.updateMaster(auxMaster);
   }
 
@@ -395,6 +419,7 @@ export class FirebaseService {
 
   public async addPokemonFavorito(pokemon: PokemonInterface) {
     let auxMaster: Master = this.repo.getMaster();
+    this.logger.debug('FirebaseService.addPokemonFavorito', 'Anadiendo Pokemon favorito', { numNation: pokemon.num_nation || '(empty)', favoritos: auxMaster.favoritos?.length ?? 0 });
     auxMaster.favoritos!.push(pokemon.num_nation);
     this.repo.setMaster(auxMaster);
     await this.updateMaster(auxMaster);
@@ -405,7 +430,28 @@ export class FirebaseService {
   /////////////////////////////////////////////////////////////
 
   public async addPokemon(pokemon: PokemonInterface) {
-    return await this.pokeCollection.doc<PokemonInterface>(pokemon.num_nation).set(pokemon);
+    const cleanPokemon = this.sanitizeForFirestore(pokemon);
+
+    if (!cleanPokemon.num_nation) {
+      this.logger.error('FirebaseService.addPokemon', 'Numero nacional vacio al guardar Pokemon', cleanPokemon);
+      throw new Error('No hay numero nacional para guardar el Pokemon en Firebase.');
+    }
+
+    this.logger.debug('FirebaseService.addPokemon', 'Guardando Pokemon en pokedex', { numNation: cleanPokemon.num_nation, name: cleanPokemon.name || '(empty)' });
+    await this.pokeCollection.doc<PokemonInterface>(cleanPokemon.num_nation).set(cleanPokemon);
+
+    const correo = this.repo.getCorreo();
+    const pokedex = this.repo.getPokedex();
+    const index = pokedex.findIndex(auxPokemon => auxPokemon.num_nation === cleanPokemon.num_nation);
+
+    if (index >= 0) {
+      pokedex[index] = cleanPokemon;
+    } else {
+      pokedex.push(cleanPokemon);
+    }
+
+    this.repo.setPokedex(pokedex);
+    if (correo) { await this.localDb.setPokedex(correo, pokedex); }
   }
 
   public async getPokedex() {
@@ -434,19 +480,20 @@ export class FirebaseService {
         }
       }
 
+      this.logger.warn('FirebaseService.getMaster', 'No se pudo cargar master remoto ni cache', { correo: correo || '(empty)', error });
       throw error;
     }
   }
 
   private async getPokemonAtrapado(): Promise<PokemonInterface[]> {
-    console.log('INI - firebase.service - getPokemonAtrapado');
+    this.logger.debug('FirebaseService.getPokemonAtrapado', 'Inicio lectura de Pokemon atrapados');
     let pokes: PokemonInterface[] = [];
 
     pokes = await this.masterCollection.doc<Master>('ash').ref.get().then(resultado => {
       let aux: PokemonInterface[] = [];
 
-      console.log(resultado);
-      console.log(resultado.data()!.capturados);
+      this.logger.verbose('FirebaseService.getPokemonAtrapado', 'Snapshot recibido', { exists: resultado.exists });
+      this.logger.verbose('FirebaseService.getPokemonAtrapado', 'Capturados recibidos', { count: resultado.data()?.capturados?.length ?? 0 });
 
       if (resultado.exists) {
         aux = resultado.data()!.capturados;
@@ -457,12 +504,12 @@ export class FirebaseService {
       return aux;
     });
 
-    console.log('FIN - firebase.service - getPokemonAtrapado');
+    this.logger.debug('FirebaseService.getPokemonAtrapado', 'Fin lectura de Pokemon atrapados', { count: pokes.length });
     return pokes;
   }
 
   public async getTeamPokemon(): Promise<PokemonInterface[]> {
-    console.log('INI - firebase.service - getTeamPokemon');
+    this.logger.debug('FirebaseService.getTeamPokemon', 'Inicio lectura de equipo');
     let pokes: PokemonInterface[] = [];
 
     pokes = await this.masterCollection.doc<Master>('ash').ref.get().then((resultado) => {
@@ -477,8 +524,31 @@ export class FirebaseService {
       return aux;
     });
 
-    console.log('FIN - firebase.service - getTeamPokemon');
+    this.logger.debug('FirebaseService.getTeamPokemon', 'Fin lectura de equipo', { count: pokes.length });
     return pokes;
+  }
+
+  private sanitizeForFirestore<T>(value: T): T {
+    if (Array.isArray(value)) {
+      return value.map(item => item === undefined ? null : this.sanitizeForFirestore(item)) as T;
+    }
+
+    if (value !== null && typeof value === 'object') {
+      if (Object.prototype.toString.call(value) !== '[object Object]') {
+        return value;
+      }
+
+      const cleanValue: Record<string, unknown> = {};
+      Object.entries(value as Record<string, unknown>).forEach(([key, fieldValue]) => {
+        if (fieldValue !== undefined) {
+          cleanValue[key] = this.sanitizeForFirestore(fieldValue);
+        }
+      });
+
+      return cleanValue as T;
+    }
+
+    return value;
   }
 
 }

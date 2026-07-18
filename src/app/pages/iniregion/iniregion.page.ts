@@ -10,6 +10,9 @@ import { LvupService } from 'src/app/services/lvup.service';
 import { RepositoryService } from 'src/app/services/repository.service';
 import { StatsService } from 'src/app/services/stats.service';
 import { ConstantService } from 'src/app/services/constant.service';
+import { ItemService } from 'src/app/services/item.service';
+import { LoggerService } from 'src/app/services/logger.service';
+import { FocusService } from 'src/app/services/focus.service';
 
 @Component({
   selector: 'app-iniregion',
@@ -27,7 +30,7 @@ export class IniregionPage implements OnInit {
 
   constructor(private router: Router, private formBuilder: FormBuilder, private alertaServicio: AlertsService,
     private firebase: FirebaseService, private repo: RepositoryService, private stats: StatsService,
-    private lvup: LvupService, private loading: LoadingService, private constants: ConstantService ) { }
+    private lvup: LvupService, private loading: LoadingService, private constants: ConstantService, private itemService: ItemService, private logger: LoggerService, private focus: FocusService ) { }
 
   /**
    * Comprueba e inicializa todos los datos necesarios
@@ -102,13 +105,35 @@ export class IniregionPage implements OnInit {
   public async onSubmit() {
     let master: Master = this.constants.master_empty;
     this.masterData = this.saveMaster();
-    let correo = this.repo.getCorreo();
-    this.firebase.inicializar(correo!);
-    master = await this.inicializarMaestroPokemon(master);
-    this.inicializarRepositorio(master);
-    this.addToFirebase(master);
-    this.repo.setAvatar('../../../assets/images/avatar/avatar.png');
-    this.router.navigateByUrl('/home');
+    const correo = this.repo.getCorreo();
+    this.logger.info('IniregionPage.onSubmit', 'Inicio alta de master', { correo: correo || '(empty)', masterData: this.masterData });
+
+    if (!correo) {
+      this.logger.warn('IniregionPage.onSubmit', 'Alta cancelada por correo vacio');
+      await this.alertaServicio.alertaSimple('Sesion no disponible', 'No hay correo de usuario para guardar el Master. Vuelve a iniciar sesion.', 'warning');
+      return;
+    }
+
+    try {
+      this.firebase.inicializar(correo);
+      master = await this.inicializarMaestroPokemon(master);
+      this.logger.debug('IniregionPage.onSubmit', 'Master preparado antes de guardar', { nick: master.nick, region: master.region_ini, pokeIni: master.poke_ini?.num_nation || '(empty)', items: master.items?.length ?? 0 });
+
+      if (!master.poke_ini.num_nation) {
+        this.logger.warn('IniregionPage.onSubmit', 'Alta cancelada por Pokemon inicial sin num_nation', master.poke_ini);
+        await this.alertaServicio.alertaSimple('Pokemon no valido', 'No se ha podido preparar el Pokemon inicial.', 'warning');
+        return;
+      }
+
+      this.inicializarRepositorio(master);
+      await this.addToFirebase(master);
+      this.repo.setAvatar('../../../assets/images/avatar/avatar.png');
+      this.logger.info('IniregionPage.onSubmit', 'Alta de master finalizada; navegando a home', { correo, nick: master.nick });
+      this.router.navigateByUrl('/home');
+    } catch (error) {
+      this.logger.error('IniregionPage.onSubmit', 'Error durante el alta de master', error);
+      await this.alertaServicio.alertaSimple('No se pudo guardar', 'No se ha podido guardar el Master. Revisa la consola para ver el punto exacto.', 'error');
+    }
   }
 
   /**
@@ -122,6 +147,8 @@ export class IniregionPage implements OnInit {
     master.capturados = [];
     master.favoritos = [];
     master.team = [];
+    master.money = typeof master.money === 'number' ? master.money : 1500;
+    master.items = await this.itemService.buildStarterInventory();
     master.favoritos.push(master.poke_ini.num_nation);
     return master;
   }
@@ -130,12 +157,12 @@ export class IniregionPage implements OnInit {
    * Establece, carga y calcula las estadisticas del pokemon inicial.
    */
   private async establecerPokeInicial(): Promise<PokemonInterface> {
-    // let pokemon: PokemonInterface = this.stats.getStatsPokemon(this.masterData.pokemon);
-    console.log(this.masterData);
+    this.logger.debug('IniregionPage.establecerPokeInicial', 'Preparando Pokemon inicial', { pokemon: this.masterData.pokemon });
     let pokemon: PokemonInterface = await this.stats.getStatsPokemonV2(this.masterData.pokemon, 'es');
-    // console.log(this.lvup.checkEvolutionConditions(pokemon));
     pokemon.level = 5; pokemon.ball = 'pokeball'; pokemon.state = 'nada';
-    return pokemon = this.lvup.calcularStats(pokemon);
+    pokemon = this.lvup.calcularStats(pokemon);
+    this.logger.debug('IniregionPage.establecerPokeInicial', 'Pokemon inicial preparado', { numNation: pokemon.num_nation || '(empty)', name: pokemon.name || '(empty)' });
+    return pokemon;
   }
 
   /**
@@ -143,10 +170,10 @@ export class IniregionPage implements OnInit {
    * @param master Objeto Master para completar los datos restantes.
    */
   private async addToFirebase(master: Master) {
+    this.logger.info('IniregionPage.addToFirebase', 'Guardando alta inicial en Firebase', { nick: master.nick, pokeIni: master.poke_ini?.num_nation || '(empty)' });
     await this.firebase.addMaster(master);
-    await this.firebase.addPokemon(master.poke_ini);
-    await this.firebase.addPokemonAtrapado(master.poke_ini);  
-    await this.firebase.addPokemonFavorito(master.poke_ini);
+    await this.firebase.addPokemonAtrapado(master.poke_ini);
+    this.logger.info('IniregionPage.addToFirebase', 'Alta inicial guardada en Firebase', { nick: master.nick, pokeIni: master.poke_ini?.num_nation || '(empty)' });
   }
 
   /**

@@ -5,6 +5,8 @@ import { GoogleAuth, User } from '@codetrix-studio/capacitor-google-auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertsService } from 'src/app/services/alerta.service';
 import { UserData } from 'src/app/model/UserData';
+import { LoggerService } from 'src/app/services/logger.service';
+import { FocusService } from 'src/app/services/focus.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +20,7 @@ export class LoginPage implements OnInit {
     password: ["aaaaaa", [Validators.required, Validators.minLength(6)]]
   });
 
-  constructor(private authService: AuthService, private alertaServicio: AlertsService, private router: Router, private formBuilder: FormBuilder) {}
+  constructor(private authService: AuthService, private alertaServicio: AlertsService, private router: Router, private formBuilder: FormBuilder, private logger: LoggerService, private focus: FocusService) {}
 
   ngOnInit() {
     //GoogleAuth.initialize();
@@ -55,17 +57,27 @@ export class LoginPage implements OnInit {
 
   public async onSubmit() {
     this.user_data = this.saveUserData();
+    this.logger.info('LoginPage.onSubmit', 'Formulario de login enviado', { email: this.user_data.email || '(empty)' });
+
     await this.authService.loginUsuario(this.user_data).then(async (usuario: UserData) => {
+      const nextRoute = this.authService.needsMasterSetup() ? '/iniregion' : '/home';
+      this.logger.info('LoginPage.onSubmit', 'Login resuelto; guardando sesion', { email: usuario?.email || '(empty)', nextRoute });
+
       await this.authService.saveSession(usuario!).then(async () => {
-        await this.alertaServicio.alertaSimple("Sesión Iniciada", "La sesión ha sido iniciada.", "success").then(() => {
-          this.router.navigateByUrl("/home");
+        await this.alertaServicio.alertaSimple("Sesion Iniciada", "La sesion ha sido iniciada.", "success").then(() => {
+          this.logger.info('LoginPage.onSubmit', 'Navegando tras login', { nextRoute });
+          this.router.navigateByUrl(nextRoute);
         }).catch((error) => { this.alertaServicio.alertaSimple('Error login 3', error + '. Codigo error: 312189.', 'error'); });
       }).catch((erroneo) => { this.alertaServicio.alertaSimple('Error login 2', erroneo + '. Codigo error: 415563.', 'error'); });
-    }).catch(error => { this.alertaServicio.alertaSimple('Error login 1', error + '. Codigo error: 545615.', 'error'); });
+    }).catch(error => {
+      this.logger.error('LoginPage.onSubmit', 'Login fallido', error);
+      this.alertaServicio.alertaSimple('Error login 1', error + '. Codigo error: 545615.', 'error');
+    });
     this.resetFields();
   }
 
   public async loginGoogle() {
+    this.focus.clearActiveElement();
     await this.authService.iniciarSesionGoogle().then(async (usuario: UserData) => {
       if (usuario.uid != '' && usuario.uid != null) {
         await this.authService.saveSession(usuario).then(async (ok) => {

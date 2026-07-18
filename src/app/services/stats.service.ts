@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PokemonInterface } from '../model/Pokemon';
 import { ConstantService } from './constant.service';
 import { LvupService } from './lvup.service';
+import { LoggerService } from './logger.service';
 
 interface EvolutionDetails {
   trigger: string;
@@ -27,7 +28,7 @@ interface Evolution {
 export class StatsService {
   private poke: PokemonInterface = this.constant.poke_empty;
 
-  constructor(private constant: ConstantService) {}
+  constructor(private constant: ConstantService, private logger: LoggerService) {}
 
   public getStatsPokemon(pokemon: PokemonInterface, num_nation: string){
     switch (num_nation) {
@@ -889,14 +890,25 @@ export class StatsService {
   }
 
   public async getStatsPokemonV2(nation: string, lang?: string): Promise<PokemonInterface> {
-    console.log(nation);
-    const aux_pokemon_species = `https://pokeapi.co/api/v2/pokemon-species/${ parseInt(nation) }/`;
-    const aux_pokemon = `https://pokeapi.co/api/v2/pokemon/${ parseInt(nation) }`;
+    const numericNation = parseInt(nation, 10);
+
+    if (Number.isNaN(numericNation)) {
+      throw new Error('El identificador del Pokemon inicial no es valido.');
+    }
+
+    const nationalId = numericNation.toString().padStart(4, '0');
+    this.logger.debug('StatsService.getStatsPokemonV2', 'Identificador nacional normalizado', { nationalId });
+    const aux_pokemon_species = `https://pokeapi.co/api/v2/pokemon-species/${ numericNation }/`;
+    const aux_pokemon = `https://pokeapi.co/api/v2/pokemon/${ numericNation }`;
     let data = await this.getExternalJson(aux_pokemon);
     let data_species = await this.getExternalJson(aux_pokemon_species);
     let data_chain = await this.getExternalJson(data_species.evolution_chain.url);
 
-    let aux_poke: PokemonInterface = this.getStatsPokemon(this.constant.poke_empty, nation);
+    let aux_poke: PokemonInterface = this.getStatsPokemon({ ...this.constant.poke_empty }, nationalId);
+
+    if (!aux_poke.num_nation) {
+      throw new Error(`No se han encontrado stats locales para el Pokemon ${nationalId}.`);
+    }
 
     if (lang != undefined)
       aux_poke.descripcion = await this.getDescription(aux_pokemon_species, lang);
@@ -928,7 +940,7 @@ export class StatsService {
 
     // Podrías agregar la cadena evolutiva al objeto `PokemonInterface` si es necesario
     // aux_poke.evolution_chain = evolutionChain;
-    console.log({ ...aux_poke });
+    this.logger.verbose('StatsService.getStatsPokemonV2', 'Pokemon calculado', { numNation: aux_poke.num_nation || '(empty)', name: aux_poke.name || '(empty)', region: aux_poke.region || '(empty)' });
     return { ...aux_poke };
   }
 
