@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Master } from '../model/Master';
 import { PokemonInterface } from '../model/Pokemon';
+import { ItemInterface } from '../model/Item';
 import { StatsService } from './stats.service';
 import { ConstantService } from './constant.service';
 import { RepositoryService } from './repository.service';
+import { LoggerService } from './logger.service';
 
 interface EvolutionDetails {
   trigger: string;
@@ -13,7 +15,16 @@ interface EvolutionDetails {
   time_of_day?: string;
   location?: string;
   known_move_type?: string;
+  known_move?: string;
   min_happiness?: number;
+  min_affection?: number;
+  min_beauty?: number;
+  gender?: number;
+  needs_overworld_rain?: boolean;
+  party_species?: string;
+  party_type?: string;
+  relative_physical_stats?: number;
+  turn_upside_down?: boolean;
 }
 
 interface Evolution {
@@ -23,13 +34,19 @@ interface Evolution {
   evolution_details: EvolutionDetails[];
 }
 
+export interface EvolutionItemResult {
+  evolved: boolean;
+  pokemon: PokemonInterface;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class LvupService {
   private contenedorExpPokemon: number = 0;
 
-  constructor(private stats: StatsService, private constant: ConstantService, private repo: RepositoryService) { }
+  constructor(private stats: StatsService, private constant: ConstantService, private repo: RepositoryService, private logger: LoggerService) { }
 
   public calcularBarraHpPokemon(barraHp: any, vida: number, vida_max: number) {
     if (barraHp != undefined) {
@@ -79,7 +96,7 @@ export class LvupService {
     // Calcular la experiencia obtenida al derrotar al rival
     pokeExp.exp! = this.convertirEntero(pokeExp.exp! + Math.floor((250 * level_rival) / 7));
 
-    console.log(pokeExp);
+    this.logger.verbose('LvupService.obtenerExpPokemon', 'Experiencia aplicada al Pokemon', { numNation: pokeExp.num_nation, name: pokeExp.name, exp: pokeExp.exp, level: pokeExp.level });
 
     do {
       // Recalcular la experiencia necesaria para el próximo level basado en el level actual
@@ -270,7 +287,16 @@ export class LvupService {
         time_of_day: detail.time_of_day || undefined,
         location: detail.location ? detail.location.name : undefined,
         known_move_type: detail.known_move_type ? detail.known_move_type.name : undefined,
+        known_move: detail.known_move ? detail.known_move.name : undefined,
         min_happiness: detail.min_happiness || undefined,
+        min_affection: detail.min_affection || undefined,
+        min_beauty: detail.min_beauty || undefined,
+        gender: detail.gender ?? undefined,
+        needs_overworld_rain: detail.needs_overworld_rain || undefined,
+        party_species: detail.party_species ? detail.party_species.name : undefined,
+        party_type: detail.party_type ? detail.party_type.name : undefined,
+        relative_physical_stats: detail.relative_physical_stats ?? undefined,
+        turn_upside_down: detail.turn_upside_down || undefined,
       })),
     };
 
@@ -291,14 +317,15 @@ export class LvupService {
 
     // Extraer la cadena evolutiva completa
     const evolutionChain = this.extractEvolutionChain(data_chain.chain);
-    console.log(evolutionChain); // Aquí tienes la cadena evolutiva completa con las condiciones
+    this.logger.verbose('LvupService.checkEvolutionConditions', 'Cadena evolutiva calculada', evolutionChain);
 
     for (const evolution of evolutionChain.evolves_to) {
       for (const detail of evolution.evolution_details) {
         // Verificar condiciones como level mínimo, objeto necesario, hora del día, etc.
+        const equippedItemName = pokemon.heldItem?.name;
         const meetsLevelCondition = !detail.min_level || pokemon.level! >= detail.min_level;
-        const meetsItemCondition = !detail.item || pokemon.item === detail.item;
-        const meetsHeldItemCondition = !detail.held_item || pokemon.item === detail.held_item;
+        const meetsItemCondition = !detail.item || equippedItemName === detail.item;
+        const meetsHeldItemCondition = !detail.held_item || equippedItemName === detail.held_item;
         const meetsTimeOfDayCondition = !detail.time_of_day || this.checkTimeOfDay(detail.time_of_day);
         // const meetsLocationCondition = !detail.location || this.repo.getRegion() === detail.location;
         const meetsLocationCondition = true;
@@ -314,35 +341,260 @@ export class LvupService {
     return pokemon; // Si no cumple las condiciones, retornar el Pokémon sin cambios
   }
 
-  private updateStatsForEvolution(pokemon: PokemonInterface): PokemonInterface {
-    // Aquí podrías hacer una nueva llamada a la API para obtener los stats del Pokémon evolucionado
-    // Por ejemplo, podrías hacer una llamada similar a getStatsPokemon pero para la nueva especie.
-  
-    const updatedStats = this.stats.getStatsPokemon(this.constant.poke_empty, pokemon.num_nation); // o una llamada similar
-  
-    // Ahora puedes asignar los nuevos stats al Pokémon evolucionado
-    pokemon.hp = updatedStats.hp;
-    pokemon.attack = updatedStats.attack;
-    pokemon.defense = updatedStats.defense;
-    pokemon.special_attack = updatedStats.special_attack;
-    pokemon.special_defense = updatedStats.special_defense;
-    pokemon.speed = updatedStats.speed;
-    pokemon.types = updatedStats.types;
-  
-    // Otros atributos a actualizar, dependiendo de tu lógica
-    // pokemon.ability = updatedStats.ability; // etc.
-  
+  public async useEvolutionItem(pokemon: PokemonInterface, item: ItemInterface): Promise<EvolutionItemResult> {
+    const itemName = this.normalizeEvolutionName(item.name);
+    const auxPokemonSpecies = `https://pokeapi.co/api/v2/pokemon-species/${parseInt(pokemon.num_nation, 10)}/`;
+    const dataSpecies = await this.getExternalJson(auxPokemonSpecies);
+    const dataChain = await this.getExternalJson(dataSpecies.evolution_chain.url);
+    const evolutionChain = this.extractEvolutionChain(dataChain.chain);
+    const currentEvolution = this.findEvolutionNode(evolutionChain, pokemon);
+
+    this.logger.verbose('LvupService.useEvolutionItem', 'Cadena evolutiva calculada para item', { pokemon: pokemon.name, item: item.name, evolutionChain });
+
+    if (!currentEvolution) {
+      return {
+        evolved: false,
+        pokemon,
+        message: `No se ha encontrado la evolucion de ${pokemon.name}.`,
+      };
+    }
+
+    let blockedMessage = '';
+
+    for (const evolution of currentEvolution.evolves_to) {
+      for (const detail of evolution.evolution_details) {
+        if (!detail.item || this.normalizeEvolutionName(detail.item) !== itemName) {
+          continue;
+        }
+
+        const unmetConditions = this.getUnmetEvolutionConditions(pokemon, detail);
+
+        if (unmetConditions.length > 0) {
+          blockedMessage = `${pokemon.name} necesita ${unmetConditions.join(', ')} para evolucionar con ${item.display_name || item.name}.`;
+          continue;
+        }
+
+        const previousName = pokemon.name;
+        this.evolvePokemon(pokemon, evolution.species_name, evolution.species_url);
+        await this.hydrateEvolutionMetadata(pokemon, pokemon.num_nation);
+
+        return {
+          evolved: true,
+          pokemon,
+          message: `${previousName} ha evolucionado a ${pokemon.name}.`,
+        };
+      }
+    }
+
+    return {
+      evolved: false,
+      pokemon,
+      message: blockedMessage || `${item.display_name || item.name} no sirve para evolucionar a ${pokemon.name}.`,
+    };
+  }
+
+  private findEvolutionNode(evolution: Evolution, pokemon: PokemonInterface): Evolution | null {
+    const pokemonNationalId = this.normalizeNationalId(pokemon.num_nation);
+    const evolutionNationalId = this.normalizeNationalId(this.getNumNationalOfUrl(evolution.species_url));
+
+    if (evolutionNationalId === pokemonNationalId || this.normalizeEvolutionName(evolution.species_name) === this.normalizeEvolutionName(pokemon.name)) {
+      return evolution;
+    }
+
+    for (const nextEvolution of evolution.evolves_to) {
+      const match = this.findEvolutionNode(nextEvolution, pokemon);
+
+      if (match) {
+        return match;
+      }
+    }
+
+    return null;
+  }
+
+  private getUnmetEvolutionConditions(pokemon: PokemonInterface, detail: EvolutionDetails): string[] {
+    const unmetConditions: string[] = [];
+
+    if (detail.min_level && (pokemon.level ?? 0) < detail.min_level) {
+      unmetConditions.push(`nivel ${detail.min_level}`);
+    }
+
+    if (detail.held_item && this.normalizeEvolutionName(pokemon.heldItem?.name || '') !== this.normalizeEvolutionName(detail.held_item)) {
+      unmetConditions.push(`llevar ${detail.held_item}`);
+    }
+
+    if (detail.time_of_day && !this.checkTimeOfDay(detail.time_of_day)) {
+      unmetConditions.push(`hora ${detail.time_of_day}`);
+    }
+
+    if (detail.min_happiness && (pokemon.happiness ?? 0) < detail.min_happiness) {
+      unmetConditions.push(`felicidad ${detail.min_happiness}`);
+    }
+
+    if (detail.gender && !this.checkGender(pokemon, detail.gender)) {
+      unmetConditions.push(this.describeGender(detail.gender));
+    }
+
+    if (detail.min_affection) {
+      unmetConditions.push(`afecto ${detail.min_affection}`);
+    }
+
+    if (detail.min_beauty) {
+      unmetConditions.push(`belleza ${detail.min_beauty}`);
+    }
+
+    if (detail.known_move) {
+      unmetConditions.push(`movimiento ${detail.known_move}`);
+    }
+
+    if (detail.known_move_type) {
+      unmetConditions.push(`movimiento de tipo ${detail.known_move_type}`);
+    }
+
+    if (detail.location) {
+      unmetConditions.push(`ubicacion ${detail.location}`);
+    }
+
+    if (detail.needs_overworld_rain) {
+      unmetConditions.push('lluvia');
+    }
+
+    if (detail.party_species) {
+      unmetConditions.push(`equipo con ${detail.party_species}`);
+    }
+
+    if (detail.party_type) {
+      unmetConditions.push(`equipo con tipo ${detail.party_type}`);
+    }
+
+    if (detail.relative_physical_stats !== undefined) {
+      unmetConditions.push('condicion de ataque/defensa');
+    }
+
+    if (detail.turn_upside_down) {
+      unmetConditions.push('consola boca abajo');
+    }
+
+    return unmetConditions;
+  }
+
+  private checkGender(pokemon: PokemonInterface, requiredGender: number): boolean {
+    const gender = (pokemon.genero || '').toLowerCase();
+
+    if (requiredGender === 1) {
+      return gender === 'hembra';
+    }
+
+    if (requiredGender === 2) {
+      return gender === 'macho';
+    }
+
+    return true;
+  }
+
+  private describeGender(requiredGender: number): string {
+    if (requiredGender === 1) {
+      return 'ser hembra';
+    }
+
+    if (requiredGender === 2) {
+      return 'ser macho';
+    }
+
+    return 'genero compatible';
+  }
+
+  private normalizeEvolutionName(value: string): string {
+    return (value || '').toLowerCase().trim().replace(/\s+/g, '-');
+  }
+
+  private normalizeNationalId(value: string): string {
+    return `${parseInt(value, 10)}`;
+  }
+
+  private updateStatsForEvolution(pokemon: PokemonInterface, targetNationalId: string): PokemonInterface {
+    const previous = {
+      level: pokemon.level,
+      exp: pokemon.exp,
+      genero: pokemon.genero,
+      ball: pokemon.ball,
+      heldItem: pokemon.heldItem,
+      favorito: pokemon.favorito,
+      happiness: pokemon.happiness,
+      IV: pokemon.IV,
+      EV: pokemon.EV,
+      hpRatio: pokemon.hp_max > 0 ? pokemon.hp / pokemon.hp_max : 1,
+    };
+    const updatedStats = this.stats.getStatsPokemon({ ...this.constant.poke_empty }, targetNationalId.padStart(4, '0'));
+
+    Object.assign(pokemon, updatedStats, {
+      level: previous.level,
+      exp: previous.exp,
+      genero: previous.genero,
+      ball: previous.ball,
+      heldItem: previous.heldItem,
+      favorito: previous.favorito,
+      happiness: previous.happiness,
+      IV: previous.IV,
+      EV: previous.EV,
+    });
+
+    this.calcularStats(pokemon);
+    pokemon.genero = previous.genero;
+    pokemon.hp = previous.hpRatio <= 0 ? 0 : Math.max(1, Math.min(pokemon.hp_max, Math.floor(pokemon.hp_max * previous.hpRatio)));
+
     return pokemon;
   }
 
   private evolvePokemon(pokemon: PokemonInterface, speciesName: string, speciesUrl: string): PokemonInterface {
-    // Aquí podrías obtener más datos del nuevo Pokémon si es necesario, usando speciesUrl.
-    pokemon.name = speciesName; // Actualizar el name
-    pokemon.num_nation = this.getNumNationalOfUrl(speciesUrl); // Actualizar el número nation
-    pokemon = this.updateStatsForEvolution(pokemon); // Actualizar estadísticas, etc.
-  
-    console.log(`¡${pokemon.name} ha evolucionado a ${speciesName}!`);
+    const targetNationalId = this.getNumNationalOfUrl(speciesUrl).padStart(4, '0');
+    this.updateStatsForEvolution(pokemon, targetNationalId);
+    pokemon.name = pokemon.name || speciesName;
+    pokemon.num_nation = targetNationalId;
+    pokemon.img = this.getPokemonHomeImage(targetNationalId);
+
+    this.logger.info('LvupService.evolvePokemon', 'Pokemon evolucionado', { name: pokemon.name, speciesName, numNation: pokemon.num_nation });
     return pokemon;
+  }
+
+  private getPokemonHomeImage(nationalId: string): string {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${parseInt(nationalId, 10)}.png`;
+  }
+
+  private async hydrateEvolutionMetadata(pokemon: PokemonInterface, targetNationalId: string, lang = 'es'): Promise<void> {
+    const numericNationalId = parseInt(targetNationalId, 10);
+
+    if (Number.isNaN(numericNationalId)) {
+      return;
+    }
+
+    pokemon.img = this.getPokemonHomeImage(targetNationalId);
+
+    try {
+      const [pokemonData, speciesData] = await Promise.all([
+        this.getExternalJson(`https://pokeapi.co/api/v2/pokemon/${numericNationalId}`),
+        this.getExternalJson(`https://pokeapi.co/api/v2/pokemon-species/${numericNationalId}/`),
+      ]);
+
+      pokemon.height = pokemonData.height;
+      pokemon.weight = pokemonData.weight;
+      pokemon.base_experience = pokemonData.base_experience;
+      pokemon.types = pokemonData.types;
+      pokemon.descripcion = this.pickLocalizedText(speciesData.flavor_text_entries, lang, 'flavor_text');
+      pokemon.specie = this.pickLocalizedText(speciesData.genera, lang, 'genus');
+    } catch (error) {
+      this.logger.warn('LvupService.hydrateEvolutionMetadata', 'No se pudo actualizar metadata del Pokemon evolucionado', { targetNationalId, error });
+    }
+  }
+
+  private pickLocalizedText(entries: any[] | undefined, lang: string, field: string): string {
+    if (!Array.isArray(entries)) {
+      return '';
+    }
+
+    const entry = entries.find((value: any) => value.language?.name === lang) || entries[0];
+    const text = entry?.[field];
+    return typeof text === 'string' ? text.replace(/\n/g, ' ') : '';
   }
 
   private checkTimeOfDay(requiredTimeOfDay: string): boolean {
