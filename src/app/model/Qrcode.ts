@@ -13,7 +13,7 @@ export interface QrPayloadInterface {
 }
 
 export interface QrRewardItem {
-    key: 'pokeBalls' | 'superBalls' | 'ultraBalls' | 'masterBalls';
+    key: string;
     nombre: string;
     cantidad: number;
     imagen: string;

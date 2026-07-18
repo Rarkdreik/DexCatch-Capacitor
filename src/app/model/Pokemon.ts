@@ -1,3 +1,5 @@
+import { ItemInterface } from './Item';
+
 /**
  * Parametros del pokemon
  */
@@ -43,7 +45,7 @@ export interface PokemonInterface {
     evolutionMethod?: EvolutionMethod;
     evolutionCondition?: any; // para condiciones adicionales como hora del día, objeto, etc.
 
-    item?: string;
+    heldItem?: ItemInterface | null;
     img?: string;
     types?: any;
     base_experience?: number;

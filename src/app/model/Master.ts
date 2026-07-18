@@ -1,13 +1,10 @@
 import { PokemonInterface } from "./Pokemon";
+import { ItemInterface } from "./Item";
 
 export interface Master {
     nick: string;
     level: number;
     exp: number;
-    pokeBalls: number;
-    superBalls: number;
-    ultraBalls: number;
-    masterBalls: number;
 
     // Region inicial del master
     region_ini: string;
@@ -20,5 +17,5 @@ export interface Master {
     // Array de los pokemons team
     team: PokemonInterface[];
     money: number;
-    items: any[]
+    items: ItemInterface[]
 }
