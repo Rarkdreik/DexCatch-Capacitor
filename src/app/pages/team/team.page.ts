@@ -8,6 +8,7 @@ import { AlertsService } from 'src/app/services/alerta.service';
 import { ConstantService } from 'src/app/services/constant.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import { ItemService } from 'src/app/services/item.service';
 import { RepositoryService } from 'src/app/services/repository.service';
 import { StatsService } from 'src/app/services/stats.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -19,10 +20,10 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class TeamPage implements OnInit {
     master: Master = this.constants.master_empty;
-    selectedTeamIndex: any = null;
-    selectedCapturedIndex: any = null;
-    team: any[] = [];
-    capturedPokemons: any[] = [];
+    selectedTeamIndex: number | null = null;
+    selectedCapturedIndex: number | null = null;
+    team: PokemonInterface[] = [];
+    capturedPokemons: PokemonInterface[] = [];
 
     constructor(
         public router: Router,
@@ -33,62 +34,23 @@ export class TeamPage implements OnInit {
         private alerta: AlertsService,
         private fire: FirebaseService,
         private constants: ConstantService,
+        private itemService: ItemService,
         private modalController: ModalController // Inyecta el controlador del modal
     ) { }
 
+    public get teamSlots(): Array<PokemonInterface | null> {
+        return this.buildPokemonSlots(this.team, 6);
+    }
+
+    public get capturedPokemonSlots(): Array<PokemonInterface | null> {
+        return this.buildPokemonSlots(this.capturedPokemons, 10, 4);
+    }
+
     ngOnInit() {
         console.log("INI - team - ngOnInit");
-        this.master = this.repo.getMaster();
-        this.capturedPokemons = this.master.capturados;
-        let team_poke: PokemonInterface[] = this.master.team;
-        this.team = [];
-
-        // for (let i = 0; i < 6; i++) {
-        //   // Usamos el operador de propagación para crear una copia del objeto
-        //   let poke_aux1: PokemonInterface = { ...this.constants.poke_empty };
-        //   poke_aux1.num_nation = '10' + i;
-        //   poke_aux1 = { ...this.stats.getStatsPokemon(poke_aux1.num_nation) };
-        //   poke_aux1.ball = 'pokeball';
-        //   poke_aux1.img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ +poke_aux1.num_nation }.png`;
-        //   this.team.push(poke_aux1);
-        // }
-
-        // for (let i = 10; i < 27; i++) {
-        //   // Usamos el operador de propagación para crear una copia del objeto
-        //   let poke_aux2: PokemonInterface = { ...this.constants.poke_empty };
-        //   poke_aux2.num_nation = '2' + i;
-        //   poke_aux2 = { ...this.stats.getStatsPokemon(poke_aux2.num_nation) };
-        //   poke_aux2.ball = 'ultraball';
-        //   poke_aux2.img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ +poke_aux2.num_nation }.png`;
-        //   this.capturedPokemons.push(poke_aux2);
-        // }
-
-        team_poke.forEach((poke: PokemonInterface) => {
-            if (poke) {
-                poke.item = `../../../assets/images/item_pokemon/${poke.ball}.png`;
-                poke.img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${+poke.num_nation}.png`;
-            }
-
-            this.team.push(poke);
-        });
-
-        this.capturedPokemons.forEach((poke: PokemonInterface) => {
-            if (poke) {
-                poke.item = `../../../assets/images/item_pokemon/${poke.ball}.png`;
-                poke.img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${+poke.num_nation}.png`;
-            }
-        });
-
-        // Rellenar para asegurar que al menos hay 20 elementos
-        // Rellenar para que la longitud sea un múltiplo de 4
-        while (this.capturedPokemons.length < 10 || this.capturedPokemons.length % 4 !== 0) {
-            this.capturedPokemons.push(null);
-        }
-
-        while (this.team.length < 6) {
-            this.team.push(null);
-        }
-
+        this.master = this.itemService.ensureMasterItems(this.repo.getMaster());
+        this.team = this.preparePokemonList(this.master.team).slice(0, 6);
+        this.capturedPokemons = this.preparePokemonList(this.master.capturados);
         console.log("FIN - team - ngOnInit");
     }
 
@@ -115,80 +77,101 @@ export class TeamPage implements OnInit {
     }
 
     addOrChangePokemon() {
-        if (this.selectedTeamIndex !== null && this.selectedCapturedIndex !== null) {
-            let selectedTeamPokemon = this.team[this.selectedTeamIndex];
-            let selectedCapturedPokemon = this.capturedPokemons[this.selectedCapturedIndex];
+        if (this.selectedTeamIndex === null || this.selectedCapturedIndex === null) {
+            return;
+        }
 
-            // Verifica si el Pokémon seleccionado en el equipo es el último no nulo
-            const nonNullPokemons = this.team.filter(pokemon => pokemon !== null);
+        const selectedTeamPokemon = this.team[this.selectedTeamIndex] ?? null;
+        const selectedCapturedPokemon = this.capturedPokemons[this.selectedCapturedIndex] ?? null;
 
-            if (nonNullPokemons.length === 1 && selectedCapturedPokemon === null) {
-                this.toast.presentarToast('No puedes cambiar el último Pokémon por uno vacío', 'danger', 3000);
-                return;
+        if (!selectedTeamPokemon && !selectedCapturedPokemon) {
+            this.clearSelection();
+            return;
+        }
+
+        if (this.team.length === 1 && selectedTeamPokemon && !selectedCapturedPokemon) {
+            this.toast.presentarToast('No puedes cambiar el ultimo Pokemon por uno vacio', 'danger', 3000);
+            return;
+        }
+
+        if (selectedCapturedPokemon) {
+            if (selectedTeamPokemon && this.selectedTeamIndex < this.team.length) {
+                this.team[this.selectedTeamIndex] = selectedCapturedPokemon;
+            } else if (this.team.length < 6) {
+                this.team.push(selectedCapturedPokemon);
             }
 
-            // Realiza el intercambio
-            this.team[this.selectedTeamIndex] = selectedCapturedPokemon;
-            this.capturedPokemons[this.selectedCapturedIndex] = selectedTeamPokemon;
-
-            // Ordena el equipo, moviendo los nulos al final
-            this.team = this.team.filter(pokemon => pokemon !== null).concat(this.team.filter(pokemon => pokemon === null));
-
-            this.updateMaster();
-
-            // Limpiar la selección
-            this.selectedCapturedIndex = null;
-            this.selectedTeamIndex = null;
+            this.capturedPokemons.splice(this.selectedCapturedIndex, 1);
+        } else if (selectedTeamPokemon) {
+            this.team.splice(this.selectedTeamIndex, 1);
         }
+
+        if (selectedTeamPokemon) {
+            const insertIndex = selectedCapturedPokemon
+                ? Math.min(this.selectedCapturedIndex, this.capturedPokemons.length)
+                : this.capturedPokemons.length;
+            this.capturedPokemons.splice(insertIndex, 0, selectedTeamPokemon);
+        }
+
+        this.updateMaster();
+        this.clearSelection();
     }
 
     async releasePokemon() {
-        if (this.selectedTeamIndex !== null && this.selectedCapturedIndex == null) {
-            if (this.team.filter(pokemon => pokemon !== null).length > 1) {
-                this.team.splice(this.selectedTeamIndex, 1);
-                this.team.push(null);
-
-                this.updateMaster();
-                this.selectedTeamIndex = null;
-            } else {
-                await this.toast.presentarToast('No puedes liberar el último Pokémon del equipo', 'warning', 3000);
+        if (this.selectedTeamIndex !== null && this.selectedCapturedIndex === null) {
+            if (!this.team[this.selectedTeamIndex]) {
+                this.clearSelection();
+                return;
             }
-        } else if (this.selectedCapturedIndex !== null && this.selectedTeamIndex == null) {
-            this.capturedPokemons.splice(this.selectedCapturedIndex, 1);
-            this.capturedPokemons.push(null);
 
+            if (this.team.length > 1) {
+                this.team.splice(this.selectedTeamIndex, 1);
+                this.updateMaster();
+                this.clearSelection();
+            } else {
+                await this.toast.presentarToast('No puedes liberar el ultimo Pokemon del equipo', 'warning', 3000);
+            }
+        } else if (this.selectedCapturedIndex !== null && this.selectedTeamIndex === null) {
+            if (!this.capturedPokemons[this.selectedCapturedIndex]) {
+                this.clearSelection();
+                return;
+            }
+
+            this.capturedPokemons.splice(this.selectedCapturedIndex, 1);
             this.updateMaster();
-            this.selectedCapturedIndex = null;
+            this.clearSelection();
         }
     }
 
     assignItem() {
-        // Lógica para asignar un item
+        this.router.navigateByUrl('/items');
     }
 
     async showPokemonInfo() {
-        let selectedPoke: PokemonInterface = this.constants.getPoke_Empty();
-
-        // Comprobamos que solo haya uno seleccionado
-        if (this.selectedCapturedIndex !== null && this.selectedTeamIndex !== null)
-            this.toast.presentarToast('Solo puedes tener uno seleccionado', 'warning');
-        else {
-            if (this.selectedCapturedIndex !== null)
-                selectedPoke = this.capturedPokemons[this.selectedCapturedIndex];
-            else
-                selectedPoke = this.team[this.selectedTeamIndex];
-
-            console.log(selectedPoke);
-            // Abre un modal con la información del Pokémon seleccionado
-            const modal = await this.modalController.create({
-                component: PokeModalComponent,
-                componentProps: {
-                    'num_nation': selectedPoke.num_nation // Pasa el número de la nación como propiedad al modal
-                }
-            });
-
-            return await modal.present();
+        if (this.selectedCapturedIndex !== null && this.selectedTeamIndex !== null) {
+            await this.toast.presentarToast('Solo puedes tener uno seleccionado', 'warning');
+            return;
         }
+
+        const selectedPoke = this.selectedCapturedIndex !== null
+            ? this.capturedPokemons[this.selectedCapturedIndex] ?? null
+            : this.selectedTeamIndex !== null
+                ? this.team[this.selectedTeamIndex] ?? null
+                : null;
+
+        if (!selectedPoke) {
+            await this.toast.presentarToast('Selecciona un Pokemon primero', 'warning');
+            return;
+        }
+
+        const modal = await this.modalController.create({
+            component: PokeModalComponent,
+            componentProps: {
+                'num_nation': selectedPoke.num_nation
+            }
+        });
+
+        return await modal.present();
     }
 
     // shouldPulse(pokemon: any, index: number) {
@@ -210,20 +193,47 @@ export class TeamPage implements OnInit {
     // }
 
     loadMore(event: any) {
-        // Cargar más Pokémon capturados
+        // Cargar mas Pokemon capturados
         event.target.complete();
     }
 
-    private updateMaster() {
-        // Filtra los elementos no nulos de team y capturedPokemons
-        const filteredTeam = this.team.filter(pokemon => pokemon !== null);
-        const filteredCapturedPokemons = this.capturedPokemons.filter(pokemon => pokemon !== null);
+    private preparePokemonList(pokemons: Array<PokemonInterface | null | undefined> | null | undefined): PokemonInterface[] {
+        return Array.isArray(pokemons)
+            ? pokemons
+                .filter((pokemon): pokemon is PokemonInterface => !!pokemon)
+                .map(pokemon => this.preparePokemon(pokemon))
+            : [];
+    }
 
-        // Asigna los arrays filtrados al master
+    private preparePokemon(pokemon: PokemonInterface): PokemonInterface {
+        this.itemService.syncPokemonHeldItem(pokemon);
+        pokemon.img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${+pokemon.num_nation}.png`;
+        return pokemon;
+    }
+
+    private buildPokemonSlots(pokemons: PokemonInterface[], minLength: number, multipleOf?: number): Array<PokemonInterface | null> {
+        const slots: Array<PokemonInterface | null> = [...pokemons];
+        const baseLength = Math.max(minLength, slots.length);
+        const targetLength = multipleOf ? Math.ceil(baseLength / multipleOf) * multipleOf : baseLength;
+        const emptySlots = Array.from({ length: targetLength - slots.length }, (): null => null);
+
+        return [...slots, ...emptySlots];
+    }
+
+    private clearSelection(): void {
+        this.selectedCapturedIndex = null;
+        this.selectedTeamIndex = null;
+    }
+
+    private updateMaster() {
+        const filteredTeam = this.team.filter((pokemon): pokemon is PokemonInterface => !!pokemon).slice(0, 6);
+        const filteredCapturedPokemons = this.capturedPokemons.filter((pokemon): pokemon is PokemonInterface => !!pokemon);
+
+        this.team = filteredTeam;
+        this.capturedPokemons = filteredCapturedPokemons;
         this.master.team = filteredTeam;
         this.master.capturados = filteredCapturedPokemons;
 
-        // Guarda los cambios en el repositorio y en Firebase
         this.repo.setMaster(this.master);
         this.fire.updateMaster(this.master);
     }

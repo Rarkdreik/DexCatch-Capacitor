@@ -6,6 +6,7 @@ import { PokemonInterface } from '../model/Pokemon';
 import { Master } from '../model/Master';
 import { ConstantService } from './constant.service';
 import { FirebaseService } from './firebase.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class RepositoryService {
   private equipoPokemon: PokemonInterface[] = [];
   private pokemonsRegionActual: PokemonInterface[] = [];
 
-  constructor(private stats: StatsService, private constant: ConstantService) {
+  constructor(private stats: StatsService, private constant: ConstantService, private logger: LoggerService) {
     this.usuario = { uid: '', email: '', photoURL: '', displayName: '' };
     this.master = this.constant.master_empty;
     this.regionActual = '';
@@ -53,7 +54,19 @@ export class RepositoryService {
   }
 
   public modificarEquipoPokemon(poke: PokemonInterface, indice: number) {
-    this.master.team[indice] = poke;
+    if (indice < 0 || indice >= 6) {
+      return;
+    }
+
+    const team = this.normalizePokemonList(this.master.team);
+
+    if (indice >= team.length) {
+      team.push(poke);
+    } else {
+      team[indice] = poke;
+    }
+
+    this.master.team = team.slice(0, 6);
   }
 
   //////////////////  Master  /////////////////////////////
@@ -65,15 +78,18 @@ export class RepositoryService {
   }
 
   public getMaster(): Master {
+    this.setAtrapados(this.master.capturados);
+    this.setEquipoPokemon(this.master.team);
     return this.master;
   }
 
   public getAtrapados(): PokemonInterface[] {
+    this.setAtrapados(this.master.capturados);
     return this.master.capturados;
   }
 
-  public setAtrapados(atrapados: PokemonInterface[]): void {
-    this.master.capturados = atrapados;
+  public setAtrapados(atrapados: Array<PokemonInterface | null | undefined> | null | undefined): void {
+    this.master.capturados = this.normalizePokemonList(atrapados);
   }
 
   public getPokedex(): PokemonInterface[] {
@@ -85,16 +101,17 @@ export class RepositoryService {
   }
 
   public getEquipoPokemon(): PokemonInterface[] {
+    this.setEquipoPokemon(this.master.team);
     return this.master.team;
   }
 
-  public setEquipoPokemon(equipoPokemon: PokemonInterface[]): void {
-    this.master.team = equipoPokemon;
+  public setEquipoPokemon(equipoPokemon: Array<PokemonInterface | null | undefined> | null | undefined): void {
+    this.master.team = this.normalizePokemonList(equipoPokemon).slice(0, 6);
   }
 
   public updatePokemonBatalla(pokebatalla: PokemonInterface): PokemonInterface[] {
-    // Filtrar Pokémon nulos o indefinidos
-    let aux_team = this.master.team.filter(poke => poke !== null && poke !== undefined);
+    // Filtrar Pokemon nulos o indefinidos
+    let aux_team = this.normalizePokemonList(this.master.team);
 
     // Actualizar el equipo con el Pokémon actualizado
     this.master.team = aux_team.map(poke => 
@@ -137,7 +154,7 @@ export class RepositoryService {
   }
 
   public async getListaPokemonRegion(region: string): Promise<PokemonInterface[]> {
-    console.log('INI - repository - getListaPokemonRegion');
+    this.logger.info('RepositoryService.getListaPokemonRegion', 'Inicio carga lista Pokemon por region', { region });
     
     let lista: PokemonInterface[] = []
     let listaCapturados: PokemonInterface[] = []
@@ -234,7 +251,7 @@ export class RepositoryService {
     // Aquí 'lista' tendrá solo los elementos únicos según 'num_nation'
     this.pokemonsRegionActual = lista;
 
-    console.log('FIN - repository - getListaPokemonRegion');
+    this.logger.info('RepositoryService.getListaPokemonRegion', 'Fin carga lista Pokemon por region', { region, count: lista.length });
     return lista;
   }
 
@@ -290,10 +307,16 @@ export class RepositoryService {
   //////////////////////////////////////////////////////////
 
   public evoEquipo(pokanterior: PokemonInterface, pokedespues: PokemonInterface) {
-    const index = this.master.team.findIndex(poke => poke.num_nation === pokanterior.num_nation);
+    const index = this.master.team.findIndex(poke => poke?.num_nation === pokanterior.num_nation);
     if (index !== -1) {
       this.master.team[index] = pokedespues;
     }
+  }
+
+  private normalizePokemonList(pokemons: Array<PokemonInterface | null | undefined> | null | undefined): PokemonInterface[] {
+    return Array.isArray(pokemons)
+      ? pokemons.filter((pokemon): pokemon is PokemonInterface => !!pokemon)
+      : [];
   }
 
 }

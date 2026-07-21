@@ -23,7 +23,7 @@ import { QrRewardModalComponent } from './qr-reward-modal.component';
 })
 export class HomePage implements OnInit, ViewWillEnter {
   public master: Master = this.constants.master_empty;
-  public team_poke: any[] = this.constants.pokes_empty;
+  public team_poke: Array<PokemonInterface | null> = [];
   public map_poke: string = 'kanto';
   public avatarSrc: string = 'assets/images/avatar/avatar.png';
 
@@ -46,12 +46,8 @@ export class HomePage implements OnInit, ViewWillEnter {
   async ionViewWillEnter() {
     console.log('INI - home - ionViewWillEnter');
     this.master = this.repo.getMaster();
-    this.team_poke = this.master.team;
+    this.team_poke = this.buildTeamSlots(this.master.team);
     await this.cargarAvatar();
-
-    while (this.team_poke.length < 6) {
-      this.team_poke.push(null);
-    }
 
     console.log('FIN - home - ionViewWillEnter');
   }
@@ -59,7 +55,7 @@ export class HomePage implements OnInit, ViewWillEnter {
   public async ngOnInit() {
     console.log('INI - home - ngOnInit');
     this.master = this.repo.getMaster();
-    this.team_poke = this.master.team;
+    this.team_poke = this.buildTeamSlots(this.master.team);
     await this.cargarAvatar();
     this.map_poke = this.master.region_ini;
     this.repo.setRegion(this.master.region_ini);
@@ -70,10 +66,6 @@ export class HomePage implements OnInit, ViewWillEnter {
       const qrPublicado = await this.fire.crearQr(codigoQr);
       this.qrData = this.fire.buildQrPayload(qrPublicado);
       console.log('Home QR payload', this.qrData);
-    }
-
-    while (this.team_poke.length < 6) {
-      this.team_poke.push(null);
     }
 
     console.log('FIN - home - ngOnInit');
@@ -195,6 +187,15 @@ export class HomePage implements OnInit, ViewWillEnter {
     });
 
     return await modal.present();
+  }
+
+  private buildTeamSlots(pokemons: Array<PokemonInterface | null | undefined> | null | undefined): Array<PokemonInterface | null> {
+    const team = Array.isArray(pokemons)
+      ? pokemons.filter((pokemon): pokemon is PokemonInterface => !!pokemon).slice(0, 6)
+      : [];
+    const emptySlots = Array.from({ length: Math.max(0, 6 - team.length) }, (): null => null);
+
+    return [...team, ...emptySlots];
   }
 
   private async cargarAvatar(): Promise<void> {

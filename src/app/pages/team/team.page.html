@@ -10,22 +10,22 @@
   <!-- Contenedor del equipo Pokémon -->
   <div class="row team-container">
     <div class="col-8 all-cero">
-      <!-- <div class="pokemon-slot" *ngFor="let pokemon of team; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
+      <!-- <div class="pokemon-slot" *ngFor="let pokemon of teamSlots; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
         <div class="pokemon-card">
           <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
           <span *ngIf="pokemon">{{ pokemon.name }}</span>
-          <div class="item-badge" *ngIf="pokemon?.item"><img [src]="pokemon.item" alt="Item" /></div>
+          <div class="item-badge" *ngIf="pokemon?.heldItem?.img"><img [src]="pokemon.heldItem?.img" alt="Item" /></div>
         </div>
         <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
       </div> -->
 
       <ion-grid>
         <ion-row>
-          <div class="pokemon-slot" *ngFor="let pokemon of team; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
+          <div class="pokemon-slot" *ngFor="let pokemon of teamSlots; let i = index" [class.selected]="selectedTeamIndex === i" (click)="selectTeamMember(i)">
             <div class="row">
               <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
               <span *ngIf="pokemon">{{ pokemon.name }}</span>
-              <div class="item-badge" *ngIf="pokemon?.item" style="background-image: url('../../../assets/images/item_pokemon/{{ pokemon.ball }}.png');"></div>
+              <div class="item-badge" *ngIf="pokemon?.heldItem?.img as heldItemImg" [style.background-image]="'url(' + heldItemImg + ')'"></div>
             </div>
             <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
           </div>
@@ -47,12 +47,12 @@
   <div class="captured-container">
     <ion-grid>
       <ion-row>
-        <!-- <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemons; let i = index" (click)="selectCapturedPokemon(i)" [class.selected]="selectedCapturedIndex === i" [class.pulsating]="shouldPulse(pokemon, i)"> -->
-        <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemons; let i = index" [class.selected]="selectedCapturedIndex === i" (click)="selectCapturedPokemon(i)">
+        <!-- <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemonSlots; let i = index" (click)="selectCapturedPokemon(i)" [class.selected]="selectedCapturedIndex === i" [class.pulsating]="shouldPulse(pokemon, i)"> -->
+        <div class="col-4 pokemon-catch-slot" *ngFor="let pokemon of capturedPokemonSlots; let i = index" [class.selected]="selectedCapturedIndex === i" (click)="selectCapturedPokemon(i)">
           <div class="row">
             <img *ngIf="pokemon" [src]="pokemon.img" alt="{{pokemon.name}}" />
             <span *ngIf="pokemon">{{ pokemon.name }}</span>
-            <div class="item-badge" *ngIf="pokemon?.item" style="background-image: url('../../../assets/images/item_pokemon/{{ pokemon.ball }}.png');"></div>
+            <div class="item-badge" *ngIf="pokemon?.heldItem?.img as heldItemImg" [style.background-image]="'url(' + heldItemImg + ')'"></div>
           </div>
           <ion-icon *ngIf="!pokemon" name="add-outline" class="add-icon"></ion-icon>
         </div>
