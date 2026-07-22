@@ -1,0 +1,75 @@
+name: Publish Android APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web application
+        run: npm run build
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Build installable APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Prepare release files
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          apk_name="DexCatch-${version}.apk"
+          checksum_name="DexCatch-${version}.sha256"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "${apk_name}"
+          sha256sum "${apk_name}" > "${checksum_name}"
+          echo "APK_NAME=${apk_name}" >> "${GITHUB_ENV}"
+          echo "CHECKSUM_NAME=${checksum_name}" >> "${GITHUB_ENV}"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DexCatch-${{ github.ref_name }}
+          path: |
+            ${{ env.APK_NAME }}
+            ${{ env.CHECKSUM_NAME }}
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          "${APK_NAME}"
+          "${CHECKSUM_NAME}"
+          --prerelease
+          --title "DexCatch ${GITHUB_REF_NAME} - Android beta"
+          --notes "APK beta para instalacion directa fuera de Play Store. En Android debes permitir la instalacion desde origenes desconocidos. Esta compilacion usa firma de depuracion y esta destinada a pruebas y distribucion directa, no a venta."

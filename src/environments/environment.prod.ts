@@ -1,8 +1,8 @@
 
 export const environment = {
-  production: false,
+  production: true,
   id_app: 'CatchDex',
-  logging: { enabled: true, level: 'verbose' },
+  logging: { enabled: false, level: 'error' },
   googleWebClientId: '446704972713-s73s5csaakd726t2oqnds4ot8un57gab.apps.googleusercontent.com',
   firebase: {
     apiKey: 'AIzaSyCkS2v2UUNwB1ClI9nnNGstkVBZcHpMLy8',

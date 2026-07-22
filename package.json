@@ -1,6 +1,6 @@
 {
   "name": "dexcatch",
-  "version": "0.0.1",
+  "version": "1.0.0-beta.1",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -54,8 +54,6 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "angularx-qrcode": "^18.0.1",
-    "dexcatch": "file:",
-    "DexCatch": "file:",
     "eslint": "^9.8.0",
     "firebase": "^10.12.5",
     "gsap": "^3.12.5",
